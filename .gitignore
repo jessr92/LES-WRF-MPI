@@ -8,3 +8,7 @@ Project Proposal/1002536r.pdf
 *.toc
 
 *.gz
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
