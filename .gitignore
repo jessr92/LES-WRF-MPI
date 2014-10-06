@@ -17,3 +17,5 @@ Project Proposal/1002536r.pdf
 *.mod
 Examples/helloMPI
 Examples/helloOpenMP
+Examples/helloMPIOpenMP
+
