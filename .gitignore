@@ -12,3 +12,7 @@ Project Proposal/1002536r.pdf
 *.blg
 *.fls
 *.fdb_latexmk
+*~
+*.o
+*.mod
+Examples/hello
