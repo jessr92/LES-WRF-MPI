@@ -1,4 +1,4 @@
-program hello
+program helloMPI
 implicit none
 include 'mpif.h'
 call main()
@@ -15,4 +15,4 @@ subroutine main()
     call MPI_FINALIZE(ierror)
 end subroutine main
 
-end program hello
+end program helloMPI

@@ -1,13 +1,18 @@
 FC = mpifort
-FCFLAGS = -W -Wall -Wno-unused-parameter -O2
-PROGRAMS = hello
-HELLO_OBJS = hello.o
+FCFLAGS = -fopenmp -W -Wall -Wno-unused-parameter -O2
+PROGRAMS = helloMPI helloOpenMP
+HELLO_MPI_OBJS = helloMPI.o
+HELLO_OPEN_MP_OBJS = helloOpenMP.o
 
 all: $(PROGRAMS)
 
-hello: $(HELLO_OBJS)
+helloMPI: $(HELLO_MPI_OBJS)
 
-hello.o : hello.f95
+helloOpenMP: $(HELLO_OPEN_MP_OBJS)
+
+helloMPI.o: helloMPI.f95
+
+helloOpenMP.o: helloOpenMP.f95
 
 %: %.o
 	$(FC) $(FCFLAGS) -o $@ $^ $(LDFLAGS)
@@ -19,4 +24,4 @@ hello.o : hello.f95
 	$(FC) $(FCFLAGS) -c $<
 
 clean:
-	rm *.o ${PROGRAMS}
+	rm *.o *~ ${PROGRAMS}
