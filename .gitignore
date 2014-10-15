@@ -20,3 +20,5 @@ Examples/helloOpenMP
 Examples/helloMPIOpenMP
 
 esmf/
+OpenPALMDistrib/
+oasis3-mct/
