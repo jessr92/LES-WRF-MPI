@@ -22,3 +22,5 @@ Examples/helloMPIOpenMP
 esmf/
 OpenPALMDistrib/
 oasis3-mct/
+*_LogFile
+helloESMF
