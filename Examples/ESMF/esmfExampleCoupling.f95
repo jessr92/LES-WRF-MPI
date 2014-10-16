@@ -57,7 +57,6 @@ subroutine main()
                              stopTime=endTime, rc=rc)
     call checkRC(rc, "Error occurred while creating clock")
     ! Initialise Components
-    call componentOneInit1(componentOne, importStateOne, exportStateOne, clock, rc)
     call ESMF_GridCompInitialize(componentOne, importstate=importStateOne, &
                                  exportstate=exportStateOne, clock=clock, &
                                  phase=1, rc=rc)
