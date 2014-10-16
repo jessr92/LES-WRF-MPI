@@ -1,5 +1,5 @@
 FC = mpifort
-FCFLAGS += -W -Wall -O2 -fopenmp -Wno-unused-parameter
+FCFLAGS += -W -Wall -O2 -fopenmp -Wno-unused-parameter -Wno-unused-dummy-argument -Wno-unused-function
 PROGRAMS = esmfExampleCoupling
 ESMF_EXAMPLE_COUPLING_OBJS = esmfExampleCoupling.o componentOne.o componentTwo.o couplerComponent.o esmfHelpers.o
 
