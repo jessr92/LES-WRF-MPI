@@ -12,7 +12,7 @@ contains
 
 subroutine componentTwoSetServices(component, rc)
     type(ESMF_GridComp) :: component
-    integer :: rc
+    integer, intent(out) :: rc
     call ESMF_GridCompSetEntryPoint(component, ESMF_METHOD_INITIALIZE, componentTwoInit, rc=rc)
     call checkRC(rc, "Error occurred setting init method for "//componentName)
     call ESMF_GridCompSetEntryPoint(component, ESMF_METHOD_RUN, componentTwoRun, rc=rc)

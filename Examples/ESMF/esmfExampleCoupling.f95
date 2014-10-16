@@ -59,20 +59,13 @@ subroutine main()
     call checkRC(rc, "Error occurred while creating clock")
     ! Initialise Components
     call ESMF_GridCompInitialize(componentOne, importstate=importStateOne, &
-                                 exportstate=exportStateOne, clock=clock, &
-                                 phase=1, rc=rc)
-    call checkRC(rc, "Error occurred while calling init1 for Component One")
-    call ESMF_GridCompInitialize(componentOne, importstate=importStateOne, &
-                                 exportstate=exportStateOne, clock=clock, &
-                                 phase=2, rc=rc)
-    call checkRC(rc, "Error occurred while calling init2 for Component One")
+                                 exportstate=exportStateOne, clock=clock, rc=rc)
+    call checkRC(rc, "Error occurred while calling init for Component One")
     call ESMF_GridCompInitialize(componentTwo, importstate=importStateTwo, &
-                                 exportstate=exportStateTwo, clock=clock, &
-                                 phase=1, rc=rc)
-    call checkRC(rc, "Error occurred while calling init1 for Component Two")
-    call ESMF_GridCompInitialize(componentTwo, importstate=importStateTwo, &
-                                 exportstate=exportStateTwo, clock=clock, &
-                                 phase=2, rc=rc)
+                                 exportstate=exportStateTwo, clock=clock, rc=rc)
+    call checkRC(rc, "Error occurred while calling init for Component Two")
+    call ESMF_CplCompInitialize(couplerComponent, importstate=importStateTwo, &
+                                 exportstate=exportStateTwo, clock=clock, rc=rc)
     call checkRC(rc, "Error occurred while calling init2 for Component Two")
     ! Finalise the ESMF Framework
     call ESMF_Finalize()

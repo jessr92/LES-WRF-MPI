@@ -12,7 +12,7 @@ contains
 
 subroutine couplerSetServices(component, rc)
     type(ESMF_CplComp) :: component
-    integer :: rc
+    integer, intent(out) :: rc
     call ESMF_CplCompSetEntryPoint(component, ESMF_METHOD_INITIALIZE, couplerInit, rc=rc)
     call checkRC(rc, "Error occurred setting init method for "//componentName)
     call ESMF_CplCompSetEntryPoint(component, ESMF_METHOD_RUN, couplerRun, rc=rc)
