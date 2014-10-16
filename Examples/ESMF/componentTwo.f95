@@ -1,5 +1,6 @@
 module componenttwo
 use ESMF
+use esmfHelpers
 implicit none
 
 public :: componentTwoSetServices

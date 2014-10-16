@@ -1,5 +1,6 @@
 module couplerComponent
 use ESMF
+use esmfHelpers
 implicit none
 
 public :: couplerSetServices

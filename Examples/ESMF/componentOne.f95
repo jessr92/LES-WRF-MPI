@@ -1,5 +1,6 @@
 module componentone
 use ESMF
+use esmfHelpers
 implicit none
 
 public :: componentOneSetServices
