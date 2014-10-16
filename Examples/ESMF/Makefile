@@ -1,7 +1,8 @@
 FC = mpifort
 FCFLAGS += -W -Wall -O2 -fopenmp -Wno-unused-parameter
-PROGRAMS = helloESMF
+PROGRAMS = helloESMF esmfExampleCoupling
 HELLO_ESMF_OBJS = helloESMF.o
+ESMF_EXAMPLE_COUPLING_OBJS = esmfExampleCoupling.o componentOne.o componentTwo.o couplerComponent.o
 
 ESMF_LIB=$(ESMF_DIR)/lib/libO/Linux.gfortran.64.mpiuni.default
 ESMF_MOD=$(ESMF_DIR)/mod/modO/Linux.gfortran.64.mpiuni.default
@@ -14,7 +15,11 @@ all: $(PROGRAMS)
 
 helloESMF: $(HELLO_ESMF_OBJS)
 
+esmfExampleCoupling: $(ESMF_EXAMPLE_COUPLING_OBJS)
+
 helloESMF.o: helloESMF.f95
+
+esmfExampleCoupling.o: componentOne.mod componentTwo.mod couplerComponent.mod esmfExampleCoupling.f95
 
 %: %.o
 	$(FC) $(ESMF_F90LINKOPTS) $(ESMF_F90LINKPATHS) \
@@ -27,4 +32,4 @@ helloESMF.o: helloESMF.f95
 	$(FC) $(FCFLAGS) -c -o $@ $<
 
 clean:
-	rm *.o *~ ${PROGRAMS}
+	rm *.o *.mod *~ ${PROGRAMS}
