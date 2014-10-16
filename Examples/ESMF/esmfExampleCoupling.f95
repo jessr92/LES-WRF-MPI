@@ -67,6 +67,30 @@ subroutine main()
     call ESMF_CplCompInitialize(couplerComponent, importstate=importStateTwo, &
                                  exportstate=exportStateTwo, clock=clock, rc=rc)
     call checkRC(rc, "Error occurred while calling init for Coupler Component")
+    ! Clock stepping loop
+    do while (.not. ESMF_ClockIsStopTime(clock, rc=rc))
+        call ESMF_GridCompRun(componentOne, importstate=importStateOne, &
+                              exportstate=exportStateOne, clock=clock, rc=rc)
+        call checkRC(rc, "Error occurred while running component one")
+        call ESMF_CplCompRun(couplerComponent, importstate=exportStateOne, &
+                              exportstate=importStateTwo, clock=clock, rc=rc)
+        call checkRC(rc, "Error occurred while running coupler for one->two")
+        call ESMF_GridCompRun(componentTwo, importstate=importstatetwo, &
+                              exportstate=exportStateTwo, clock=clock, rc=rc)
+        call checkRC(rc, "Error occurred while running component two")
+        call ESMF_CplCompRun(couplerComponent, importstate=exportStateTwo, &
+                             exportstate=exportStateTwo, clock=clock, rc=rc)
+        call checkRC(rc, "Error occurred while running coupler for two->one")
+        call ESMF_ClockAdvance(clock, rc=rc)
+        call checkRC(rc, "Error occurred while advancing the clock")
+    end do
+    ! Finalise Components
+    call ESMF_GridCompFinalize(componentOne, rc=rc)
+    call checkRC(rc, "Error occurred while finalising Component One")
+    call ESMF_GridCompFinalize(componentTwo, rc=rc)
+    call checkRC(rc, "Error occurred while finalising Component Two")
+    call ESMF_CplCompFinalize(couplerComponent, rc=rc)
+    call checkRC(rc, "Error occurred while finalising Coupler Component")
     ! Cleanup Components
     call ESMF_GridCompDestroy(componentOne, rc=rc)
     call checkRC(rc, "Error occurred while destroying Component One")
