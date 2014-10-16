@@ -79,20 +79,6 @@ subroutine main()
     write(*, "(A)") "Completed!"
 end subroutine main
 
-subroutine setupCouplerServices(coupler, init, run, final, couplerName)
-    implicit none
-    type(ESMF_CplComp) :: coupler
-    external :: init, run, final
-    character (len=*), optional :: couplerName
-    integer :: rc
-    call ESMF_CplCompSetEntryPoint(coupler, ESMF_METHOD_INITIALIZE, init, rc=rc)
-    call checkRC(rc, "Error occurred setting init method for "//couplerName)
-    call ESMF_CplCompSetEntryPoint(coupler, ESMF_METHOD_RUN, run, rc=rc)
-    call checkRC(rc, "Error occurred setting run method for "//couplerName)
-    call ESMF_CplCompSetEntryPoint(coupler, ESMF_METHOD_FINALIZE, final, rc=rc)
-    call checkRC(rc, "Error occurred setting finalize method for "//couplerName)
-end subroutine setupCouplerServices
-
 subroutine checkRC(rc, message)
     implicit none
     integer, intent(in) :: rc
