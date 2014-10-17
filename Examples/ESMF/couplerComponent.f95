@@ -3,12 +3,28 @@ use ESMF
 use esmfHelpers
 implicit none
 
-public :: couplerSetServices
+public :: couplerSetServices, couplerSetVM
 
 private
     character (len=*), parameter :: componentName = "Coupler Component"
 
 contains
+
+subroutine couplerSetVM(component, rc)
+    type(ESMF_CplComp) :: component
+    integer, intent(out) :: rc
+    type(ESMF_VM) :: vm
+    logical :: pthreadsEnabled
+    call ESMF_VMGetGlobal(vm, rc=rc)
+    call checkRC(rc, "Error occurred while trying to get global VM for "//componentName)
+    call ESMF_VMGet(vm, pthreadsEnabledFlag=pthreadsEnabled, rc=rc)
+    call checkRC(rc, "Error occurred while trying to get pthreads enabled info for "//componentName)
+    if (pthreadsEnabled) then
+        call ESMF_CplCompSetVMMinThreads(component, rc=rc)
+        call checkRC(rc, "Error occurred while trying to set minimum threads for "//componentName)
+    endif
+    rc=ESMF_SUCCESS
+end subroutine couplerSetVM
 
 subroutine couplerSetServices(component, rc)
     type(ESMF_CplComp) :: component
@@ -29,6 +45,12 @@ subroutine couplerInit(cplcomp, importState, exportState, clock, rc)
     type(ESMF_State) :: importState, exportState
     type(ESMF_Clock) :: clock
     integer, intent(out) :: rc
+    integer :: localPET
+    type(ESMF_VM) :: vm
+    call ESMF_VMGetGlobal(vm, rc=rc)
+    call checkRC(rc, "Error occurred while trying to get global VM for "//componentName)
+    call ESMF_VMGet(vm, localPET=localPET, rc=rc)
+    call checkRC(rc, "Error occurred while trying to get local PET id info for "//componentName)
     rc = ESMF_SUCCESS
     call ESMF_LogWrite("Coupler Init subroutine called", ESMF_LOGMSG_INFO)
 end subroutine couplerInit

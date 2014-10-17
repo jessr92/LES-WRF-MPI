@@ -1,9 +1,9 @@
 program esmfExampleCoupling
 use ESMF
 use esmfHelpers
-use componentOne, only : componentOneSetServices
-use componentTwo, only : componentTwoSetServices
-use couplerComponent, only : couplerSetServices
+use componentOne
+use componentTwo
+use couplerComponent
 implicit none
 
 call main()
@@ -12,7 +12,8 @@ contains
 
 subroutine main()
     implicit none
-    integer :: rc
+    integer :: rc, npets, pet_id
+    type(ESMF_VM) :: vm
     type(ESMF_GridComp) :: componentOne, componentTwo
     type(ESMF_CplComp) :: couplerComponent
     type(ESMF_State) :: importStateOne, importStateTwo, exportStateOne, exportStateTwo
@@ -20,16 +21,19 @@ subroutine main()
     type(ESMF_Time) :: startTime, endTime
     type(ESMF_TimeInterval) :: timeInterval
     ! Initialise the ESMF Framework
-    call ESMF_Initialize(defaultCalKind=ESMF_CALKIND_GREGORIAN, &
+    call ESMF_Initialize(vm=vm, defaultCalKind=ESMF_CALKIND_GREGORIAN, &
                          defaultlogfilename="esmfExampleCouplingLog", &
                          logkindflag=ESMF_LOGKIND_MULTI, rc=rc)
     call checkRC(rc, "Error occurred initialising ESMF")
+    call ESMF_VMGet(vm, petCount=npets, localPET=pet_id, rc=rc)
+    call checkRC(rc, "Error getting VM information")
+    write(*,*), npets, pet_id
     ! Create the required components
-    componentOne = ESMF_GridCompCreate(name="Component One", rc=rc)
+    componentOne = ESMF_GridCompCreate(name="Component One", petList=(/0/), rc=rc)
     call checkRC(rc, "Error occurred creating component one")
-    componentTwo = ESMF_GridCompCreate(name="Component Two", rc=rc)
+    componentTwo = ESMF_GridCompCreate(name="Component Two", petList=(/1/), rc=rc)
     call checkRC(rc, "Error occurred creating component two")
-    couplerComponent = ESMF_CplCompCreate(name="Coupler Component", rc=rc)
+    couplerComponent = ESMF_CplCompCreate(name="Coupler Component", petList=(/0/), rc=rc)
     call checkRC(rc, "Error occurred creating coupler component")
     ! Create the import/export states
     importStateOne = ESMF_StateCreate(name="Component One Import State", &
@@ -45,8 +49,11 @@ subroutine main()
                                       stateintent=ESMF_STATEINTENT_EXPORT, rc=rc)
     call checkRC(rc, "Error occurred creating component two's export state")
     ! Setup init/run/finalise methods for each component
+    call ESMF_GridCompSetVM(componentOne, userRoutine=componentOneSetVM, rc=rc)
     call ESMF_GridCompSetServices(componentOne, componentOneSetServices, rc=rc)
+    call ESMF_GridCompSetVM(componentTwo, userRoutine=componentTwoSetVM, rc=rc)
     call ESMF_GridCompSetServices(componentTwo, componentTwoSetServices, rc=rc)
+    call ESMF_CplCompSetVM(couplerComponent, couplerSetVM, rc=rc)
     call ESMF_CplCompSetServices(couplerComponent, couplerSetServices, rc=rc)
     ! Initialise clock
     call ESMF_TimeSet(startTime, yy=2014, mm=1, dd=1, h=0, m=0, s=0, rc=rc)
@@ -75,15 +82,21 @@ subroutine main()
         ! Component two can then run then the data it exports is given to
         ! component one.
         call ESMF_GridCompRun(componentOne, importstate=importStateOne, &
-                              exportstate=exportStateOne, clock=clock, rc=rc)
+                              exportstate=exportStateOne, &
+                              syncFlag=ESMF_SYNC_NONBLOCKING, clock=clock, rc=rc)
         call checkRC(rc, "Error occurred while running component one")
+        call ESMF_GridCompRun(componentTwo, importstate=importstatetwo, &
+                              exportstate=exportStateTwo, &
+                              syncFlag=ESMF_SYNC_NONBLOCKING, clock=clock, rc=rc)
+        call checkRC(rc, "Error occurred while running component two")
+        call ESMF_GridCompWait(componentOne, rc=rc)
+        call checkRC(rc, "Error occurred while waiting for component one")
+        call ESMF_GridCompWait(componentTwo, rc=rc)
+        call checkRC(rc, "Error occurred while waiting for component two")
         call ESMF_CplCompRun(couplerComponent, importstate=exportStateOne, &
                               exportstate=importStateTwo, phase=1, &
                               clock=clock, rc=rc)
         call checkRC(rc, "Error occurred while running coupler for one->two")
-        call ESMF_GridCompRun(componentTwo, importstate=importstatetwo, &
-                              exportstate=exportStateTwo, clock=clock, rc=rc)
-        call checkRC(rc, "Error occurred while running component two")
         call ESMF_CplCompRun(couplerComponent, importstate=exportStateTwo, &
                              exportstate=exportStateTwo, phase=2, &
                              clock=clock, rc=rc)
