@@ -29,7 +29,7 @@ subroutine componentOneInit(gridcomp, importState, exportState, clock, rc)
     type(ESMF_Clock) :: clock
     integer, intent(out) :: rc
     rc = ESMF_SUCCESS
-    write(*, "(A)") "Component One Init subroutine called"
+    call ESMF_LogWrite("Component One Init subroutine called", ESMF_LOGMSG_INFO)
 end subroutine componentOneInit
 
 subroutine componentOneRun(gridcomp, importState, exportState, clock, rc)
@@ -39,7 +39,7 @@ subroutine componentOneRun(gridcomp, importState, exportState, clock, rc)
     type(ESMF_Clock) :: clock
     integer, intent(out) :: rc
     rc = ESMF_SUCCESS
-    write(*, "(A)") "Component One Run subroutine called"
+    call ESMF_LogWrite("Component One Run subroutine called", ESMF_LOGMSG_INFO)
 end subroutine componentOneRun
 
 subroutine componentOneFinal(gridcomp, importState, exportState, clock, rc)
@@ -49,7 +49,7 @@ subroutine componentOneFinal(gridcomp, importState, exportState, clock, rc)
     type(ESMF_Clock) :: clock
     integer, intent(out) :: rc
     rc = ESMF_SUCCESS
-    write(*, "(A)") "Component One Final subroutine called"
+    call ESMF_LogWrite("Component One Final subroutine called", ESMF_LOGMSG_INFO)
 end subroutine componentOneFinal
 
 end module componentone

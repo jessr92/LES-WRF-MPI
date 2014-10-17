@@ -28,7 +28,7 @@ subroutine componentTwoInit(gridcomp, importState, exportState, clock, rc)
     type(ESMF_Clock) :: clock
     integer, intent(out) :: rc
     rc = ESMF_SUCCESS
-    write(*, "(A)") "Component Two Init subroutine called"
+    call ESMF_LogWrite("Component Two Init subroutine called", ESMF_LOGMSG_INFO)
 end subroutine componentTwoInit
 
 subroutine componentTwoRun(gridcomp, importState, exportState, clock, rc)
@@ -38,7 +38,7 @@ subroutine componentTwoRun(gridcomp, importState, exportState, clock, rc)
     type(ESMF_Clock) :: clock
     integer, intent(out) :: rc
     rc = ESMF_SUCCESS
-    write(*, "(A)") "Component Two Run subroutine called"
+    call ESMF_LogWrite("Component Two Run subroutine called", ESMF_LOGMSG_INFO)
 end subroutine componentTwoRun
 
 subroutine componentTwoFinal(gridcomp, importState, exportState, clock, rc)
@@ -48,7 +48,7 @@ subroutine componentTwoFinal(gridcomp, importState, exportState, clock, rc)
     type(ESMF_Clock) :: clock
     integer, intent(out) :: rc
     rc = ESMF_SUCCESS
-    write(*, "(A)") "Component Two Final subroutine called"
+    call ESMF_LogWrite("Component Two Final subroutine called", ESMF_LOGMSG_INFO)
 end subroutine componentTwoFinal
 
 end module componenttwo

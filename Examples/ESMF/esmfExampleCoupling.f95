@@ -20,7 +20,8 @@ subroutine main()
     type(ESMF_Time) :: startTime, endTime
     type(ESMF_TimeInterval) :: timeInterval
     ! Initialise the ESMF Framework
-    call ESMF_Initialize(defaultCalKind=ESMF_CALKIND_GREGORIAN, & 
+    call ESMF_Initialize(defaultCalKind=ESMF_CALKIND_GREGORIAN, &
+                         defaultlogfilename="esmfExampleCouplingLog", &
                          logkindflag=ESMF_LOGKIND_MULTI, rc=rc)
     call checkRC(rc, "Error occurred initialising ESMF")
     ! Create the required components
@@ -69,17 +70,23 @@ subroutine main()
     call checkRC(rc, "Error occurred while calling init for Coupler Component")
     ! Clock stepping loop
     do while (.not. ESMF_ClockIsStopTime(clock, rc=rc))
+        ! Component one has to run first then the data it exports is given to
+        ! component two.
+        ! Component two can then run then the data it exports is given to
+        ! component one.
         call ESMF_GridCompRun(componentOne, importstate=importStateOne, &
                               exportstate=exportStateOne, clock=clock, rc=rc)
         call checkRC(rc, "Error occurred while running component one")
         call ESMF_CplCompRun(couplerComponent, importstate=exportStateOne, &
-                              exportstate=importStateTwo, clock=clock, rc=rc)
+                              exportstate=importStateTwo, phase=1, &
+                              clock=clock, rc=rc)
         call checkRC(rc, "Error occurred while running coupler for one->two")
         call ESMF_GridCompRun(componentTwo, importstate=importstatetwo, &
                               exportstate=exportStateTwo, clock=clock, rc=rc)
         call checkRC(rc, "Error occurred while running component two")
         call ESMF_CplCompRun(couplerComponent, importstate=exportStateTwo, &
-                             exportstate=exportStateTwo, clock=clock, rc=rc)
+                             exportstate=exportStateTwo, phase=2, &
+                             clock=clock, rc=rc)
         call checkRC(rc, "Error occurred while running coupler for two->one")
         call ESMF_ClockAdvance(clock, rc=rc)
         call checkRC(rc, "Error occurred while advancing the clock")
@@ -109,8 +116,8 @@ subroutine main()
     call ESMF_ClockDestroy(clock, rc=rc)
     call checkRC(rc, "Error occurred while destroying Clock")
     ! Finalise the ESMF Framework
+    call ESMF_LogWrite("Completed!", ESMF_LOGMSG_INFO)
     call ESMF_Finalize()
-    write(*, "(A)") "Completed!"
 end subroutine main
 
 end program esmfExampleCoupling

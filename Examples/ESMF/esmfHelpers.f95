@@ -10,9 +10,9 @@ subroutine checkRC(rc, message)
     character (len=*), intent(in), optional :: message
     if (rc /= ESMF_SUCCESS) then
         if (present(message)) then
-            write(*, "(A)") message
+            call ESMF_LogWrite(message, ESMF_LOGMSG_ERROR)
         else
-            write(*, "(A)") "Unspecified error occurred."
+            call ESMF_LogWrite("Unspecified error occurred.", ESMF_LOGMSG_ERROR)
         end if
         call ESMF_Finalize(endflag=ESMF_END_ABORT)
     end if    

@@ -23,5 +23,6 @@ esmf/
 OpenPALMDistrib/
 oasis3-mct/
 *_LogFile
+*Log
 helloESMF
 esmfExampleCoupling
