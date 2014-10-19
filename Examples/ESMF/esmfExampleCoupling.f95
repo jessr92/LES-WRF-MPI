@@ -16,7 +16,8 @@ subroutine main()
     type(ESMF_VM) :: vm
     type(ESMF_GridComp) :: componentOne, componentTwo
     type(ESMF_CplComp) :: couplerComponent
-    type(ESMF_State) :: importStateOne, importStateTwo, exportStateOne, exportStateTwo
+    type(ESMF_State) :: importStateOne, importStateTwo
+    type(ESMF_State) :: exportStateOne, exportStateTwo
     type(ESMF_Clock) :: clock
     type(ESMF_Time) :: startTime, endTime
     type(ESMF_TimeInterval) :: timeInterval
@@ -83,10 +84,8 @@ subroutine main()
     call checkRC(rc, "Error occurred while calling init for Coupler Component")
     ! Clock stepping loop
     do while (.not. ESMF_ClockIsStopTime(clock, rc=rc))
-        ! Component one has to run first then the data it exports is given to
-        ! component two.
-        ! Component two can then run then the data it exports is given to
-        ! component one.
+        call checkRC(rc, "Error occurred while checking if we're at clock stop time")
+        ! Component one and two run in parallel
         call ESMF_GridCompRun(componentOne, importstate=importStateOne, &
                               exportstate=exportStateOne, &
                               syncFlag=ESMF_SYNC_NONBLOCKING, clock=clock, rc=rc)
@@ -99,10 +98,12 @@ subroutine main()
         call checkRC(rc, "Error occurred while waiting for component one")
         call ESMF_GridCompWait(componentTwo, rc=rc)
         call checkRC(rc, "Error occurred while waiting for component two")
+        ! Transfer component one's export data into component two
         call ESMF_CplCompRun(couplerComponent, importstate=exportStateOne, &
                               exportstate=importStateTwo, phase=1, &
                               clock=clock, rc=rc)
         call checkRC(rc, "Error occurred while running coupler for one->two")
+        ! Transfer component two's export data into component one
         call ESMF_CplCompRun(couplerComponent, importstate=exportStateTwo, &
                              exportstate=exportStateTwo, phase=2, &
                              clock=clock, rc=rc)
