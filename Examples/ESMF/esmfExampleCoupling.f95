@@ -30,9 +30,9 @@ subroutine main()
     call checkRC(rc, "Error getting VM information")
     write(*,*), npets, pet_id
     ! Create the required components
-    componentOne = ESMF_GridCompCreate(name="Component One", petList=(/0/), rc=rc)
+    componentOne = ESMF_GridCompCreate(name="Component One", petList=(/0, 2/), rc=rc)
     call checkRC(rc, "Error occurred creating component one")
-    componentTwo = ESMF_GridCompCreate(name="Component Two", petList=(/1/), rc=rc)
+    componentTwo = ESMF_GridCompCreate(name="Component Two", petList=(/1, 3/), rc=rc)
     call checkRC(rc, "Error occurred creating component two")
     couplerComponent = ESMF_CplCompCreate(name="Coupler Component", petList=(/0/), rc=rc)
     call checkRC(rc, "Error occurred creating coupler component")
