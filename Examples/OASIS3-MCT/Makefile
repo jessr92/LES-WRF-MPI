@@ -5,8 +5,6 @@ F90FLAGS += -W -Wall -O2 -fopenmp
 PROGRAMS = oasisExampleA
 OASIS_EXAMPLE_A_OBJS = oasisExampleA.o
 
-FCFLAGS += -lnetcdf -lnetcdff $(LIBPSMILE)
-
 all: $(PROGRAMS)
 
 oasisExampleA: $(OASIS_EXAMPLE_A_OBJS) $(LIBPSMILE) Makefile
