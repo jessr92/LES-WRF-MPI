@@ -28,7 +28,10 @@ subroutine main()
     call checkRC(rc, "Error occurred initialising ESMF")
     call ESMF_VMGet(vm, petCount=npets, localPET=pet_id, rc=rc)
     call checkRC(rc, "Error getting VM information")
-    write(*,*), npets, pet_id
+    if (npets < 4) then
+        call ESMF_LogWrite("This example requires at least four PETs.", ESMF_LOGMSG_ERROR)
+        call ESMF_Finalize(endflag=ESMF_END_ABORT)
+    end if
     ! Create the required components
     componentOne = ESMF_GridCompCreate(name="Component One", petList=(/0, 2/), rc=rc)
     call checkRC(rc, "Error occurred creating component one")
