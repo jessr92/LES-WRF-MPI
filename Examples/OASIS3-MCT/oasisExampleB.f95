@@ -19,11 +19,11 @@ contains
 
 subroutine main()
     implicit none
-    integer :: componentId, ierror, info, needsgrids, i, j, time
+    integer :: componentId, ierror, info, i, j, time
     real(kind=8), dimension(nlon, nlat) :: lat, lon
     integer, dimension(nlon, nlat) :: mask
     real(kind=8), dimension(nlon, nlat) :: outfield, infield
-    integer :: outid, inid, compid, partid
+    integer :: outid, inid, partid
     integer, dimension(3) :: partition
     integer, dimension(2) :: ndims
     integer, dimension(4) :: dims
@@ -56,12 +56,12 @@ subroutine main()
     call checkIError(ierror, componentId, componentName)
     
     do time=0,145,5
-        call oasis_put(outid, time, outfield, info)
-        write (*,*) componentName//" put status ", time, info
-        call oasis_get(inid, time+5, infield, info)
+        call oasis_get(inid, time, infield, info)
         write (*,*) componentName//" get status ", time, info
+        call oasis_put(outid, time+5, outfield, info)
+        write (*,*) componentName//" put status ", time+5, info
     end do
-    
+
     call oasis_terminate(ierror)
     call checkIError(ierror, componentId, componentName)
 end subroutine main

@@ -29,7 +29,7 @@
 # 30 for full debug information
 ###############################################################################
  $NLOGPRT
-30
+2
  $END
 ###############################################################################
 # SECTION TWO
@@ -88,8 +88,8 @@
 ###############################################################################
 # Field 1 - component A to component B
 ###############################################################################
-aoutxxxx binxxxxx 1 3600 2 fileA.nc EXPORTED
-axxx bxxx
+aoutxxxx binxxxxx 1 50 2 fileA.nc EXPORTED
+axxx bxxx LAG=+0
  R 0 R 0
 CHECKIN CHECKOUT
 INT=0
@@ -97,8 +97,8 @@ INT=0
 ###############################################################################
 # Field 2 - component B to component A
 ###############################################################################
-boutxxxx ainxxxxx 1 3600 2 fileB.nc EXPORTED
-bxxx axxx
+boutxxxx ainxxxxx 1 50 2 fileB.nc EXPORTED
+bxxx axxx LAG=+10
  R 0 R 0
 CHECKIN CHECKOUT
 INT=0
