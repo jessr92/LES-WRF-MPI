@@ -1,11 +1,11 @@
-program oasisExampleA
+program oasisExampleB
 use netcdf
 use mod_oasis
 use oasisHelpers
 implicit none
 
-character(len=6), parameter :: componentName = "A"
-character(len=8), parameter :: componentOutField = "outField"
+character(len=6), parameter :: componentName = "B"
+character(len=8), parameter :: componentInField = "inField"
 integer, parameter :: timeStep = 3600
 
 call main()
@@ -27,5 +27,5 @@ subroutine main()
     call checkIError(ierror, componentId, componentName)
 end subroutine main
 
-end program oasisExampleA
+end program oasisExampleB
 

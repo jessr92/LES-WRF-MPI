@@ -1,0 +1,92 @@
+###############################################################################
+# SECTION ONE
+###############################################################################
+# $NFIELDS - The total number of field entires in the second part of namcouple
+###############################################################################
+ $NFIELDS
+1
+ $END
+###############################################################################
+# $NBMODEL - The number of models in the coupling, followed by their names as
+# they are given to oasis_init_comp calls. Model name cannot be more than six
+# characters.
+###############################################################################
+ $NBMODEL
+2 A B
+ $END
+###############################################################################
+# $RUNTIME - The number of seconds the simulation should last for
+###############################################################################
+ $RUNTIME
+86400
+ $END
+###############################################################################
+# $NLOGPRT - The amount of information that will be rewritten to debug files.
+# 0 means one file that contains only error information. Numbers can go up to
+# 30 for full debug information
+###############################################################################
+ $NLOGPRT
+30
+ $END
+###############################################################################
+# SECTION TWO
+###############################################################################
+# $STRINGS - Denotes the beginning of section two
+###############################################################################
+# EXPORTED/EXPOUT format
+# Line 1
+# 1) Symbolic name for field before interpolation (max 8 characters)
+# 2) Symbolic name for field after interploation (max 8 characters)
+# 3) UNUSED but still required for parsing
+# 4) Number of seconds between exchanges
+# 5) Number of transformations to be performed on the field
+# 6) Name of the coupling restart field (max 8 characters)
+# 7) UNUSED but still required for parsing
+# 8) Field status (has to be EXPORTED or EXPOUT)
+# Line 2
+# 1) Number of points for the source grid first dimension (optional)
+# 2) Number of points for the source grid second dimension (optional)
+# 3) Number of points for the target grid first dimension (optional)
+# 4) Number of points for the target grid second dimension (optional)
+# 5) Source grid name prefix from grid data files (max 4 characters)
+# 6) Target grid name prefix from grid data files (max 4 characters)
+# 7) Lag index for the field expressed in seconds (optional)
+# 8) Sequence index for the field (optional)
+# Line 3
+# 1) Source grid first dimension characteristic (P = periodical, R = regional)
+# 2) Source grid first dimension number of overlapping grid points
+# 3) Target grid first dimension characteristic (P = periodical, R = regional)
+# 4) Target grid first dimension number of overlapping grid points
+###############################################################################
+# OUTPUT format
+# Line 1
+# Similar for EXPOUT but:
+# * Field status has to be OUTPUT
+# * Symbolic name must be repeated
+# * Restart filename only needed if LOCTRANS transformations are present
+# * No output file name 
+# Line 2
+# Similar for EXPOUT but:
+# * No grid dimensions or LAG or SEQ index
+# Line 3
+# 1) LOCTRANS only if this transformation is chosen for the field (LOCTRANS is
+# the only transformation available for OUTPUT.
+###############################################################################
+# INPUT format
+# Line 1
+# 1) Symbolic name for the field in the target model (max 8 characters)
+# 2) Repeat of 1)
+# 3) UNUSED but still required for parsing
+# 4) Input period in seconds
+# 5) Number of transformations (has to be 0 for INPUT fields)
+# 6) Field status (has to be INPUT)
+###############################################################################
+ $STRINGS
+###############################################################################
+# Field 1 - component A to component B
+###############################################################################
+outField inField 1 3600 0 fileA.nc EXPOUT
+griA griB
+P 0 P 0
+###############################################################################
+ $END

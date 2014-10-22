@@ -17,4 +17,6 @@ subroutine checkRC(rc, message)
         call ESMF_Finalize(endflag=ESMF_END_ABORT)
     end if    
 end subroutine checkRC
+
 end module esmfHelpers
+
