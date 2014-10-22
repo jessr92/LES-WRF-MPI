@@ -1,10 +1,13 @@
 ###############################################################################
+# Based off of github.com/ScottWales/oasis-pingpong
+# Updated for OASIS3-MCT
+###############################################################################
 # SECTION ONE
 ###############################################################################
 # $NFIELDS - The total number of field entires in the second part of namcouple
 ###############################################################################
  $NFIELDS
-1
+2
  $END
 ###############################################################################
 # $NBMODEL - The number of models in the coupling, followed by their names as
@@ -18,7 +21,7 @@
 # $RUNTIME - The number of seconds the simulation should last for
 ###############################################################################
  $RUNTIME
-86400
+150
  $END
 ###############################################################################
 # $NLOGPRT - The amount of information that will be rewritten to debug files.
@@ -48,8 +51,8 @@
 # 2) Number of points for the source grid second dimension (optional)
 # 3) Number of points for the target grid first dimension (optional)
 # 4) Number of points for the target grid second dimension (optional)
-# 5) Source grid name prefix from grid data files (max 4 characters)
-# 6) Target grid name prefix from grid data files (max 4 characters)
+# 5) Source grid name prefix from grid data files (4 characters)
+# 6) Target grid name prefix from grid data files (4 characters)
 # 7) Lag index for the field expressed in seconds (optional)
 # 8) Sequence index for the field (optional)
 # Line 3
@@ -85,8 +88,20 @@
 ###############################################################################
 # Field 1 - component A to component B
 ###############################################################################
-outField inField 1 3600 0 fileA.nc EXPOUT
-griA griB
-P 0 P 0
+aoutxxxx binxxxxx 1 3600 2 fileA.nc EXPORTED
+axxx bxxx
+ R 0 R 0
+CHECKIN CHECKOUT
+INT=0
+INT=0
+###############################################################################
+# Field 2 - component B to component A
+###############################################################################
+boutxxxx ainxxxxx 1 3600 2 fileB.nc EXPORTED
+bxxx axxx
+ R 0 R 0
+CHECKIN CHECKOUT
+INT=0
+INT=0
 ###############################################################################
  $END
