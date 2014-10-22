@@ -4,7 +4,7 @@ use mod_oasis
 use oasisHelpers
 implicit none
 
-! Based off of github.com/ScottWales/oasis-pingpong
+! Based off of https://github.com/ScottWales/oasis-pingpong
 ! Updated for OASIS3-MCT
 
 character(len=6), parameter :: componentName = "B"
