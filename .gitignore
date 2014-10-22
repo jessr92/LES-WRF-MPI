@@ -31,3 +31,5 @@ oasisExample
 oasisExampleA
 nout.*
 oasisExampleB
+debug.*
+*.nc
