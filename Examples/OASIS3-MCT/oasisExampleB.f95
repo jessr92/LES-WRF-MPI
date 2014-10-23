@@ -34,6 +34,7 @@ subroutine main()
             lat(i,j) = nlat/10.0 * j
         end do
     end do
+    outfield = lat
     
     call oasis_init_comp(componentId, componentName, ierror)
     call checkIError(ierror, componentId, componentName)
@@ -56,12 +57,18 @@ subroutine main()
     call oasis_enddef(ierror)
     call checkIError(ierror, componentId, componentName)
     
-    do time=0,145,5
+    do time=0,90,10
         call oasis_get(inid, time, infield, info)
         write (*,*) componentName//" get status ", time, info
-        call oasis_put(outid, time+5, outfield, info)
-        write (*,*) componentName//" put status ", time+5, info
+        call oasis_put(outid, time+10, outfield, info)
+        write (*,*) componentName//" put status ", time+10, info
     end do
+
+    if (.NOT.(ALL(infield .EQ. lon))) then
+        write(*,*) "Error, should have received lon from A"
+    else
+        write(*,*) "Received lon from A perfectly"
+    end if
 
     call oasis_terminate(ierror)
     call checkIError(ierror, componentId, componentName)
