@@ -37,11 +37,12 @@ subroutine main()
     
     call oasis_init_comp(componentId, componentName, ierror)
     call checkIError(ierror, componentId, componentName)
-    
+
     call oasis_write_grid(gridNamePrefix, nlon, nlat, lon, lat)
     mask = 0
     call oasis_write_mask(gridNamePrefix, nlon, nlat, mask)
-    
+    call oasis_terminate_grids_writing()
+        
     partition = (/0,0,nlon*nlat/)
     call oasis_def_partition(partid, partition, ierror)
     call checkIError(ierror, componentId, componentName)

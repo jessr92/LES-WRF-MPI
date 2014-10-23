@@ -27,20 +27,21 @@ subroutine main()
     integer, dimension(3) :: partition
     integer, dimension(2) :: ndims
     integer, dimension(4) :: dims
- 
+
     do j=1, nlat
         do i=1, nlon
             lon(i,j) = nlon/20.0 * i
             lat(i,j) = nlat/10.0 * j
         end do
     end do
-
+    
     call oasis_init_comp(componentId, componentName, ierror)
     call checkIError(ierror, componentId, componentName)
     
     call oasis_write_grid(gridNamePrefix, nlon, nlat, lon, lat)
     mask = 0
     call oasis_write_mask(gridNamePrefix, nlon, nlat, mask)
+    call oasis_terminate_grids_writing()
     
     partition = (/0,0,nlon*nlat/)
     call oasis_def_partition(partid, partition, ierror)
