@@ -57,11 +57,11 @@ subroutine main()
     call oasis_enddef(ierror)
     call checkIError(ierror, componentId, componentName)
 
-    do time=0,90,10
+    do time=0,140,10
         call oasis_get(inid, time, infield, info)
         write (*,*) componentName//" get status ", time, info
-        call oasis_put(outid, time+10, outfield, info)
-        write (*,*) componentName//" put status ", time+10, info
+        call oasis_put(outid, time, outfield, info)
+        write (*,*) componentName//" put status ", time, info
     end do
     
     if (.NOT.(ALL(infield .EQ. lat))) then
