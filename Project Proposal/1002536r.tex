@@ -1,61 +1,140 @@
-\documentclass[twoside]{article}
+\documentclass[a4paper,twocolumn,10pt]{article}
 
-\usepackage{multicol}
-\usepackage{fullpage}
+\usepackage[cm]{fullpage}
 
-\usepackage{abstract}
-	\renewcommand{\abstractnamefont}{\normalfont\bfseries}
-	\renewcommand{\abstracttextfont}{\normalfont\small\itshape}
-
-
-% ------
-% Titling (section/subsection)
 \usepackage{titlesec}
-\renewcommand\thesection{\Roman{section}}
-\titleformat{\section}[block]{\large\scshape\centering}{\thesection.}{1em}{}
+\titlespacing{\section}{0pt}{0pt}{0pt}
+\titlespacing{\subsection}{0pt}{0pt}{0pt}
+\titlespacing{\subsubsection}{0pt}{0pt}{0pt}
 
+\title{Coupling the distributed Large Eddy Simulation (LES) and Weather
+Research and Forecasting model (WRF) using OASIS3-MCT and MPI}
 
-% ------
-% Header/footer
-\usepackage{fancyhdr}
-	\pagestyle{fancy}
-	\fancyhead{}
-	\fancyfoot{}
-	\fancyhead[C]{Project Proposal $\bullet$ Level 5 Computing Science}
-	\fancyfoot[RO,LE]{\thepage}
+\author{\large\textsc{Gordon Reid - 1002536r}\\University of Glasgow}
 
-\usepackage{hyperref}
-
-\title{
-	\fontsize{24pt}{10pt}\selectfont
-	\textbf{Long Titles Look More Impressive Than Short Ones}
-	}
-\author{%
-	\large
-	\textsc{Gordon Reid - 1002536r}
-	\normalsize	University of Glasgow \\
-	\vspace{-5mm}
-	}
 \date{\today}
 
 \begin{document}
+\setlength{\parskip}{0.3cm}
 
 \maketitle
-\thispagestyle{fancy}
 
 \begin{abstract}
-\noindent adasd asdasdas das dasd
+
+Scientists studying the geosciences have created software which models different
+aspects of our planet's ecosystem, for example ocean, wind, land and atmosphere.
+On their own, each model is useful however for higher accuracy, and to model
+more complex aspects of our climate, these models need to be coupled together.
+The project proposed involves creating a distributed version of the Large Eddy
+Simulator (LES) then coupling the LES with the Weather Research and Forecasting
+model (WRF). The coupled system should scale to large computing clusters.
+Ideally the coupling would also be generic such that the OpenCL-accelerated LES
+could be used to allow greater performance on heterogeneous systems.
+
 \end{abstract}
 
+\section*{Introduction}
 
-\begin{multicols}{2}
+Our planet's ecosystem is highly complex. Geoscientists that are interested in
+modelling this ecosystem have created numerous systems which each model one
+aspect, for instance a Large Eddy Simulator (LES) to study turbulent air flows
+\cite{Nakayama2011,Nakayama2012} and the Weather Research and Forecasting Model
+(WRF) for mesoscale weather prediction. For the last decade or so, interest has
+evolved from individual models to combining models \cite{Michalakes2010}. With
+this trend, a number of model coupling frameworks have been created to support
+the desire for co-simulation. These allow a single application to make use of
+multiple models without significant changes to the individual models code bases.
+Models communicate with each other via data exchanges at each timestep.
 
-asdouashda
+The proposed work for the project involves two distinct stages. The first
+requires the modification of existing LES code to create a distributed version
+using the Message Passing Interface (MPI) for use on computer clusters. An
+additional aim is to allow use of the OpenCL-accelerated LES
+\cite{Vanderbauwhede2014} in the distributed system to improve the model's
+throughput further. The second stage involves the coupling of the distributed
+LES with the WRF using a model coupling framework.
 
-\nocite{*}
+A number of modeling frameworks have been looked at, including: the Model
+Coupling Toolkit (MCT) \cite{Larson2005}; OASIS3-MCT \cite{Valcke,Valcke2013};
+the Earth System Modeling Framework (ESMF) \cite{Ramework2004}; and OpenPALM
+\cite{Piacentini2011}. After comparing these modeling frameworks, OASIS3-MCT was
+chosen given its continued development and simple coupling mechanism.
+
+The remainder of the document discusses the research problem in detail before
+going onto an in-depth literature review for the state of the art in distributed
+and coupled applications. The proposed approach and work plan for the project is
+then given to conclude the proposal.
+
+\section*{Statement of Problem}
+
+Currently, WRF and LES aren't coupled and LES has two variants: the original
+single threaded code and the OpenCL-accelerated variant. Kinabra et al.
+\cite{Kinbara2010} found merging WRF and LES to be worthwhile.
+
+Clearly state the problem to be addressed in your forthcoming project. Explain
+why it would be worthwhile to solve this problem.
+
+\section*{Literature Review}
+
+Intro and statement of problem in much more detail. Discussion of effective MPI
+usage as well.
+
+Present an overview of relevant previous work including articles, books, and
+existing software products. Critically evaluate the strengths and weaknesses of
+previous work.
+
+\subsection*{Message Passing Interface}
+
+What is it?
+
+Why is it useful?
+
+How to make sure MPI is used efficiently?
+
+\subsection*{Model Couplers}
+
+\subsubsection*{Why Couple?}
+
+Applications currently exist that model a single aspect of our Earth's climate.
+Each model is useful in their own right however more accurate and detailed
+analysis can be conducted by making use of multiple models. For instance, the
+effect ocean and land temperatures have on airflows could be investigated. This
+isn't viable by using the models independently.
+
+\subsubsection*{How to Couple?}
+
+Three ways to couple models: merging code bases (bad); using some method of
+communication (e.g.) MPI, or using a coupling framework (best).
+
+\subsubsection*{Comparison of Model Couplers}
+
+MCT
+
+ESMF
+
+OASIS3-MCT
+
+OpenPALM
+
+\section*{Proposed Approach}
+
+State how you propose to solve the software development problem. Show that your
+approach is feasible, but identify any risks.
+
+\section*{Work Plan}
+
+Show how you plan to organise your work, identifying intermediate deliverables
+and dates.
+
+\begin{itemize}
+	\item Create distributed LES
+	\item Couple LES and WRF
+	\item Evaluate performance
+	\item Compare coupling framework to GCMF
+	\item Evaluate differences
+\end{itemize}
+
 \bibliographystyle{plain}
 \bibliography{1002536r}
-
-\end{multicols}
 
 \end{document}
