@@ -1,43 +1,52 @@
-\documentclass[twoside]{article}
-\usepackage{multicol}
+\documentclass[a4page,twocolumn]{article}
+
 \usepackage{fullpage}
-\usepackage{fancyhdr}
-	\pagestyle{fancy}
-	\fancyhead{}
-	\fancyfoot{}
-	\fancyhead[C]{Project Proposal $\bullet$ Level 5 Computing Science}
-	\fancyfoot[RO,LE]{\thepage}
-\usepackage{hyperref}
+
+\usepackage{titlesec}
+\titlespacing{\section}{0pt}{0pt}{0pt}
+\titlespacing{\subsection}{0pt}{0pt}{0pt}
+\titlespacing{\subsubsection}{0pt}{0pt}{0pt}
+
 \title{Coupling the distributed Large Eddy Simulation (LES) and Weather
 Research and Forecasting model (WRF) using OASIS3-MCT and MPI}
-\author{
-	\large
-	\textsc{Gordon Reid - 1002536r}\\University of Glasgow
-}
+
+\author{\large\textsc{Gordon Reid - 1002536r}\\University of Glasgow}
+
 \date{\today}
 
 \begin{document}
+\setlength{\parskip}{0.3cm}
 
 \maketitle
-\thispagestyle{fancy}
 
 \begin{abstract}
 
-\noindent Weather and climate scientists have created software which models
-different aspects of our planet's ecosystem, for example ocean, wind, land, and
+\noindent Scientists studying the geosciences have created software which models
+different aspects of our planet's ecosystem, for example ocean, wind, land and
 atmosphere. On their own, each model is useful however for higher accuracy, and
 to model more complex aspects of our climate, these models need to be coupled
-together. The project proposed involves coupling the Large Eddy Simulator (LES)
-with the Weather Research and Forecasting model (WRF) and having the coupled
-system scale to large computing clusters. Ideally the coupling would also be
-generic such that the OpenCL-accelerated LES could be used to allow greater
-performance on heterogeneous systems.
+together. The project proposed involves creating a distributed version of the
+Large Eddy Simulator (LES) then coupling the LES with the Weather Research and
+Forecasting model (WRF). The coupled system should scale to large computing
+clusters. Ideally the coupling would also be generic such that the
+OpenCL-accelerated LES could be used to allow greater performance on
+heterogeneous systems.
 
 \end{abstract}
 
-\begin{multicols}{2}
-
 \section*{Introduction}
+
+Our planet's ecosystem is highly complex. Geoscientists that are interested in
+modelling this ecosystem have created numerous systems which model one aspect of
+it, for instance creating a Large Eddy Simulator (LES) to study turbulent air
+flows \cite{Nakayama2011,Nakayama2012} and the Weather Research and Forecasting
+Model (WRF) for mesoscale weather prediction. For the last decade or so,
+interest has evolved from individual models to combining models
+\cite{Michalakes2010}. With this trend, a number of model coupling frameworks
+have been created to support the desire for co-simulation. A number of modeling
+frameworks have been looked at, including: The Model Coupling Toolkit (MCT)
+\cite{Larson2005}; OASIS3 \cite{Valcke,Valcke2013}; the Earth System Modeling
+Framework (ESMF) \cite{Ramework2004}; and OpenPALM \cite{Piacentini2011}.
 
 \section*{Statement of Problem}
 
@@ -51,7 +60,5 @@ performance on heterogeneous systems.
 
 \bibliographystyle{plain}
 \bibliography{1002536r}
-
-\end{multicols}
 
 \end{document}
