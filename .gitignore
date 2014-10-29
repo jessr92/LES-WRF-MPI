@@ -33,3 +33,5 @@ nout.*
 oasisExampleB
 debug.*
 *.nc
+
+*.out
