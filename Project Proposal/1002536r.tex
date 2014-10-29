@@ -1,16 +1,6 @@
-\documentclass[twocolumn]{article}
+\documentclass[a4paper,twocolumn,10pt]{article}
 
-\usepackage{geometry}
-\geometry{
-    a4paper,
-    total={210mm,297mm},
-	left=20mm,
-	right=20mm,
-	top=20mm,
-	bottom=20mm
-}
-
-\usepackage{fullpage}
+\usepackage[cm]{fullpage}
 
 \usepackage{titlesec}
 \titlespacing{\section}{0pt}{0pt}{0pt}
@@ -47,16 +37,34 @@ heterogeneous systems.
 \section*{Introduction}
 
 Our planet's ecosystem is highly complex. Geoscientists that are interested in
-modelling this ecosystem have created numerous systems which model one aspect of
-it, for instance creating a Large Eddy Simulator (LES) to study turbulent air
-flows \cite{Nakayama2011,Nakayama2012} and the Weather Research and Forecasting
-Model (WRF) for mesoscale weather prediction. For the last decade or so,
-interest has evolved from individual models to combining models
-\cite{Michalakes2010}. With this trend, a number of model coupling frameworks
-have been created to support the desire for co-simulation. A number of modeling
-frameworks have been looked at, including: The Model Coupling Toolkit (MCT)
-\cite{Larson2005}; OASIS3 \cite{Valcke,Valcke2013}; the Earth System Modeling
-Framework (ESMF) \cite{Ramework2004}; and OpenPALM \cite{Piacentini2011}.
+modelling this ecosystem have created numerous systems which each model one
+aspect, for instance a Large Eddy Simulator (LES) to study turbulent air flows
+\cite{Nakayama2011,Nakayama2012} and the Weather Research and Forecasting Model
+(WRF) for mesoscale weather prediction. For the last decade or so, interest has
+evolved from individual models to combining models \cite{Michalakes2010}. With
+this trend, a number of model coupling frameworks have been created to support
+the desire for co-simulation. These allow a single application to make use of
+multiple models without significant changes to the individual models code bases.
+Models communicate with each other via data exchanges at each timestep.
+
+The proposed work for the project involves two distinct stages. The first
+requires the modification of existing LES code to create a distributed version
+using the Message Passing Interface (MPI) for use on computer clusters. An
+additional aim is to allow use of the OpenCL-accelerated LES
+\cite{Vanderbauwhede2014} in the distributed system to improve the model's
+throughput further. The second stage involves the coupling of the distributed
+LES with the WRF using a model coupling framework.
+
+A number of modeling frameworks have been looked at, including: The Model
+Coupling Toolkit (MCT) \cite{Larson2005}; OASIS3-MCT \cite{Valcke,Valcke2013};
+the Earth System Modeling Framework (ESMF) \cite{Ramework2004}; and OpenPALM
+\cite{Piacentini2011}. After comparing these modeling frameworks, OASIS3-MCT was
+chosen given its continued development and simple coupling mechanism.
+
+The remainder of the document discusses the research problem in detail before
+going onto an in-depth literature review for the state of the art in distributed
+and coupled applications. The proposed approach and work plan for the project is
+then given with a summary afterwords to conclude the proposal.
 
 \section*{Statement of Problem}
 
