@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <dataset>
+        <oasis3-mct value="">
+            <param value="">
+                <intro value="" />
+                <generaldesc value="" />
+                <guidesc value="" />
+            </param>
+            <printruns value="">
+                <descprint value="" />
+                <runtime value="">
+                    <duration value="150" />
+                </runtime>
+                <debug value="">
+                    <nlogprt value="ptr_2">
+                        <ptr_2 value="" />
+                    </nlogprt>
+                </debug>
+                <timestat value="">
+                    <opttime value="none">
+                        <none value="" />
+                    </opttime>
+                </timestat>
+                <generalgroup value="">
+                    <groups_onoff value="0" />
+                    <mult_fields_name value="single" />
+                </generalgroup>
+            </printruns>
+            <modeldef value="">
+                <mainmodelparam value="" />
+                <modelparam value="">
+                    <models value="">
+                        <item_1912856 value="A">
+                            <maxunits value="units_off">
+                                <units_off value="" />
+                            </maxunits>
+                        </item_1912856>
+                        <item_1919465 value="B">
+                            <maxunits value="units_off">
+                                <units_off value="" />
+                            </maxunits>
+                        </item_1919465>
+                    </models>
+                    <model_names_list value="A;B" />
+                </modelparam>
+            </modeldef>
+            <grids value="">
+                <modelgrids value="" />
+                <defgrids value="">
+                    <gridsline value="">
+                        <item_2048788 value="axxx">
+                            <gridstatus value="regional_grid" />
+                            <grid_overlap value="0" />
+                            <dimsgrid value="dims_off">
+                                <dims_off value="" />
+                            </dimsgrid>
+                        </item_2048788>
+                        <item_2068867 value="bxxx">
+                            <gridstatus value="regional_grid" />
+                            <grid_overlap value="0" />
+                            <dimsgrid value="dims_off">
+                                <dims_off value="" />
+                            </dimsgrid>
+                        </item_2068867>
+                    </gridsline>
+                    <grid_names_list value="axxx;bxxx" />
+                </defgrids>
+            </grids>
+            <groups value="">
+                <groupedfld value="" />
+                <gpfld value="">
+                    <group value="" />
+                </gpfld>
+            </groups>
+            <fielddef value="">
+                <flddesc value="" />
+                <fldname value="">
+                    <flddef value="">
+                        <item_2213339 value="aoutxxxx">
+                            <namefldgui value="aoutxxxx" />
+                            <fldnamebef value="aoutxxxx" />
+                            <srcgrid value="axxx" />
+                            <fldnameaft value="binxxxx" />
+                            <tgtgrid value="bxxx" />
+                            <fldmult value="single" />
+                        </item_2213339>
+                        <item_2409680 value="boutxxxx">
+                            <namefldgui value="boutxxxx" />
+                            <fldnamebef value="boutxxxx" />
+                            <srcgrid value="bxxx" />
+                            <fldnameaft value="ainxxxxx" />
+                            <tgtgrid value="axxx" />
+                            <fldmult value="single" />
+                        </item_2409680>
+                    </flddef>
+                    <field_names_list value="aoutxxxx;boutxxxx" />
+                </fldname>
+            </fielddef>
+            <cplrststatus value="">
+                <fldproper value="" />
+                <cplrststatus value="">
+                    <crs value="">
+                        <item_2625542 value="aoutxxxx">
+                            <cpl value="10" />
+                            <restart value="fileA.nc" />
+                            <status value="exported" />
+                        </item_2625542>
+                        <item_2625553 value="boutxxxx">
+                            <cpl value="10" />
+                            <restart value="fileB.nc" />
+                            <status value="exported" />
+                        </item_2625553>
+                    </crs>
+                </cplrststatus>
+            </cplrststatus>
+            <seqlag value="">
+                <defineseqlag value="" />
+                <defseqlag value="">
+                    <seqlag value="">
+                        <item_2630553 value="aoutxxxx">
+                            <lag value="lag_off">
+                                <lag_off value="" />
+                            </lag>
+                            <seq value="seq_off">
+                                <seq_off value="" />
+                            </seq>
+                        </item_2630553>
+                        <item_2630564 value="boutxxxx">
+                            <lag value="lag_on">
+                                <lag_on value="">
+                                    <lag_fld value="10" />
+                                </lag_on>
+                            </lag>
+                            <seq value="seq_off">
+                                <seq_off value="" />
+                            </seq>
+                        </item_2630564>
+                    </seqlag>
+                </defseqlag>
+            </seqlag>
+            <timetransfo value="">
+                <timetransfo value="" />
+                <transftime value="">
+                    <time value="">
+                        <item_2638237 value="aoutxxxx">
+                            <loctrans value="loctrans_off">
+                                <loctrans_off value="" />
+                            </loctrans>
+                        </item_2638237>
+                        <item_2638248 value="boutxxxx">
+                            <loctrans value="loctrans_off">
+                                <loctrans_off value="" />
+                            </loctrans>
+                        </item_2638248>
+                    </time>
+                </transftime>
+            </timetransfo>
+            <checktransfo value="">
+                <cicotransfo value="" />
+                <transfcico value="">
+                    <checkinoutminmax value="">
+                        <item_2642181 value="aoutxxxx">
+                            <checkin value="checkin_on">
+                                <checkin_on value="" />
+                            </checkin>
+                            <checkout value="checkout_on">
+                                <checkout_on value="" />
+                            </checkout>
+                        </item_2642181>
+                        <item_2642192 value="boutxxxx">
+                            <checkin value="checkin_on">
+                                <checkin_on value="" />
+                            </checkin>
+                            <checkout value="checkout_on">
+                                <checkout_on value="" />
+                            </checkout>
+                        </item_2642192>
+                    </checkinoutminmax>
+                </transfcico>
+            </checktransfo>
+            <blastransfo value="">
+                <transfblas value="" />
+                <transfblon value="">
+                    <multaddoldnew value="">
+                        <item_2649145 value="aoutxxxx">
+                            <blasold value="blasold_off">
+                                <blasold_off value="" />
+                            </blasold>
+                            <blasnew value="blasnew_off">
+                                <blasnew_off value="" />
+                            </blasnew>
+                        </item_2649145>
+                        <item_2649156 value="boutxxxx">
+                            <blasold value="blasold_off">
+                                <blasold_off value="" />
+                            </blasold>
+                            <blasnew value="blasnew_off">
+                                <blasnew_off value="" />
+                            </blasnew>
+                        </item_2649156>
+                    </multaddoldnew>
+                </transfblon>
+            </blastransfo>
+            <interpolation value="">
+                <scriptransfo value="" />
+                <transfinterp value="">
+                    <interp value="">
+                        <item_2656109 value="aoutxxxx">
+                            <scrip value="scrip_off">
+                                <scrip_off value="" />
+                            </scrip>
+                        </item_2656109>
+                        <item_2656120 value="boutxxxx">
+                            <scrip value="scrip_off">
+                                <scrip_off value="" />
+                            </scrip>
+                        </item_2656120>
+                    </interp>
+                </transfinterp>
+            </interpolation>
+            <mapping value="">
+                <mappingtransfo value="" />
+                <transfmap value="">
+                    <map value="">
+                        <item_2660053 value="aoutxxxx">
+                            <mapremapping value="mapping_off">
+                                <mapping_off value="" />
+                            </mapremapping>
+                        </item_2660053>
+                        <item_2660064 value="boutxxxx">
+                            <mapremapping value="mapping_off">
+                                <mapping_off value="" />
+                            </mapremapping>
+                        </item_2660064>
+                    </map>
+                </transfmap>
+            </mapping>
+            <conservtransof value="">
+                <conservtransfo value="" />
+                <transfconserv value="">
+                    <conservation value="">
+                        <item_2663997 value="aoutxxxx">
+                            <conservopt value="conserv_off">
+                                <conserv_off value="" />
+                            </conservopt>
+                        </item_2663997>
+                        <item_2664008 value="boutxxxx">
+                            <conservopt value="conserv_off">
+                                <conserv_off value="" />
+                            </conservopt>
+                        </item_2664008>
+                    </conservation>
+                </transfconserv>
+            </conservtransof>
+            <summary value="">
+                <scriptsummary value="">
+                    <summaryscript value="******************************************************************BREAKLINE*** Summary of the coupling fields and their transformations: BREAKLINE******************************************************************BREAKLINE******************************************************************BREAKLINEaoutxxxx-binxxxx:BREAKLINESource grid : axxxBREAKLINETarget grid : bxxxBREAKLINESource grid regionalBREAKLINETarget grid regional BREAKLINECoupling period=10BREAKLINERestart file: fileA.ncBREAKLINEField status: EXPORTEDBREAKLINEBREAKLINEMin and max of the field sent calculatedBREAKLINEMin and max of the received field calculatedBREAKLINE********************************************************BREAKLINE********************************************************BREAKLINEboutxxxx-ainxxxxx:BREAKLINESource grid : bxxxBREAKLINETarget grid : axxxBREAKLINESource grid regionalBREAKLINETarget grid regional BREAKLINECoupling period=10BREAKLINERestart file: fileB.ncBREAKLINEField status: EXPORTEDBREAKLINE LAG=10BREAKLINEMin and max of the field sent calculatedBREAKLINEMin and max of the received field calculatedBREAKLINE********************************************************BREAKLINE********************************************************" />
+                </scriptsummary>
+            </summary>
+            <write value="">
+                <scriptnamcouple value="">
+                    <namcouplescript value="$NFIELDS BREAKLINE2BREAKLINE$END BREAKLINE####BREAKLINE$NBMODEL BREAKLINE2 A BBREAKLINE$END BREAKLINE####BREAKLINE$RUNTIME BREAKLINE150BREAKLINE$END BREAKLINE####BREAKLINE$NLOGPRT BREAKLINE2 0BREAKLINE$END BREAKLINE####BREAKLINE$STRINGS BREAKLINEaoutxxxx binxxxx 1 10 2 fileA.nc EXPORTEDBREAKLINEaxxx bxxxBREAKLINER 0 R 0 BREAKLINECHECKIN CHECKOUT BREAKLINEINT=1BREAKLINEINT=1BREAKLINE####BREAKLINEboutxxxx ainxxxxx 1 10 2 fileB.nc EXPORTEDBREAKLINEbxxx axxx LAG=10BREAKLINER 0 R 0 BREAKLINECHECKIN CHECKOUT BREAKLINEINT=1BREAKLINEINT=1BREAKLINE####BREAKLINE $END" />
+                </scriptnamcouple>
+            </write>
+        </oasis3-mct>
+        <meta>
+            <solver>
+                <name value="oasis3-mct" />
+            </solver>
+            <project>
+                <name value="asdasdasd" />
+                <address value="/home/mpi-user/LES-WRF-MPI/Examples/OASIS3-MCT/asdasdasd.xml" />
+                <username value="myName" />
+                <company value="myCompany" />
+            </project>
+            <action>
+                <callingAddress value="root.oasis3-mct.write" />
+            </action>
+            <temporary />
+            <scriptSuccess value="1" />
+            <engine>
+                <name value="OpenTEA" />
+                <launchCommand value="/usr/bin/wish /home/mpi-user/LES-WRF-MPI/OASIS3-MCT-GUI/opentea/opentea.tcl  -config /home/mpi-user/LES-WRF-MPI/OASIS3-MCT-GUI/myconfig.xml -config /home/mpi-user/LES-WRF-MPI/OASIS3-MCT-GUI/myconfig.xml -library /home/mpi-user/LES-WRF-MPI/OASIS3-MCT-GUI/library -config /home/mpi-user/LES-WRF-MPI/OASIS3-MCT-GUI/myconfig.xml -plugins /home/mpi-user/LES-WRF-MPI/OASIS3-MCT-GUI/library/DATA/pluginscripts" />
+                <pluginsPath value="/home/mpi-user/LES-WRF-MPI/OASIS3-MCT-GUI/library/DATA/pluginscripts" />
+                <libraryPath value="/home/mpi-user/LES-WRF-MPI/OASIS3-MCT-GUI/library" />
+                <configPath value="/home/mpi-user/LES-WRF-MPI/OASIS3-MCT-GUI/myconfig.xml" />
+            </engine>
+        </meta>
+    </dataset>
