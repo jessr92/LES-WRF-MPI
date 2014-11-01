@@ -185,10 +185,49 @@ Applications currently exist that model a single aspect of our Earth's climate.
 Each model is useful in their own right however more accurate and detailed
 analysis can be conducted by making use of multiple models. For instance, the
 effect ocean and land temperatures have on airflows could be investigated. This
-isn't viable by using the models independently.
+isn't viable by using the models independently so there is significant
+motivation to construct an efficient method of allowing applications to
+interact.
 
-Three ways to couple models: merging code bases (bad); using some method of
-communication (e.g.) MPI, or using a coupling framework (best).
+There are three ways applications can be coupled together \cite{Thevenin}. The
+first involves merging the two code bases. This solution is very efficient and
+portable as a single process is compiled. Data is shared via memory exchanges
+which are very lightweight however the process of merging is very complicated
+and the two code bases are no longer independent making continued development of
+each model difficult. Merging also causes problems for parallelism since each
+model's parallel abilities are dictated by the overarching code that controls
+both models. For these reasons this solution is not an appropriate way to couple
+models.
+
+The second solution \cite{Thevenin} is to use a communication library directly,
+such as MPI. This allows each model to be kept independent with the only code
+changes involved being related to the communication between each model itself.
+The solution still suffers from many problems. The coupling code isn't generic
+since each model needs to know exactly what model it is sending data to. Also,
+since the MPI API is fairly low level, knowledge of parallel computing
+techniques is required for efficient coupling. The problems of complexity and
+genericness increase if there are many models involved in the coupling with
+complicated exchanges required. Using MPI for data exchanges is definitely a
+viable way forward however a higher level solution is required to make coupling
+many models viable.
+
+The third solution \cite{Thevenin} follows on from the second. Instead of using
+an MPI library directly, a coupling library should be employed to extract the
+low level complexities of coupling. A coupling library is a separate piece of
+software that acts as the ``middle man'' between models and facilitates data
+exchanges between models using a generic interface. Coupling libraries can also
+provide tools for interpolation such as re-gridding if there is a difference
+between data representations between communicating models. Some coupling
+libraries also supply tools for performance analysis with graphical
+representations of runtime execution characteristics. There are many examples of
+coupling libraries in use, for example: the Model Coupling Toolkit (MCT)
+\cite{Larson2005}; OASIS3-MCT \cite{Valcke,Valcke2013}; the Earth System
+Modeling Framework (ESMF) \cite{Ramework2004}; and OpenPALM
+\cite{Piacentini2011}.
+
+Each of the listed model couplers have many similarities however they also have
+a number of differences in terms of how they couple models and the tools
+offered. A comparison of model couplers is given below.
 
 \subsubsection*{Comparison of Model Couplers}
 
