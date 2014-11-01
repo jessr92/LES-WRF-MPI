@@ -50,7 +50,9 @@ using the Message Passing Interface (MPI) for use on computer clusters. An
 additional aim is to allow use of the OpenCL-accelerated LES
 \cite{Vanderbauwhede2014} in the distributed system to improve the model's
 throughput further. The second stage involves the coupling of the distributed
-LES with the WRF using a model coupling framework.
+LES with the WRF using a model coupling framework. There is a potential third
+stage which involves comparing the coupling to the coupling using the Glasgow
+Model Coupling Framework (gcmf) \cite{Vanderbauwhede2014}.
 
 A number of modeling frameworks have been looked at, including: the Model
 Coupling Toolkit (MCT) \cite{Larson2005}; OASIS3-MCT \cite{Valcke,Valcke2013};
@@ -65,12 +67,26 @@ then given to conclude the proposal.
 
 \section*{Statement of Problem}
 
-Currently, WRF and LES aren't coupled and LES has two variants: the original
-single threaded code and the OpenCL-accelerated variant. Kinabra et al.
-\cite{Kinbara2010} found merging WRF and LES to be worthwhile.
+Individuals models for ocean, land, atmosphere, etc are useful in ther own right
+however geoscientists are now wanting to model more complex scenarios that
+require collaboration of multiple models. The collaboration can also lead to
+more accurate results since additional effects of other parts of the system can
+be added to the model in question e.g. merging WRF and LES led to greater wind
+velocity being predicted compared with running WRF on its own
+\cite{Kinbara2010,Nakayama1998}.
 
-Clearly state the problem to be addressed in your forthcoming project. Explain
-why it would be worthwhile to solve this problem.
+Currently, WRF and LES are independent models and LES has two variants: the
+original single threaded code and the OpenCL-accelerated variant. Vanderbauwhede
+and Takemi \cite{Vanderbauwhede2013} have also investigated the benefits of GPU
+accelerating WRF and found this to be ``feasible and worthwhile''.
+
+The problem to be addressed is two-fold: creating a MPI variant of LES to allow
+LES to run on multiple nodes in a computer cluster and then coupling this
+variant of LES with WRF. The MPI variant of the LES will increase the
+performance of the simulator since it will allow it to make use of a multi-node
+system such as a Beowulf cluster. The coupling of MPI LES with WRF will allow
+create a system that benefits from scalable performance and high accuracy
+results.
 
 \section*{Literature Review}
 
