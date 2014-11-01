@@ -55,7 +55,7 @@ additional aim is to allow use of the OpenCL-accelerated LES
 throughput further. The second stage involves the coupling of the distributed
 LES with the WRF using a model coupling framework. There is a potential third
 stage which involves comparing the coupling to the coupling using the Glasgow
-Model Coupling Framework (gcmf) \cite{Vanderbauwhede2014}.
+Model Coupling Framework (GCMF) \cite{Vanderbauwhede2014}.
 
 A number of modeling frameworks have been looked at, including: the Model
 Coupling Toolkit (MCT) \cite{Larson2005}; OASIS3-MCT \cite{Valcke,Valcke2013};
@@ -207,16 +207,25 @@ approach is feasible, but identify any risks.
 
 \section*{Work Plan}
 
-Show how you plan to organise your work, identifying intermediate deliverables
-and dates.
+The project has a number of distinct stages with deliverables at the end of each
+stage. The following major stages have been identified with the estimated
+delivery date given in bold:
 
-\begin{itemize}
-	\item Create distributed LES
-	\item Couple LES and WRF
-	\item Evaluate performance
-	\item Compare coupling framework to GCMF
-	\item Evaluate differences
-\end{itemize}
+\begin{description}
+	\item[25th November] Create distributed LES using MPI
+	\item[15th December] Couple LES and WRF using OASIS3-MCT
+	\item[3rd February] Evaluate performance of different node count and node
+    configurations for:
+    \begin{itemize}
+        \item MPI LES (using multiple MPI libraries if available)
+        \item Coupled System
+    \end{itemize}
+	\item[10th March] Compare coupling framework to GCMF
+	\item[31st March] Evaluate differences in performance between OASIS3-MCT
+    coupling and GCMF Coupling
+    \item[24th April Estimated] Final deliverable in the form of a paper/poster
+    describing work completed.
+\end{description}
 
 \bibliographystyle{acm}
 \bibliography{1002536r}
