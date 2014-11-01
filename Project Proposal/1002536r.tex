@@ -226,7 +226,17 @@ coupling libraries in use, for example: the Model Coupling Toolkit (MCT)
 System Modeling Framework (ESMF) \cite{Ramework2004}; and OpenPALM
 \cite{Piacentini2011}.
 
-Types of coupling (static/dynamic)...
+There are two main types of coupling: static and dynamic. In static coupling,
+all of the coupled components have to start simultaneously at the beginning of
+the simulation. This means any memory and CPU resources required by each model
+are allocated and locked until the end of the simulation, even if a model
+doesn't start using the resources until midway through the simulation. Dynamic
+coupling allows each coupled component to start and end as required, freeing up
+resources when not in use. Instead, resources are managed by the coupler.
+Generally there is a fixed amount of resources available to the coupler at the
+beginning of the simulation however the coupler is free to dynamically manage
+how the resources are used to meet the requirements of the currently running
+components.
 
 M x N problem...
 
