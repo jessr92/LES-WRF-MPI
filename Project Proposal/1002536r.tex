@@ -58,10 +58,11 @@ stage which involves comparing the coupling to the coupling using the Glasgow
 Model Coupling Framework (GCMF) \cite{Vanderbauwhede2014}.
 
 A number of modeling frameworks have been looked at, including: the Model
-Coupling Toolkit (MCT) \cite{Larson2005}; OASIS3-MCT \cite{Valcke,Valcke2013};
-the Earth System Modeling Framework (ESMF) \cite{Ramework2004}; and OpenPALM
-\cite{Piacentini2011}. After comparing these modeling frameworks, OASIS3-MCT was
-chosen given its continued development and simple coupling mechanism.
+Coupling Toolkit (MCT) \cite{Larson2005,Jacob2005}; OASIS3-MCT
+\cite{Valcke,Valcke2013}; the Earth System Modeling Framework (ESMF)
+\cite{Ramework2004}; and OpenPALM \cite{Piacentini2011}. After comparing these
+modeling frameworks, OASIS3-MCT was chosen given its continued development and
+simple coupling mechanism.
 
 The remainder of the document discusses the research problem in detail before
 going onto an in-depth literature review for the state of the art in distributed
@@ -221,9 +222,13 @@ between data representations between communicating models. Some coupling
 libraries also supply tools for performance analysis with graphical
 representations of runtime execution characteristics. There are many examples of
 coupling libraries in use, for example: the Model Coupling Toolkit (MCT)
-\cite{Larson2005}; OASIS3-MCT \cite{Valcke,Valcke2013}; the Earth System
-Modeling Framework (ESMF) \cite{Ramework2004}; and OpenPALM
+\cite{Larson2005,Jacob2005}; OASIS3-MCT \cite{Valcke,Valcke2013}; the Earth
+System Modeling Framework (ESMF) \cite{Ramework2004}; and OpenPALM
 \cite{Piacentini2011}.
+
+Types of coupling (static/dynamic)...
+
+M x N problem...
 
 Each of the listed model couplers have many similarities however they also have
 a number of differences in terms of how they couple models and the tools
@@ -231,7 +236,16 @@ offered. A comparison of model couplers is given below.
 
 \subsubsection*{Comparison of Model Couplers}
 
-MCT
+The Model Coupling Toolkit (MCT) \cite{Larson2005,Jacob2005} is a simple
+coupling framework which has been very successful having been used in the
+Coupled Ocean-Atmosphere-Wave-Sediment Transport (COAWST) modelling system,
+COAMPS for coastal atmosphere simulation, and WRF. The toolkit also forms the
+underlying code for the coupler in the Community Climate System Model (CCSM).
+The project is suffering from bitrot, with the last commit to the MCT repository
+in December 2012. However, the OASIS team have integrated MCT code with their
+latest framework, OASIS3-MC,T so the framework is still in active use. For these
+reasons MCT will not be considered in its own right, instead considered with
+respect to OASIS3-MCT which is in active development.
 
 ESMF
 
