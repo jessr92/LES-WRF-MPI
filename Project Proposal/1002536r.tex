@@ -13,6 +13,9 @@ Forecasting model using OASIS3-MCT and MPI}
     \email{1002536r@student.gla.ac.uk}
 }
 
+\let\underscore\_
+\renewcommand{\_}{\underscore\hspace{0pt}}
+
 \begin{document}
 
 \maketitle
@@ -76,46 +79,111 @@ velocity being predicted compared with running WRF on its own
 \cite{Kinbara2010,Nakayama1998}.
 
 Currently, WRF and LES are independent models and LES has two variants: the
-original single threaded code and the OpenCL-accelerated variant. Vanderbauwhede
-and Takemi \cite{Vanderbauwhede2013} have also investigated the benefits of GPU
-accelerating WRF and found this to be ``feasible and worthwhile''.
+original single threaded code and the OpenCL-accelerated variant
+\cite{Vanderbauwhede2014}. Vanderbauwhede and Takemi \cite{Vanderbauwhede2013}
+have also investigated the benefits of GPU accelerating WRF and found this to be
+``feasible and worthwhile''.
 
 The problem to be addressed is two-fold: creating a MPI variant of LES to allow
 LES to run on multiple nodes in a computer cluster and then coupling this
 variant of LES with WRF. The MPI variant of the LES will increase the
 performance of the simulator since it will allow it to make use of a multi-node
-system such as a Beowulf cluster. The coupling of MPI LES with WRF will allow
-create a system that benefits from scalable performance and high accuracy
-results.
+distributed memory system such as a Beowulf cluster. The coupling of MPI LES
+with WRF will allow create a system that benefits from scalable performance and
+high accuracy results.
 
 \section*{Literature Review}
 
-Intro and statement of problem in much more detail. Discussion of effective MPI
-usage as well.
-
-Present an overview of relevant previous work including articles, books, and
-existing software products. Critically evaluate the strengths and weaknesses of
-previous work.
+Previous work falls under two related but independent areas: distributed
+computing using MPI for data sharing and model coupling. Model couplers
+generally use MPI for cross-model communication however this is generally hidden
+to the user under an API offered by the model coupling framework. MPI specific
+work will be discussed followed by a section dedicated to related work on model
+coupling.
 
 \subsection*{Message Passing Interface}
 
-What is it?
+Message Passing Interface (MPI) is a recognised standard for sharing data
+between processes on parallel systems and supports message passing between
+distinct computing nodes in a connected cluster. The standard creates a common
+interface that allows anybody to create their own implementation and ensures
+that different implementations of the same version of the standard can be
+interchanged without requiring user code changes. This has led MPI to be a
+\textit{de facto} standard for inter-process communication, especially across
+multiple nodes.
 
-Why is it useful?
+\subsubsection*{Multithreaded MPI Communication}
 
-How to make sure MPI is used efficiently?
+In addition to computer systems making use of multiple machines, each individual
+node now has multiple CPU cores and multiple CPU sockets. This poses an
+additional problem for application developers: how to enable the use of MPI
+inside a multithreaded application? Multiple threads and MPI individually bring
+their own complexity however there is an additional challenge when considering
+how multiple threads make MPI calls. The MPI standard defines four levels of
+thread support: \textbf{MPI\_THREAD\_SINGLE} requiring user code to be single
+threaded; \textbf{MPI\_THREAD\_FUNNELED} allowing user code to be multithreaded but
+one thread makes MPI calls; \textbf{MPI\_THREAD\_SERIALIZED} allowing user code to be
+multithreaded but MPI library calls are serialised and \textbf{MPI\_THREAD\_MULTIPLE}
+where threads can make MPI calls without concerning themselves about the other
+threads. Thakur and Gropp \cite{Thakur2009} and D\'{o}zsa and Kuma et al.\
+\cite{Kumar} have discussed the challenges of code correctness and performance
+of multithreaded MPI communication however they only focus on the
+\textbf{MPI\_THREAD\_MULTIPLE} case. This limitation isn't necessarily significant
+given that this is the most general case with \textbf{MPI\_THREAD\_FUNNELLED} and
+\textbf{MPI\_THREAD\_SERIALIZED} being restricted cases of multithread MPI programs.
+
+D\'{o}zsa and Kuma et al.\ \cite{Kumar} use a multichannel-enabled network
+hardware, granular locking, atomic operations, and concurrency-aware message
+queues to demonstrate that multithreaded applications can have a message passing
+rate that scales with multiple threads. The authors send zero-byte messages to
+measure the number of messages that can be sent per second as the number of
+threads grows. Performance is still worse than the Deep Computing Message
+Framework (DCMF) that is a lower level messaging library and has a message rate
+that scales almost linearly with the number of threads. The author's also
+haven't considered latency of messages or raw throughput since there may be an
+effect of the size of messages in a threaded environment and zero-byte messages
+are unrealistic. The authors have only investigated message rate for a small
+range of threads (1 to 4) however there can be single nodes with up to 64 cores
+(16 core CPUs on a quad-socket motherboard) which is where any
+multithreading-related performance problems would come to light.
+
+Thakur and Gropp \cite{Thakur2009} create and use a number of performance
+benchmarks using scenarios claimed to be close to typical applications. They
+test the cost of thread safety, the ability for concurrent progress to be made,
+and the possibilities for computation overlap. The authors first test involves a
+simple ping-pong latency test of a single threaded application that calls
+\textbf{MPI\_Init\_thread} with \textbf{MPI\_THREAD\_MULTIPLE}. The test shows
+negligible latency on some MPI implementations. The validity of this test can be
+question because, even though the MPI library is told to expect multiple threads
+making calls simultaneously, this doesn't happen and thus the effect of locks
+etc may not be being appropriately exercised to determine the overhead. The
+authors second test investigated cumulative bandwidth of MPICH2 and Open MPI
+implementations, comparing each libraries performance where parallelism is
+achieved via processes or threads. For the Linux cluster, performance in all
+cases saturates the 1Gbit/s link between nodes and thus no conclusions can be
+made. For the Sun and IBM cases, threading is shown to dramatically decrease
+throughput (over 50\%) in the threaded case compared to the process parallel
+case. The bandwidth in Sun's multithreaded case was less than the saturated
+bandwidth multithreaded case for the Linux cluster so this appears to show that
+Sun can significantly improve the performance of their MPI implementation.
+
+The other tests overall show how MPICH2 and Open MPI have fairly good
+performance however the authors note that, due to the Gigabit Ethernet
+interconnect, the overheads are generally masked since the ethernet connection
+is saturated in all cases, as shown by the cumulative bandwidth test. The paper
+has a more comprehensive look into the performance differences of MPI libraries
+and shows that significant work is required to minimise the overhead caused by
+multithreaded MPI applications. The authors also make their benchmark test suite
+available online for others to repeat their tests and see how different hardware
+setups react and how later versions of MPI libraries improve.
 
 \subsection*{Model Couplers}
-
-\subsubsection*{Why Couple?}
 
 Applications currently exist that model a single aspect of our Earth's climate.
 Each model is useful in their own right however more accurate and detailed
 analysis can be conducted by making use of multiple models. For instance, the
 effect ocean and land temperatures have on airflows could be investigated. This
 isn't viable by using the models independently.
-
-\subsubsection*{How to Couple?}
 
 Three ways to couple models: merging code bases (bad); using some method of
 communication (e.g.) MPI, or using a coupling framework (best).
