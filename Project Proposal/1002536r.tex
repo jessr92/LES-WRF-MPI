@@ -238,11 +238,24 @@ amount of resources available to the coupler at the beginning of the simulation
 however the coupler is free to dynamically manage how the resources are used to
 meet the requirements of the currently running components.
 
+During runtime, the models themselves can either be run sequentially or
+concurrently \cite{Maisonnave}. If two models need the results of each other
+from a previous timestep, they can run concurrently. If one of the models needs
+the result of the other from the current time step, the models run sequentially.
+If more than two models are coupled together, both sequential and concurrent
+execution may be required.
+
 Coupling parallel models has a problem that is generic to all models and model
-coupling frameworks. This is known as the ``Parallel Coupling Problem'' or
-``M-by-N problem''. Larson et al.\ \cite{Larson2005,Jacob2005} discuss this in
-detail with respect to the creation of the Model Coupling Toolkit....... DISCUSS
-THIS PROBLEM
+coupling frameworks. This is known as the \textit{Parallel Coupling Problem} or
+\textit{M-by-N problem}. Larson et al.\ \cite{Larson2005,Jacob2005} discuss this
+in detail with respect to the creation of the Model Coupling Toolkit. Consider a
+coupled system where a model is running on M processes and another model is
+running on N processes. The \textit{M-by-N problem} is the problem of
+transferring data between the M process model and the N process model. The
+communication pattern required changes for different values for M and N. This
+problem increases in complexity when more than two models are interacting with
+each other. It is up to the model coupling framework to work out an efficient
+and scalable solution for all possible communication patterns.
 
 Each of the listed model couplers have many similarities however they also have
 a number of differences in terms of how they couple models and the tools
