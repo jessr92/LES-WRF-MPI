@@ -1,5 +1,7 @@
 \documentclass{acm_proc_article-sp}
 
+\usepackage{hyperref}
+
 \title{Coupling the distributed Large Eddy Simulation and Weather Research and
 Forecasting model using OASIS3-MCT and MPI}
 
@@ -270,15 +272,97 @@ COAMPS for coastal atmosphere simulation, and WRF. The toolkit also forms the
 underlying code for the coupler in the Community Climate System Model (CCSM).
 The project is suffering from bitrot, with the last commit to the MCT repository
 in December 2012. However, the OASIS team have integrated MCT code with their
-latest framework, OASIS3-MC,T so the framework is still in active use. For these
+latest framework, OASIS3-MCT so the framework is still in active use. For these
 reasons MCT will not be considered in its own right, instead considered with
 respect to OASIS3-MCT which is in active development.
 
-ESMF
+The remaining three coupling frameworks have been looked at in detail. Overall
+all frameworks are functionally similar however there are different approaches
+in how coupling is expressed. ESMF has a dedicated coupler component expressed
+in Fortran with explicit API calls in each model, the coupler, and master thread
+for the coupling setup and data transfer. OASIS3-MCT and OpenPALM use a plain
+text file to express the coupling in a much simpler, condensed format.
+OASIS3-MCT allows changes to be made to the coupling configuration without
+requiring recompilation whereas OpenPALM may require recompilation due to
+changes in the GUI-created `glue code' for the coupling.
 
-OASIS3-MCT
+\textbf{ESMF} is in active development with an extensive API. The API is the
+largest out of the three (the reference documentation is 1140 pages long, an
+order of magnitude larger than the rest) and, since everything is done in
+Fortran, the framework suffers from a significant amount of boilerplate code
+that the user must write. The code is fairly straightforward so a tool could
+probably be written to create most of the code automatically however such a tool
+does not exist. The everything-in-code method also means recompilation is
+required for any modification to the coupling configuration. On a positive note,
+the extensive and granular API makes the framework arguably more flexible and
+potentially easier to read since everything is in Fortran and explicitly
+defined.
 
-OpenPALM
+A dummy coupling was created between two components
+\footnote{\url{https://github.com/gordon1992/LES-WRF-MPI/tree/master/Examples/ESMF}}.
+The dummy coupling required around 350 source lines of code just to set up a
+no-op model coupling.
+
+Due to the seemingly unnecessary amount of code required to create a simple
+coupling, ESMF was not chosen as the preferred model coupling framework to use.
+
+\textbf{OpenPALM} hasn't had a new release since January 2013, nearly two years
+ago at the time of writing. It does however seem to be in active use, with a
+training session organised for January 2015. OpenPALM uses a GUI, called
+PrePALM, which is a GUI for defining the coupling configuration. There is a
+small API with tens of possible calls that need to be added to the models to be
+coupled. Each model also requires specially defined Fortran comments that are
+`ID cards' that define information on the model and what fields it has that can
+be sent to other models. These comments are read by the GUI to help setup the
+coupling. The GUI generates many files including a text file defining the
+coupling setup and a number of glue code files to allow the coupling
+configuration to be compiled and run. When compared with OASIS3-MCT this seems
+fairly complex and overall heavyweight however the tool generates a Makefile so
+that the end user only needs to interact with the GUI and doesn't need to
+concern themeselves with the several files created by the GUI.
+
+OpenPALM also offers a feature to log and automatically analyse the runtime of
+the coupled system. The GUI offers views on CPU time for each model, a timeline
+of what model ran when, and even a `playback' feature where the flow of
+execution can be viewed graphically.
+
+Given the reliance on the GUI, a sampling coupling was not created specifically
+for comparison between ESMF and OASIS3-MCT.
+
+Overall, due to the seemingly heavyweight approach to creating a model coupling,
+OpenPALM was not chosen as the preferred model coupling framework to use.
+
+\textbf{OASIS3-MCT} is in active development, with the latest release in May
+2013. Also, from May 2014, WRF has added OASIS3-MCT coupling code
+\footnote{\url{https://verc.enes.org/oasis/news/oasis3-mct-in-wrf-version-3.6}}.
+This official coupling support makes using OASIS3-MCT for the LES-WRF coupling a
+more attractive option.
+
+The previous version of OASIS was OASIS3. The change from OASIS3 to OASIS3-MCT
+brought a lot of changes due to the integration of MCT code, for instance the
+namcouple file which contains the coupling configuration is much simpler with a
+lot of content deprecated. This doesn't seem to reduce the feature set of the
+coupling framework but does given the impression that OASIS could be doing with
+a break in backwards compatibility for the sake of cleaning up documentation and
+the framework code base.
+
+OASIS3-MCT makes use of coupling `restart files' which are netCDF files
+containing data in use. This is used to read data initially and for storing data
+to be sent to another model if the model doesn't need it yet. This reliance on
+I/O operations is a potential performance concern which will need to be
+investigated during runtime.
+
+The next version of OASIS3-MCT will bring a GUI for creating the namcouple file
+automatically and a performance analysis tool, LUCIA \cite{Maisonnave} which may
+bring its feature set more inline with OpenPALMs offerings.
+
+A dummy coupling was created between two components
+\footnote{\url{https://github.com/gordon1992/LES-WRF-MPI/tree/master/Examples/OASIS3-MCT}}.
+The coupling required just under 100 sources lines of code to create a coupling
+that transferred a 2D array between two models.
+
+Given ESMFs simple namcouple file format and active development, it was chosen
+as the preferred model coupling framework to use.
 
 \section*{Proposed Approach}
 
@@ -303,8 +387,8 @@ delivery date given in bold:
 	\item[10th March] Compare coupling framework to GCMF
 	\item[31st March] Evaluate differences in performance between OASIS3-MCT
     coupling and GCMF Coupling
-    \item[24th April Estimated] Final deliverable in the form of a paper/poster
-    describing work completed.
+    \item[24th April (Estimated)] Final deliverable in the form of a paper and a
+    presentation or poster describing work completed.
 \end{description}
 
 \bibliographystyle{acm}
