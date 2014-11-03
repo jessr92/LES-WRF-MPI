@@ -46,18 +46,21 @@ aspect, for instance a Large Eddy Simulator (LES) to study turbulent air flows
 evolved from individual models to combining models \cite{Michalakes2010}. With
 this trend, a number of model coupling frameworks have been created to support
 the desire for co-simulation. These allow a single application to make use of
-multiple models without significant changes to the individual models code bases.
-Models communicate with each other via data exchanges at each timestep.
+multiple models without significant changes to the individual models' code
+bases. Models communicate with each other via data exchanges at each timestep
+which are handled by the coupling framework. The coupling frameworks typically
+use the Message Passing Interface (MPI) for communication since MPI is the
+\textit{de facto} standard for parallel communication.
 
 The proposed work for the project involves two distinct stages. The first
 requires the modification of existing LES code to create a distributed version
-using the Message Passing Interface (MPI) for use on computer clusters. An
-additional aim is to allow use of the OpenCL-accelerated LES
-\cite{Vanderbauwhede2014} in the distributed system to improve the model's
-throughput further. The second stage involves the coupling of the distributed
-LES with the WRF using a model coupling framework. There is a potential third
-stage which involves comparing the coupling to the coupling using the Glasgow
-Model Coupling Framework (GCMF) \cite{Vanderbauwhede2014}.
+using MPI for use on computer clusters. An additional aim is to allow use of the
+OpenCL-accelerated LES \cite{Vanderbauwhede2014} in the distributed system to
+improve the model's throughput further. The second stage involves the coupling
+of the distributed LES with the WRF using a model coupling framework. There is a
+potential third stage which involves comparing the coupling from the second
+stage to a coupling using the Glasgow Model Coupling Framework (GCMF)
+\cite{Vanderbauwhede2014}.
 
 A number of modeling frameworks have been looked at, including: the Model
 Coupling Toolkit (MCT) \cite{Larson2005,Jacob2005}; OASIS3-MCT
@@ -77,12 +80,12 @@ Individuals models for ocean, land, atmosphere, etc are useful in ther own right
 however geoscientists are now wanting to model more complex scenarios that
 require collaboration of multiple models. The collaboration can also lead to
 more accurate results since additional effects of other parts of the system can
-be added to the model in question e.g. merging WRF and LES led to greater wind
+be added to the model in question e.g. coupling WRF and LES led to greater wind
 velocity being predicted compared with running WRF on its own
 \cite{Kinbara2010,Nakayama1998}.
 
 Currently, WRF and LES are independent models and LES has two variants: the
-original single threaded code and the OpenCL-accelerated variant
+original single threaded code and the OpenCL accelerated variant
 \cite{Vanderbauwhede2014}. Vanderbauwhede and Takemi \cite{Vanderbauwhede2013}
 have also investigated the benefits of GPU accelerating WRF and found this to be
 ``feasible and worthwhile''.
@@ -92,13 +95,13 @@ LES to run on multiple nodes in a computer cluster and then coupling this
 variant of LES with WRF. The MPI variant of the LES will increase the
 performance of the simulator since it will allow it to make use of a multi-node
 distributed memory system such as a Beowulf cluster. The coupling of MPI LES
-with WRF will allow create a system that benefits from scalable performance and
-high accuracy results.
+with WRF will create a system that benefits from scalable performance and high
+accuracy results.
 
 \section*{Literature Review}
 
 Previous work falls under two related but independent areas: distributed
-computing using MPI for data sharing and model coupling. Model couplers
+computing using MPI for data sharing, and model coupling. Model couplers
 generally use MPI for cross-model communication however this is generally hidden
 to the user under an API offered by the model coupling framework. MPI specific
 work will be discussed followed by a section dedicated to related work on model
@@ -107,13 +110,14 @@ coupling.
 \subsection*{Message Passing Interface}
 
 Message Passing Interface (MPI) is a recognised standard for sharing data
-between processes on parallel systems and supports message passing between
-distinct computing nodes in a connected cluster. The standard creates a common
-interface that allows anybody to create their own implementation and ensures
-that different implementations of the same version of the standard can be
+between processes on parallel systems and supports message passing between nodes
+in a computer cluster or supercomputer. The standard creates a common interface
+that allows anybody to create their own implementation and ensures that
+different implementations of the same version of the standard can be
 interchanged without requiring user code changes. This has led MPI to be a
 \textit{de facto} standard for inter-process communication, especially across
-multiple nodes.
+multiple nodes. There are implementations of the standard for many languages
+including C, Fortran, Java, and Python.
 
 \subsubsection*{Multithreaded MPI Communication}
 
@@ -121,12 +125,14 @@ In addition to computer systems making use of multiple machines, each individual
 node now has multiple CPU cores and multiple CPU sockets. This poses an
 additional problem for application developers: how to enable the use of MPI
 inside a multithreaded application? Multiple threads and MPI individually bring
-their own complexity however there is an additional challenge when considering
-how multiple threads make MPI calls. The MPI standard defines four levels of
-thread support: \textbf{MPI\_THREAD\_SINGLE} requiring user code to be single
-threaded; \textbf{MPI\_THREAD\_FUNNELED} allowing user code to be multithreaded
-but one thread makes MPI calls; \textbf{MPI\_THREAD\_SERIALIZED} allowing user
-code to be multithreaded but MPI library calls are serialised and
+their own complexity that a developer has to deal with however there is an
+additional challenge when considering how multiple threads make MPI calls. The
+concurrent calling of MPI functions can pose issues especially if the data being
+sent or received is shared by multiple threads. The MPI standard defines four
+levels of thread support: \textbf{MPI\_THREAD\_SINGLE} requiring user code to be
+single threaded; \textbf{MPI\_THREAD\_FUNNELED} allowing user code to be
+multithreaded but one thread makes MPI calls; \textbf{MPI\_THREAD\_SERIALIZED}
+allowing user code to be multithreaded but MPI library calls are serialised and
 \textbf{MPI\_THREAD\_MULTIPLE} where threads can make MPI calls without
 concerning themselves about the other threads. Thakur and Gropp
 \cite{Thakur2009} and D\'{o}zsa and Kuma et al.\ \cite{Kumar} have discussed the
@@ -142,15 +148,19 @@ hardware, granular locking, atomic operations, and concurrency-aware message
 queues to demonstrate that multithreaded applications can have a message passing
 rate that scales with multiple threads. The authors send zero-byte messages to
 measure the number of messages that can be sent per second as the number of
-threads grows. Performance is still worse than the Deep Computing Message
-Framework (DCMF) that is a lower level messaging library and has a message rate
-that scales almost linearly with the number of threads. The author's also
-haven't considered latency of messages or raw throughput since there may be an
-effect of the size of messages in a threaded environment and zero-byte messages
-are unrealistic. The authors have only investigated message rate for a small
-range of threads (1 to 4) however there can be single nodes with up to 64 cores
-(16 core CPUs on a quad-socket motherboard) which is where any
-multithreading-related performance problems would come to light.
+threads grows. There is a near-linear increase in performance as the number of
+threads is increased whereas the default implementation sees a message rate
+\textit{decrease} as thread count increases. Performance is still worse than the
+Deep Computing Message Framework (DCMF) which is a lower level messaging library
+and has a message rate that scales almost linearly with the number of threads
+and has performance nearly seven times greater than the optimised implementation
+when both run on four threads. The authors also haven't considered latency of
+messages or raw throughput since there may be an effect of the size of messages
+in a threaded environment and zero-byte messages are unrealistic. The authors
+have only investigated message rate for a small range of threads (1 to 4)
+however there can be single nodes with up to 64 cores (16 core CPUs on a
+quad-socket motherboard) which is where any multithreading-related performance
+problems would come to light.
 
 Thakur and Gropp \cite{Thakur2009} create and use a number of performance
 benchmarks using scenarios claimed to be close to typical applications. They
@@ -164,13 +174,14 @@ making calls simultaneously, this doesn't happen and thus the effect of locks
 etc may not be being appropriately exercised to determine the overhead. The
 authors second test investigated cumulative bandwidth of MPICH2 and Open MPI
 implementations, comparing each libraries performance where parallelism is
-achieved via processes or threads. For the Linux cluster, performance in all
-cases saturates the 1Gbit/s link between nodes and thus no conclusions can be
-made. For the Sun and IBM cases, threading is shown to dramatically decrease
-throughput (over 50\%) in the threaded case compared to the process parallel
-case. The bandwidth in Sun's multithreaded case was less than the saturated
-bandwidth multithreaded case for the Linux cluster so this appears to show that
-Sun can significantly improve the performance of their MPI implementation.
+achieved via processes or threads. For the Linux cluster, performance in all bar
+one case, the 1Gbit/s link between nodes is saturated and thus no conclusions
+can be made. For the Sun and IBM cases, threading is shown to dramatically
+decrease throughput (over 50\%) in the threaded case compared to the process
+parallel case. The bandwidth in Sun's multithreaded case was less than the
+saturated bandwidth multithreaded case for the Linux cluster so this appears to
+show that Sun can significantly improve the performance of their MPI
+implementation.
 
 The other tests overall show how MPICH2 and Open MPI have fairly good
 performance however the authors note that, due to the Gigabit Ethernet
@@ -309,17 +320,17 @@ coupling, ESMF was not chosen as the preferred model coupling framework to use.
 \textbf{OpenPALM} hasn't had a new release since January 2013, nearly two years
 ago at the time of writing. It does however seem to be in active use, with a
 training session organised for January 2015. OpenPALM uses a GUI, called
-PrePALM, which is a GUI for defining the coupling configuration. There is a
-small API with tens of possible calls that need to be added to the models to be
-coupled. Each model also requires specially defined Fortran comments that are
-`ID cards' that define information on the model and what fields it has that can
-be sent to other models. These comments are read by the GUI to help setup the
-coupling. The GUI generates many files including a text file defining the
-coupling setup and a number of glue code files to allow the coupling
-configuration to be compiled and run. When compared with OASIS3-MCT this seems
-fairly complex and overall heavyweight however the tool generates a Makefile so
-that the end user only needs to interact with the GUI and doesn't need to
-concern themeselves with the several files created by the GUI.
+PrePALM, for defining the coupling configuration. There is a small API with tens
+of possible calls that need to be added to the models to be coupled. Each model
+also requires specially defined Fortran comments that are `ID cards' that define
+information on the model and what fields it has that can be sent to other
+models. These comments are read by the GUI to help setup the coupling. The GUI
+generates many files including a text file defining the coupling setup and a
+number of glue code files to allow the coupling configuration to be compiled and
+run. When compared with OASIS3-MCT this seems fairly complex and overall
+heavyweight however the tool generates a Makefile so that the end user only
+needs to interact with the GUI and doesn't need to concern themeselves with the
+several files created by the GUI.
 
 OpenPALM also offers a feature to log and automatically analyse the runtime of
 the coupled system. The GUI offers views on CPU time for each model, a timeline
@@ -358,8 +369,9 @@ bring its feature set more inline with OpenPALMs offerings.
 
 A dummy coupling was created between two components
 \footnote{\url{https://github.com/gordon1992/LES-WRF-MPI/tree/master/Examples/OASIS3-MCT}}.
-The coupling required just under 100 sources lines of code to create a coupling
-that transferred a 2D array between two models.
+The coupling required an additional 100 sources lines of code (including the
+plain text namcouple file) to create a coupling that transferred a 2D array
+between two models.
 
 Given ESMFs simple namcouple file format and active development, it was chosen
 as the preferred model coupling framework to use.
