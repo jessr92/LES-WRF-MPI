@@ -2,8 +2,8 @@
 
 \usepackage{hyperref}
 
-\title{Coupling the distributed Large Eddy Simulation and Weather Research and
-Forecasting model using OASIS3-MCT and MPI}
+\title{Exploring coupling the distributed Large Eddy Simulation and Weather
+Research and Forecasting model}
 
 \numberofauthors{1}
 
@@ -414,21 +414,19 @@ used to couple OpenMP WRF with the OpenCL accelerated LES variant successfully.
 \section*{Work Plan}
 
 The project has a number of distinct stages with deliverables at the end of each
-stage. The following major stages have been identified with the estimated
+stage. The following major deliverables have been identified with the estimated
 delivery date given in bold:
 
 \begin{description}
-	\item[25th November] Create distributed LES using MPI
-	\item[15th December] Couple LES and WRF using OASIS3-MCT
-	\item[3rd February] Evaluate performance of different node count and node
-    configurations for:
+	\item[25th November] Distributed LES implementation
+	\item[15th December] Coupled system of LES and WRF using OASIS3-MCT
+	\item[3rd February] Performance evaluation for:
     \begin{itemize}
         \item MPI LES (using multiple MPI libraries if available)
         \item Coupled System
     \end{itemize}
-	\item[10th March] Compare coupling framework to GMCF
-	\item[31st March] Evaluate differences in performance between OASIS3-MCT
-    coupling and GMCF Coupling
+	\item[31st March] Performance evaluation and qualitative comparison between
+    OASIS3-MCT coupling and GMCF Coupling
     \item[24th April (Estimated)] Final deliverable in the form of a paper and a
     presentation or poster describing work completed.
 \end{description}
