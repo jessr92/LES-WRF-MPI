@@ -380,7 +380,7 @@ as the preferred model coupling framework to use.
 
 \section*{Proposed Approach}
 
-As stated before, there are a number of disinct stages to the project and each
+As stated before, there are a number of distinct stages to the project and each
 stage requires a different approach.
 
 The first stage involves creating a distributed version of the LES. This will
@@ -399,6 +399,17 @@ minimal requirement for I/O operations. There is also potential problems with
 modifying WRF for the OASIS coupling. WRF is a highly complex piece of software
 and making changes, especially given my lack of experience with the code base,
 could be challenging.
+
+The evaluation of performance will have two parts: evaluating the MPI LES and
+the coupled system performance as node count increases, perhaps with different
+MPI implementations (say MPICH and OpenMPI). MPI libraries aren't strictly
+interchangeable however with the availability of the wrapper compiler
+\textit{mpifort} mixing MPI implementations may be straightforward.
+
+If time allows, a third stage of the project will take place. The third stage
+involves comparing the differences in performance of the OASIS3-MCT coupling to
+the GCMF coupling. GCMF is in proof-of-concept stage however has already been
+used to couple OpenMP WRF with the OpenCL accelerated LES variant successfully.
 
 \section*{Work Plan}
 
