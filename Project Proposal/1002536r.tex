@@ -361,7 +361,9 @@ OASIS3-MCT makes use of coupling `restart files' which are netCDF files
 containing data in use. This is used to read data initially and for storing data
 to be sent to another model if the model doesn't need it yet. This reliance on
 I/O operations is a potential performance concern which will need to be
-investigated during runtime.
+investigated during runtime. On the other hand, Polcher et al.\
+\cite{Polcher2013} did not find I/O to be a bottleneck in their ORCHIDEE
+coupling when executed on a cluster with up to 20 CPUs.
 
 The next version of OASIS3-MCT will bring a GUI for creating the namcouple file
 automatically and a performance analysis tool, LUCIA \cite{Maisonnave} which may
@@ -378,8 +380,25 @@ as the preferred model coupling framework to use.
 
 \section*{Proposed Approach}
 
-State how you propose to solve the software development problem. Show that your
-approach is feasible, but identify any risks.
+As stated before, there are a number of disinct stages to the project and each
+stage requires a different approach.
+
+The first stage involves creating a distributed version of the LES. This will
+use MPI since it is the \textit{de facto} standard for cross-process
+communication and OASIS3-MCT uses MPI1 capabilities for the coupling itself.
+Even though OASIS3-MCT itself is limited to MPI1 capabilities, there should be
+no issue using MPI2, or even MPI3 capabilities for the model-local parallelism
+since MPI is mostly backward compatible. The dummy OASIS3-MCT coupling created
+as part of the feasibility study was compiled with MPICH 3.1.2, an MPI3 capable
+library without issue.
+
+The second stage involves coupling LES with WRF. For each timestep of WRF, LES
+will run about one hundred times then data is exchanged. This will need to be
+expressed in the coupling mechanism to avoid unnecessary data transfers and
+minimal requirement for I/O operations. There is also potential problems with
+modifying WRF for the OASIS coupling. WRF is a highly complex piece of software
+and making changes, especially given my lack of experience with the code base,
+could be challenging.
 
 \section*{Work Plan}
 
