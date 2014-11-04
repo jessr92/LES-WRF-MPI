@@ -98,7 +98,7 @@ INT=0
 # Field 2 - component B to component A
 ###############################################################################
 boutxxxx ainxxxxx 1 10 2 fileB.nc EXPORTED
-bxxx axxx LAG=+10
+bxxx axxx
  R 0 R 0
 CHECKIN CHECKOUT
 INT=0
