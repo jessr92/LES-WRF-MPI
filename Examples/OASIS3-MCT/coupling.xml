@@ -80,7 +80,7 @@
                             <namefldgui value="aoutxxxx" />
                             <fldnamebef value="aoutxxxx" />
                             <srcgrid value="axxx" />
-                            <fldnameaft value="binxxxx" />
+                            <fldnameaft value="binxxxxx" />
                             <tgtgrid value="bxxx" />
                             <fldmult value="single" />
                         </item_2213339>
@@ -126,10 +126,8 @@
                             </seq>
                         </item_2630553>
                         <item_2630564 value="boutxxxx">
-                            <lag value="lag_on">
-                                <lag_on value="">
-                                    <lag_fld value="10" />
-                                </lag_on>
+                            <lag value="lag_off">
+                                <lag_off value="" />
                             </lag>
                             <seq value="seq_off">
                                 <seq_off value="" />
@@ -259,7 +257,7 @@
             </summary>
             <write value="">
                 <scriptnamcouple value="">
-                    <namcouplescript value="$NFIELDS BREAKLINE2BREAKLINE$END BREAKLINE####BREAKLINE$NBMODEL BREAKLINE2 A BBREAKLINE$END BREAKLINE####BREAKLINE$RUNTIME BREAKLINE150BREAKLINE$END BREAKLINE####BREAKLINE$NLOGPRT BREAKLINE2 0BREAKLINE$END BREAKLINE####BREAKLINE$STRINGS BREAKLINEaoutxxxx binxxxx 1 10 2 fileA.nc EXPORTEDBREAKLINEaxxx bxxxBREAKLINER 0 R 0 BREAKLINECHECKIN CHECKOUT BREAKLINEINT=1BREAKLINEINT=1BREAKLINE####BREAKLINEboutxxxx ainxxxxx 1 10 2 fileB.nc EXPORTEDBREAKLINEbxxx axxx LAG=10BREAKLINER 0 R 0 BREAKLINECHECKIN CHECKOUT BREAKLINEINT=1BREAKLINEINT=1BREAKLINE####BREAKLINE $END" />
+                    <namcouplescript value="$NFIELDS BREAKLINE2BREAKLINE$END BREAKLINE####BREAKLINE$NBMODEL BREAKLINE2 A BBREAKLINE$END BREAKLINE####BREAKLINE$RUNTIME BREAKLINE150BREAKLINE$END BREAKLINE####BREAKLINE$NLOGPRT BREAKLINE2 0BREAKLINE$END BREAKLINE####BREAKLINE$STRINGS BREAKLINEaoutxxxx binxxxxx 1 10 2 fileA.nc EXPORTEDBREAKLINEaxxx bxxxBREAKLINER 0 R 0 BREAKLINECHECKIN CHECKOUT BREAKLINEINT=1BREAKLINEINT=1BREAKLINE####BREAKLINEboutxxxx ainxxxxx 1 10 2 fileB.nc EXPORTEDBREAKLINEbxxx axxxBREAKLINER 0 R 0 BREAKLINECHECKIN CHECKOUT BREAKLINEINT=1BREAKLINEINT=1BREAKLINE####BREAKLINE $END" />
                 </scriptnamcouple>
             </write>
         </oasis3-mct>
@@ -268,8 +266,8 @@
                 <name value="oasis3-mct" />
             </solver>
             <project>
-                <name value="asdasdasd" />
-                <address value="/home/mpi-user/LES-WRF-MPI/Examples/OASIS3-MCT/asdasdasd.xml" />
+                <name value="coupling" />
+                <address value="/home/mpi-user/LES-WRF-MPI/Examples/OASIS3-MCT/coupling.xml" />
                 <username value="myName" />
                 <company value="myCompany" />
             </project>

@@ -30,7 +30,7 @@ INT=1
 INT=1
 ####
 boutxxxx ainxxxxx 1 10 2 fileB.nc EXPORTED
-bxxx axxx LAG=10
+bxxx axxx
 R 0 R 0 
 CHECKIN CHECKOUT 
 INT=1
