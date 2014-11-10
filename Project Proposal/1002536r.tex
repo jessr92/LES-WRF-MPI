@@ -126,22 +126,7 @@ node now has multiple CPU cores and multiple CPU sockets. This poses an
 additional problem for application developers: how to enable the use of MPI
 inside a multithreaded application? Multiple threads and MPI individually bring
 their own complexity that a developer has to deal with however there is an
-additional challenge when considering how multiple threads make MPI calls. The
-concurrent calling of MPI functions can pose issues especially if the data being
-sent or received is shared by multiple threads. The MPI standard defines four
-levels of thread support: \textbf{MPI\_THREAD\_SINGLE} requiring user code to be
-single threaded; \textbf{MPI\_THREAD\_FUNNELED} allowing user code to be
-multithreaded but one thread makes MPI calls; \textbf{MPI\_THREAD\_SERIALIZED}
-allowing user code to be multithreaded but MPI library calls are serialised and
-\textbf{MPI\_THREAD\_MULTIPLE} where threads can make MPI calls without
-concerning themselves about the other threads. Thakur and Gropp
-\cite{Thakur2009} and D\'{o}zsa and Kuma et al.\ \cite{Kumar} have discussed the
-challenges of code correctness and performance of multithreaded MPI
-communication however they only focus on the \textbf{MPI\_THREAD\_MULTIPLE}
-case. This limitation isn't necessarily significant given that this is the most
-general case with \textbf{MPI\_THREAD\_FUNNELLED} and
-\textbf{MPI\_THREAD\_SERIALIZED} being restricted cases of multithread MPI
-programs.
+additional challenge when considering how multiple threads make MPI calls.
 
 D\'{o}zsa and Kuma et al.\ \cite{Kumar} use a multichannel-enabled network
 hardware, granular locking, atomic operations, and concurrency-aware message
