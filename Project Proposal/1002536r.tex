@@ -400,6 +400,18 @@ make get/put calls, it works out which processes need to communicate with each
 other to complete the calls. The developer is not required to bundle together
 the array to be sent nor does the library do this.
 
+OASIS3-MCT's architecture is simpler still.
+\footnote{\url{http://www.cerfacs.fr/oa4web/oasis3-mct/oasis3mct_UserGuide/
+node62.html}}. OASIS3-MCT is only a library just like ESMF and OpenPALM however,
+thanks to MCT, it requires no explicit coupling components as with ESMF and
+OpenPALM. Any transformations required for communication between models is
+executed on either the sender or recipient processes since there is no central
+coupler executable. This also necessitates point-to-point communication between
+models, similar to OpenPALM. OASIS3-MCT's method of dealing with the
+\textit{M-by-N problem} is the same as OpenPALM and `put' calls are also
+non-blocking with `get' calls blocking. OASIS3-MCT also allows buffering of data
+through the use of coupler restart files stored on disk during runtime.
+
 TODO - Describe why OASIS3-MCT was chosen over the others
 
 % ESMF
@@ -452,7 +464,7 @@ will run about one hundred times then data is exchanged. This will need to be
 expressed in the coupling mechanism to avoid unnecessary data transfers and
 minimal requirement for I/O operations. There is also potential problems with
 modifying WRF for the OASIS coupling. WRF is a highly complex piece of software
-and making changes, especially given my lack of experience with the code base,
+and making changes, especially with a lack of experience with the code base,
 could be challenging.
 
 The evaluation of performance will have two parts: evaluating the MPI LES and
