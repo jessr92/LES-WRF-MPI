@@ -342,18 +342,42 @@ bring its feature set more inline with OpenPALMs offerings.
 
 \subsubsection*{Comparison of Model Couplers}
 
-TODO - Compare model couplers in detail with a focus on how communication
-between the models takes place.
-
 Each model coupler takes a different approach to the overall coupling
 architecture and communication strategies.
+
+ESMF has two layers, `superstructure' and `infrastructure' which sandwich the
+user code being coupled. The superstructure is the upper layer which provides
+high level components to the developer, such as Gridded Components to associate
+with each model, Coupler Components to define how two models interact, and
+States to encapsulate data flow between models. The infrastructure layer is the
+lower layer which provides tools to manage the complexity of the different time
+steps and data representations between models. The architecture is designed such
+that each ESMF component doesn't need to know anything about the models it is
+coupled with allowing component reuse and limited changes to the model code
+itself. The design is also very flexible, allowing components to be coupled in
+any manner required, for instance a hub-and-spokes coupling, and does not
+restrict modes of execution to just solely sequential or solely concurrent.
+
+For communication, ESMF is also very flexible, even allowing model
+communications to occur in the middle of a time step. There is no communication
+mechanism hardwired into ESMF and, since all communication between models is
+done via an explicit coupling component, any number of transformations can be
+executed on data before being given to the receiving model. ESMF has a ``Uniform
+communication API''
+\footnote{\url{http://www.earthsystemmodeling.org/esmf_releases/
+public/last/ESMF_usrdoc/node12.html}}
+meaning the same interface is used for shared memory and distributed memory
+communication. This interface is realised by the ESMF Virtual Machine, an
+abstraction of machine architecture, which handles all of the resource
+management and communication methods.
 
 TODO - Describe why OASIS3-MCT was chosen over the others
 
 % ESMF
 
 A dummy coupling was created between two components in ESMF
-\footnote{\url{https://github.com/gordon1992/LES-WRF-MPI/tree/master/Examples/ESMF}}.
+\footnote{\url{https://github.com/gordon1992/LES-WRF-MPI/tree/master/
+Examples/ESMF}}.
 The dummy coupling required around 350 source lines of code just to set up a
 no-op model coupling.
 
@@ -371,7 +395,8 @@ OpenPALM was not chosen as the preferred model coupling framework to use.
 % OASIS3-MCT
 
 A dummy coupling was created between two components
-\footnote{\url{https://github.com/gordon1992/LES-WRF-MPI/tree/master/Examples/OASIS3-MCT}}.
+\footnote{\url{https://github.com/gordon1992/LES-WRF-MPI/tree/master/
+Examples/OASIS3-MCT}}.
 The coupling required an additional 100 sources lines of code (including the
 plain text namcouple file) to create a coupling that transferred a 2D array
 between two models.
