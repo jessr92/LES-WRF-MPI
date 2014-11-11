@@ -178,7 +178,7 @@ multithreaded MPI applications. The authors also make their benchmark test suite
 available online for others to repeat their tests and see how different hardware
 setups react and how later versions of MPI libraries improve.
 
-\subsection*{Model Couplers}
+\subsection*{Model Coupling}
 
 Applications currently exist that model a single aspect of our Earth's climate.
 Each model is useful in their own right however more accurate and detailed
@@ -259,7 +259,7 @@ Each of the listed model couplers have many similarities however they also have
 a number of differences in terms of how they couple models and the tools
 offered. A comparison of model couplers is given below.
 
-\subsubsection*{Comparison of Model Couplers}
+\subsubsection*{Model Couplers}
 
 The Model Coupling Toolkit (MCT) \cite{Larson2005,Jacob2005} is a simple
 coupling framework which has been very successful having been used in the
@@ -294,14 +294,6 @@ the extensive and granular API makes the framework arguably more flexible and
 potentially easier to read since everything is in Fortran and explicitly
 defined.
 
-A dummy coupling was created between two components
-\footnote{\url{https://github.com/gordon1992/LES-WRF-MPI/tree/master/Examples/ESMF}}.
-The dummy coupling required around 350 source lines of code just to set up a
-no-op model coupling.
-
-Due to the seemingly unnecessary amount of code required to create a simple
-coupling, ESMF was not chosen as the preferred model coupling framework to use.
-
 \textbf{OpenPALM} hasn't had a new release since January 2013, nearly two years
 ago at the time of writing. It does however seem to be in active use, with a
 training session organised for January 2015. OpenPALM uses a GUI, called
@@ -321,12 +313,6 @@ OpenPALM also offers a feature to log and automatically analyse the runtime of
 the coupled system. The GUI offers views on CPU time for each model, a timeline
 of what model ran when, and even a `playback' feature where the flow of
 execution can be viewed graphically.
-
-Given the reliance on the GUI, a sampling coupling was not created specifically
-for comparison between ESMF and OASIS3-MCT.
-
-Overall, due to the seemingly heavyweight approach to creating a model coupling,
-OpenPALM was not chosen as the preferred model coupling framework to use.
 
 \textbf{OASIS3-MCT} is in active development, with the latest release in May
 2013. Also, from May 2014, WRF has added OASIS3-MCT coupling code
@@ -353,6 +339,36 @@ coupling when executed on a cluster with up to 20 CPUs.
 The next version of OASIS3-MCT will bring a GUI for creating the namcouple file
 automatically and a performance analysis tool, LUCIA \cite{Maisonnave} which may
 bring its feature set more inline with OpenPALMs offerings.
+
+\subsubsection*{Comparison of Model Couplers}
+
+TODO - Compare model couplers in detail with a focus on how communication
+between the models takes place.
+
+Each model coupler takes a different approach to the overall coupling
+architecture and communication strategies.
+
+TODO - Describe why OASIS3-MCT was chosen over the others
+
+% ESMF
+
+A dummy coupling was created between two components in ESMF
+\footnote{\url{https://github.com/gordon1992/LES-WRF-MPI/tree/master/Examples/ESMF}}.
+The dummy coupling required around 350 source lines of code just to set up a
+no-op model coupling.
+
+Due to the seemingly unnecessary amount of code required to create a simple
+coupling, ESMF was not chosen as the preferred model coupling framework to use.
+
+% OpenPALM
+
+Given the reliance on the GUI, a sampling coupling was not created specifically
+for comparison between ESMF and OASIS3-MCT.
+
+Overall, due to the seemingly heavyweight approach to creating a model coupling,
+OpenPALM was not chosen as the preferred model coupling framework to use.
+
+% OASIS3-MCT
 
 A dummy coupling was created between two components
 \footnote{\url{https://github.com/gordon1992/LES-WRF-MPI/tree/master/Examples/OASIS3-MCT}}.
