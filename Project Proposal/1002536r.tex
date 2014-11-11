@@ -371,6 +371,35 @@ communication. This interface is realised by the ESMF Virtual Machine, an
 abstraction of machine architecture, which handles all of the resource
 management and communication methods.
 
+OpenPALM has a simpler architecture to ESMF, with a lot of the underlying
+complexity hidden by the supplied graphical user interface, PrePALM. There is
+still an explicit coupler component however PrePALM generates the required glue
+code and Makefile automatically. As a result, after compilation, a `palm\_main'
+executable is created alongside the model executables. This is executed directly
+and it will manage the execution of the model executables as defined in the GUI.
+
+For communication, OpenPALM uses an ``end point'' communication methodology
+\footnote{\url{http://www.cerfacs.fr/globc/PALM_WEB/EN/OVERVIEW/
+endpointcommunications.html}} and components are kept independent from each
+other. This means that when a model produces data that it would like to make
+available to a component, it executes a `PALM\_Put' call. If another model
+requires data at some point, it executes a `PALM\_Get' call. At the model level,
+there is no need for the calls to match up with another model, it is only when
+the coupling is being created are the get and put calls matched up. The primary
+benefit of this is that if a model is being reused in another coupling, it is
+unlikely the calls themselves will need to be modified, just the configuration
+in the GUI. Another benefit is that this also means data transfer doesn't need
+to happen straight away, the recipient could be executed later or may be in the
+middle of some computation so the put call is non-blocking and the data is
+buffered, awaiting the corresponding get call.
+
+OpenPALM works around the \textit{M-by-N problem} in a manner largely
+transparent to the developer. For each model with multiple processes, OpenPALM
+is aware of what process contains what portion of each array so, when processes
+make get/put calls, it works out which processes need to communicate with each
+other to complete the calls. The developer is not required to bundle together
+the array to be sent nor does the library do this.
+
 TODO - Describe why OASIS3-MCT was chosen over the others
 
 % ESMF
