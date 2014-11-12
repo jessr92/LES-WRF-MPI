@@ -413,35 +413,26 @@ OpenPALM and `put' calls are also non-blocking with `get' calls blocking.
 OASIS3-MCT also allows buffering of data through the use of coupler restart
 files stored on disk during runtime.
 
-TODO - Describe why OASIS3-MCT was chosen over the others
-
-% ESMF
+To get a feel for how each framework is used and behaves, a coupling was created
+using all three frameworks.
 
 A dummy coupling was created between two components in ESMF
 \footnote{\url{https://github.com/gordon1992/LES-WRF-MPI/tree/master/
-Examples/ESMF}}.
-The dummy coupling required around 350 source lines of code just to set up a
-no-op model coupling.
+Examples/ESMF}}. The dummy coupling required around 350 source lines of code
+just to set up a no-op model coupling. Due to the seemingly unnecessary amount
+of code required to create a simple coupling, ESMF was not chosen as the
+preferred model coupling framework to use.
 
-Due to the seemingly unnecessary amount of code required to create a simple
-coupling, ESMF was not chosen as the preferred model coupling framework to use.
+For OpenPALM, the reliance on the GUI meant that a sampling coupling was not
+created specifically for comparison between ESMF and OASIS3-MCT. Overall, due to
+the seemingly heavyweight approach to creating a model coupling, OpenPALM was
+not chosen as the preferred model coupling framework to use.
 
-% OpenPALM
-
-Given the reliance on the GUI, a sampling coupling was not created specifically
-for comparison between ESMF and OASIS3-MCT.
-
-Overall, due to the seemingly heavyweight approach to creating a model coupling,
-OpenPALM was not chosen as the preferred model coupling framework to use.
-
-% OASIS3-MCT
-
-A dummy coupling was created between two components
+A dummy coupling was created between two components in OASIS3-MCT
 \footnote{\url{https://github.com/gordon1992/LES-WRF-MPI/tree/master/
-Examples/OASIS3-MCT}}.
-The coupling required an additional 100 sources lines of code (including the
-plain text namcouple file) to create a coupling that transferred a 2D array
-between two models.
+Examples/OASIS3-MCT}}. The coupling required an additional 100 sources lines of
+code (including the plain text namcouple file) to create a coupling that
+transferred a 2D array between two models.
 
 Given ESMFs simple namcouple file format and active development, it was chosen
 as the preferred model coupling framework to use.
