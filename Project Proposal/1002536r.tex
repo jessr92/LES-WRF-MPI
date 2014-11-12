@@ -214,17 +214,17 @@ viable way forward however a higher level solution is required to make coupling
 many models viable.
 
 The third solution \cite{Thevenin} follows on from the second. Instead of using
-an MPI library directly, a coupling library should be employed to extract the
-low level complexities of coupling. A coupling library is a separate piece of
-software that acts as the ``middle man'' between models and facilitates data
-exchanges between models using a generic interface. Coupling libraries can also
-provide tools for interpolation such as re-gridding if there is a difference
-between data representations between communicating models. Some coupling
-libraries also supply tools for performance analysis with graphical
+an MPI library directly, a coupling library is employed to extract the low level
+complexities of coupling. A coupling library is a separate piece of software
+that acts as the ``middle man'' between models and facilitates data exchanges
+between models using a generic interface. Coupling libraries can also provide
+tools for interpolation such as regridding \cite{Kuinghttons} if there is a
+difference between data representations between communicating models. Some
+coupling libraries also supply tools for performance analysis with graphical
 representations of runtime execution characteristics. There are many examples of
 coupling libraries in use, for example: the Model Coupling Toolkit (MCT)
 \cite{Larson2005,Jacob2005}; OASIS3-MCT \cite{Valcke,Valcke2013}; the Earth
-System Modeling Framework (ESMF) \cite{Ramework2004}; and OpenPALM
+System Modeling Framework (ESMF) \cite{Ramework2004} and OpenPALM
 \cite{Piacentini2011}.
 
 There are two main types of coupling: static and dynamic
@@ -248,10 +248,10 @@ execution may be required.
 
 Coupling parallel models has a problem that is generic to all models and model
 coupling frameworks. This is known as the \textit{Parallel Coupling Problem} or
-\textit{M-by-N problem}. Larson et al.\ \cite{Larson2005,Jacob2005} discuss this
-in detail with respect to the creation of the Model Coupling Toolkit. Consider a
-coupled system where a model is running on M processes and another model is
-running on N processes. The \textit{M-by-N problem} is the problem of
+the \textit{M-by-N problem}. Larson et al.\ \cite{Larson2005,Jacob2005} discuss
+this in detail with respect to the creation of the Model Coupling Toolkit.
+Consider a coupled system where a model is running on M processes and another
+model is running on N processes. The \textit{M-by-N problem} is the problem of
 transferring data between the M process model and the N process model. The
 communication pattern required changes for different values for M and N. This
 problem increases in complexity when more than two models are interacting with
@@ -271,19 +271,21 @@ COAMPS for coastal atmosphere simulation, and WRF. The toolkit also forms the
 underlying code for the coupler in the Community Climate System Model (CCSM).
 The project is suffering from bitrot, with the last commit to the MCT repository
 in December 2012. However, the OASIS team have integrated MCT code with their
-latest framework, OASIS3-MCT so the framework is still in active use. For these
+latest framework, OASIS3-MCT, so the framework is still in active use. For these
 reasons MCT will not be considered in its own right, instead considered with
 respect to OASIS3-MCT which is in active development.
 
 The remaining three coupling frameworks have been looked at in detail. Overall
-all frameworks are functionally similar however there are different approaches
-in how coupling is expressed. ESMF has a dedicated coupler component expressed
-in Fortran with explicit API calls in each model, the coupler, and master thread
-for the coupling setup and data transfer. OASIS3-MCT and OpenPALM use a plain
-text file to express the coupling in a much simpler, condensed format.
-OASIS3-MCT allows changes to be made to the coupling configuration without
-requiring recompilation whereas OpenPALM may require recompilation due to
-changes in the GUI-created `glue code' for the coupling.
+all frameworks are functionally similar however they employ different approaches
+in how coupling is expressed and behaves. ESMF has a dedicated coupler component
+expressed in Fortran with explicit API calls in each model, the coupler, and
+master thread for the coupling setup and data transfer. OASIS3-MCT and OpenPALM
+use a plain text file to express the coupling in a much simpler, condensed
+format however OpenPALM generates `glue code' to create a master process whereas
+OASIS3-MCT requires no extra process. OASIS3-MCT allows changes to be made to
+the coupling configuration without requiring recompilation whereas OpenPALM may
+require recompilation due to changes in the GUI-created `glue code' for the
+coupling.
 
 \textbf{ESMF} is in active development with an extensive API. The API is the
 largest out of the three (the reference documentation is 1140 pages long, an
@@ -318,29 +320,29 @@ of what model ran when, and even a `playback' feature where the flow of
 execution can be viewed graphically.
 
 \textbf{OASIS3-MCT} is in active development, with the latest release in May
-2013. Also, from May 2014, WRF has added OASIS3-MCT coupling code
-\cite{ENES2014}. This official coupling support makes using OASIS3-MCT for the
-LES-WRF coupling a more attractive option.
+2013. Also, from May 2014, WRF has added OASIS3-MCT coupling code in its version
+3.6 release \cite{ENES2014}. This official coupling support makes using
+OASIS3-MCT for the LES-WRF coupling a more attractive option.
 
-The previous version of OASIS was OASIS3. The change from OASIS3 to OASIS3-MCT
+The previous version of OASIS was OASIS3. The move from OASIS3 to OASIS3-MCT
 brought a lot of changes due to the integration of MCT code, for instance the
-namcouple file which contains the coupling configuration is much simpler with a
-lot of content deprecated. This doesn't seem to reduce the feature set of the
-coupling framework but does given the impression that OASIS could be doing with
-a break in backwards compatibility for the sake of cleaning up documentation and
-the framework code base.
+`namcouple' file which contains the coupling configuration is much simpler with
+a lot of content deprecated. This doesn't seem to reduce the feature set of the
+coupling framework but does given the impression that the OASIS framework could
+benefit from a break in backwards compatibility for a clean up of documentation
+and the framework code base.
 
-OASIS3-MCT makes use of coupling `restart files' which are netCDF files
-containing data in use. This is used to read data initially and for storing data
-to be sent to another model if the model doesn't need it yet. This reliance on
-I/O operations is a potential performance concern which will need to be
-investigated during runtime. On the other hand, Polcher et al.\
+OASIS3-MCT makes use of coupling `restart files' which are netCDF \cite{Unidata}
+files containing data in use. This is used to read data initially and for
+storing data to be sent to another model if the recipient model doesn't need it
+yet. This reliance on I/O operations is a potential performance concern which
+will need to be investigated during runtime. On the other hand, Polcher et al.\
 \cite{Polcher2013} did not find I/O to be a bottleneck in their ORCHIDEE
 coupling when executed on a cluster with up to 20 CPUs.
 
 The next version of OASIS3-MCT will bring a GUI for creating the namcouple file
-automatically and a performance analysis tool, LUCIA \cite{Maisonnave} which may
-bring its feature set more inline with OpenPALMs offerings.
+automatically and a performance analysis tool, LUCIA \cite{Maisonnave}, which
+may bring its feature set more inline with OpenPALM's offerings.
 
 \subsubsection*{Comparison of Model Couplers}
 
@@ -368,28 +370,30 @@ executed on data before being given to the receiving model. ESMF has a ``Uniform
 communication API'' \cite{ESMF2014} meaning the same interface is used for
 shared memory and distributed memory communication. This interface is realised
 by the ESMF Virtual Machine, an abstraction of machine architecture, which
-handles all of the resource management and communication methods.
+handles all of the resource management and communication methods. For load
+balancing, ESMF supports load balancing packages such as Parmetis
+\cite{Hoefler2010,Karypis1998} or developer-defined methods of load balancing.
 
-OpenPALM has a simpler architecture to ESMF, with a lot of the underlying
-complexity hidden by the supplied graphical user interface, PrePALM. There is
+OpenPALM has a simpler architecture to ESMF and a lot of the underlying
+complexity is hidden by the supplied graphical user interface, PrePALM. There is
 still an explicit coupler component however PrePALM generates the required glue
 code and Makefile automatically. As a result, after compilation, a `palm\_main'
 executable is created alongside the model executables. This is executed directly
-and it will manage the execution of the model executables as defined in the GUI.
+and it manages the execution of the model executables as defined in the GUI.
 
 For communication, OpenPALM uses an ``end point'' communication methodology
-\cite{CERFACS2007} and components are kept independent from each
-other. This means that when a model produces data that it would like to make
-available to a component, it executes a `PALM\_Put' call. If another model
-requires data at some point, it executes a `PALM\_Get' call. At the model level,
-there is no need for the calls to match up with another model, it is only when
-the coupling is being created are the get and put calls matched up. The primary
-benefit of this is that if a model is being reused in another coupling, it is
-unlikely the calls themselves will need to be modified, just the configuration
-in the GUI. Another benefit is that this also means data transfer doesn't need
-to happen straight away, the recipient could be executed later or may be in the
-middle of some computation so the put call is non-blocking and the data is
-buffered, awaiting the corresponding get call.
+\cite{CERFACS2007} and components are kept independent from each other. This
+means that when a model produces data that it would like to make available to a
+component, it executes a non-blocking `PALM\_Put' call. If another model
+requires data at some point, it executes a blocking `PALM\_Get' call. At the
+model level, there is no need for the calls to match up with another model, it
+is only when the coupling is being created are the get and put calls matched up.
+The primary benefit of this is that if a model is being reused in another
+coupling, it is unlikely that many of the calls themselves will need to be
+modified, just the configuration in the GUI. Another benefit is that this also
+means data transfer doesn't need to happen straight away, the recipient could be
+executed later or may be in the middle of some computation so the put call is
+non-blocking and the data is buffered, awaiting the corresponding get call.
 
 OpenPALM works around the \textit{M-by-N problem} in a manner largely
 transparent to the developer. For each model with multiple processes, OpenPALM
@@ -495,7 +499,7 @@ delivery date given in bold:
     and a presentation or poster describing work completed.
 \end{description}
 
-\bibliographystyle{plain-annote}
+\bibliographystyle{IEEEannot}
 \bibliography{1002536r}
 
 \end{document}
