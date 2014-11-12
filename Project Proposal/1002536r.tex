@@ -103,23 +103,23 @@ accuracy results.
 \section*{Literature Review}
 
 Previous work falls under two related but independent areas: distributed
-computing using MPI for data sharing, and model coupling. Model couplers
-generally use MPI for cross-model communication however this is generally hidden
-to the user under an API offered by the model coupling framework. MPI specific
-work will be discussed followed by a section dedicated to related work on model
-coupling.
+computing using MPI for data sharing via message passing, and model coupling.
+Model couplers generally use MPI for cross-model communication however this is
+generally hidden to the user under an API offered by the model coupling
+framework. MPI specific work will be discussed followed by a section dedicated
+to related work on model coupling.
 
 \subsection*{Message Passing Interface}
 
 Message Passing Interface (MPI) is a recognised standard for sharing data
-between processes on parallel systems and supports message passing between nodes
-in a computer cluster or supercomputer. The standard creates a common interface
-that allows anybody to create their own implementation and ensures that
-different implementations of the same version of the standard can be
-interchanged without requiring user code changes. This has led MPI to be a
-\textit{de facto} standard for inter-process communication, especially across
-multiple nodes. There are implementations of the standard for many languages
-including C, Fortran, Java, and Python.
+between processes on parallel systems by supporting message passing between
+nodes in a computer cluster or supercomputer. The standard creates a common
+interface that allows anybody to create their own implementation and ensures
+that different implementations of the same version of the standard can be
+interchanged without requiring user code changes for the most part. This has led
+MPI to be a \textit{de facto} standard for inter-process communication,
+especially across multiple nodes. There are implementations of the standard for
+many languages including C, Fortran, Java, and Python.
 
 \subsubsection*{Multithreaded MPI Communication}
 
@@ -130,7 +130,7 @@ inside a multithreaded application? Multiple threads and MPI individually bring
 their own complexity that a developer has to deal with however there is an
 additional challenge when considering how multiple threads make MPI calls.
 
-D\'{o}zsa and Kuma et al.\ \cite{Kumar} use a multichannel-enabled network
+D\'{o}zsa and Kuma et al.\ \cite{Kumar} use multichannel-enabled network
 hardware, granular locking, atomic operations, and concurrency-aware message
 queues to demonstrate that multithreaded applications can have a message passing
 rate that scales with multiple threads. The authors send zero-byte messages to
@@ -140,39 +140,40 @@ threads is increased whereas the default implementation sees a message rate
 \textit{decrease} as thread count increases. Performance is still worse than the
 Deep Computing Message Framework (DCMF) which is a lower level messaging library
 and has a message rate that scales almost linearly with the number of threads
-and has performance nearly seven times greater than the optimised implementation
-when both run on four threads. The authors also haven't considered latency of
-messages or raw throughput since there may be an effect of the size of messages
-in a threaded environment and zero-byte messages are unrealistic. The authors
-have only investigated message rate for a small range of threads (1 to 4)
-however there can be single nodes with up to 64 cores (16 core CPUs on a
-quad-socket motherboard) which is where any multithreading-related performance
-problems would come to light.
+and has performance nearly seven times greater than the optimised MPI
+implementation when both run on four threads. The authors also haven't
+considered latency of messages or raw throughput since there may be an effect of
+the size of messages in a threaded environment and zero-byte messages are
+unrealistic. The authors have only investigated message rate for a small range
+of threads (1 to 4) however there can be single nodes with 64 cores (16 core
+CPUs on a quad-socket motherboard) or more which is where any
+multithreading-related performance problems would come to light.
 
 Thakur and Gropp \cite{Thakur2009} create and use a number of performance
 benchmarks using scenarios claimed to be close to typical applications. They
 test the cost of thread safety, the ability for concurrent progress to be made,
 and the possibilities for computation overlap. The authors first test involves a
 simple ping-pong latency test of a single threaded application that calls
-\textbf{MPI\_Init\_thread} with \textbf{MPI\_THREAD\_MULTIPLE}. The test shows
-negligible latency on some MPI implementations. The validity of this test can be
-question because, even though the MPI library is told to expect multiple threads
-making calls simultaneously, this doesn't happen and thus the effect of locks
+\textbf{MPI\_Init\_thread} with \textbf{MPI\_THREAD\_MULTIPLE} which allows all
+threads to make MPI calls without having to explicitly synchronise with the
+other threads. The test shows negligible latency on some MPI implementations.
+The validity of this test can be question because, even though the MPI library
+is told to expect multiple threads making calls simultaneously, this doesn't
+happen since the processes remain single threaded and thus the effect of locks
 etc may not be being appropriately exercised to determine the overhead. The
-authors second test investigated cumulative bandwidth of MPICH2 and Open MPI
-implementations, comparing each libraries performance where parallelism is
-achieved via processes or threads. For the Linux cluster, performance in all bar
-one case, the 1Gbit/s link between nodes is saturated and thus no conclusions
-can be made. For the Sun and IBM cases, threading is shown to dramatically
-decrease throughput (over 50\%) in the threaded case compared to the process
-parallel case. The bandwidth in Sun's multithreaded case was less than the
-saturated bandwidth multithreaded case for the Linux cluster so this appears to
-show that Sun can significantly improve the performance of their MPI
-implementation.
+authors' second test investigated cumulative bandwidth of MPICH2 and Open MPI
+implementations, comparing each library's performance where parallelism is
+achieved via processes or threads. For the Linux cluster the 1Gbit/s link
+between nodes is saturated in all bar one case and thus no conclusions can be
+made. For the Sun and IBM cases, threading is shown to dramatically decrease
+throughput (over 50\%) in the threaded case compared to the process parallel
+case. The bandwidth in Sun's multithreaded case was less than the saturated
+bandwidth multithreaded case for the Linux cluster so this appears to show that
+Sun can significantly improve the performance of their MPI implementation.
 
 The other tests overall show how MPICH2 and Open MPI have fairly good
 performance however the authors note that, due to the Gigabit Ethernet
-interconnect, the overheads are generally masked since the ethernet connection
+interconnect, the overheads are generally masked since the Ethernet connection
 is saturated in all cases, as shown by the cumulative bandwidth test. The paper
 has a more comprehensive look into the performance differences of MPI libraries
 and shows that significant work is required to minimise the overhead caused by
