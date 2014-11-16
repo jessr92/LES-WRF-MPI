@@ -1,4 +1,4 @@
 LES-WRF-MPI
 ===========
 
-Distributed Large Eddy Simulation for Weather Research and Forecasting using MPI
+Exploring coupling the distributed Large Eddy Simulation and Weather Research and Forecasting model
