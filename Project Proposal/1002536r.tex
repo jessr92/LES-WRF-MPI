@@ -330,16 +330,16 @@ brought a lot of changes due to the integration of MCT code, for instance the
 `namcouple' file which contains the coupling configuration is much simpler with
 a lot of content deprecated. This doesn't seem to reduce the feature set of the
 coupling framework but does given the impression that the OASIS framework could
-benefit from a break in backwards compatibility for a clean up of documentation
-and the framework code base.
+benefit from a clean up of documentation and the framework code base.
 
-OASIS3-MCT makes use of coupling `restart files' which are netCDF \cite{Unidata}
-files containing data in use. This is used to read data initially and for
-storing data to be sent to another model if the recipient model doesn't need it
-yet. This reliance on I/O operations is a potential performance concern which
-will need to be investigated during runtime. On the other hand, Polcher et al.\
-\cite{Polcher2013} did not find I/O to be a bottleneck in their ORCHIDEE
-coupling when executed on a cluster with up to 20 CPUs.
+Depending on the coupling configuration, OASIS3-MCT may require the use of
+coupling `restart files' which are netCDF \cite{Unidata} files containing data
+in use. This is used to read data initially and for storing data to be sent to
+another model if the recipient model doesn't need it yet. This reliance on I/O
+operations is a potential performance concern which will need to be investigated
+during runtime. On the other hand, Polcher et al.\ \cite{Polcher2013} did not
+find I/O to be a bottleneck in their ORCHIDEE coupling when executed on a
+cluster with up to 20 CPUs.
 
 The next version of OASIS3-MCT will bring a GUI for creating the namcouple file
 automatically and a performance analysis tool, LUCIA \cite{Maisonnave}, which
@@ -354,14 +354,14 @@ ESMF has two layers, `superstructure' and `infrastructure' which sandwich the
 user code being coupled. The superstructure is the upper layer which provides
 high level components to the developer, such as Gridded Components to associate
 with each model, Coupler Components to define how two models interact, and
-States to encapsulate data flow between models. The infrastructure layer is the
-lower layer which provides tools to manage the complexity of the different time
-steps and data representations between models. The architecture is designed such
-that each ESMF component doesn't need to know anything about the models it is
-coupled with allowing component reuse and limited changes to the model code
-itself. The design is also very flexible, allowing components to be coupled in
-any manner required, for instance a hub-and-spokes coupling, and does not
-restrict modes of execution to just solely sequential or solely concurrent.
+States to encapsulate data between models. The infrastructure layer is the lower
+layer which provides tools to manage the complexity of the different time steps
+and data representations between models. The architecture is designed such that
+each ESMF component doesn't need to know anything about the models it is coupled
+with allowing component reuse and limited changes to the model code itself. The
+design is also very flexible, allowing components to be coupled in any manner
+required, for instance a hub-and-spokes coupling, and does not restrict modes of
+execution to just solely sequential or solely concurrent.
 
 For communication, ESMF is also very flexible, even allowing model
 communications to occur in the middle of a time step. There is no communication
@@ -420,9 +420,9 @@ using all three frameworks.
 A dummy coupling was created between two components in ESMF
 \footnote{\url{https://github.com/gordon1992/LES-WRF-MPI/tree/master/
 Examples/ESMF}}. The dummy coupling required around 350 source lines of code
-just to set up a no-op model coupling. Due to the seemingly unnecessary amount
-of code required to create a simple coupling, ESMF was not chosen as the
-preferred model coupling framework to use.
+just to set up a `no-op' model coupling. Due to the overly large amount of code
+required to create a simple coupling, ESMF was not chosen as the preferred model
+coupling framework to use.
 
 For OpenPALM, the reliance on the GUI meant that a sampling coupling was not
 created specifically for comparison between ESMF and OASIS3-MCT in terms of
