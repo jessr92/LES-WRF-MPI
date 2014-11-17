@@ -1,9 +1,10 @@
 FC = mpifort
-FCFLAGS = -fopenmp -W -Wall -Wno-unused-parameter -O2
-PROGRAMS = helloMPI helloOpenMP helloMPIOpenMP
+FCFLAGS = -fopenmp -W -Wall -Wno-unused-parameter -g -Og -fbounds-check -fbacktrace -finit-real=nan -fcheck=all -C
+PROGRAMS = helloMPI helloOpenMP helloMPIOpenMP haloExchangeExample
 HELLO_MPI_OBJS = helloMPI.o
 HELLO_OPEN_MP_OBJS = helloOpenMP.o
 HELLO_MPI_OPEN_MP_OBJS = helloMPIOpenMP.o
+HALO_EXCHANGE_EXAMPLE_OBJS = haloExchangeExample.o mpi_helper.o
 
 all: $(PROGRAMS)
 
@@ -13,11 +14,9 @@ helloOpenMP: $(HELLO_OPEN_MP_OBJS)
 
 helloMPIOpenMP: $(HELLO_MPI_OPEN_MP_OBJS)
 
-helloMPI.o: helloMPI.f95
+haloExchangeExample: $(HALO_EXCHANGE_EXAMPLE_OBJS)
 
-helloOpenMP.o: helloOpenMP.f95
-
-helloMPIOpenMP.o: helloMPIOpenMP.f95
+haloExchangeExample.o : haloExchangeExample.f95 mpi_helper.mod
 
 %: %.o
 	$(FC) $(FCFLAGS) -o $@ $^ $(LDFLAGS)
@@ -29,4 +28,4 @@ helloMPIOpenMP.o: helloMPIOpenMP.f95
 	$(FC) $(FCFLAGS) -c $<
 
 clean:
-	rm *.o *~ ${PROGRAMS}
+	rm *.o *.mod *~ ${PROGRAMS}

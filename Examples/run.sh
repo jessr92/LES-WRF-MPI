@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 echo '**********'
 echo 'Compiling examples'
 echo '**********'
@@ -16,4 +17,7 @@ echo 'Running MPI OpenMP Hello World'
 echo '**********'
 mpiexec -n 4 ~/LES-WRF-MPI/Examples/helloMPIOpenMP
 echo '**********'
-
+echo 'Running MPI Halo Exchange Example'
+echo '*********'
+mpiexec -n 4 ~/LES-WRF-MPI/Examples/haloExchangeExample
+echo '*********'
