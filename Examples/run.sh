@@ -7,7 +7,7 @@ make
 echo '**********'
 echo 'Running Single Threaded MPI Hello World'
 echo '**********'
-mpiexec -n 8 ~/LES-WRF-MPI/Examples/helloMPI
+mpiexec -n 2 ~/LES-WRF-MPI/Examples/helloMPI
 echo '**********'
 echo 'Running Single Node OpenMP Hello World'
 echo '**********'

@@ -69,7 +69,7 @@ subroutine exchange2DHalos(processArray, colDim, rowDim)
     implicit none
     integer, dimension(colSize + 2,rowSize + 2), intent(inout) :: processArray
     integer, intent(in) :: colDim, rowDim
-    integer :: communicateWith, colType, rowType, test
+    integer :: communicateWith, colType, rowType
     call MPI_TYPE_CONTIGUOUS(colSize, MPI_INT, colType, ierror)
     call checkMPIError()
     call MPI_TYPE_COMMIT(colType, ierror)
