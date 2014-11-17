@@ -9,13 +9,17 @@ contains
 subroutine initialise_mpi()
     implicit none
     call MPI_INIT(ierror)
+    call checkMPIError()
     call MPI_COMM_SIZE(MPI_COMM_WORLD, mpi_size, ierror)
+    call checkMPIError()
     call MPI_COMM_RANK(MPI_COMM_WORLD, rank, ierror)
+    call checkMPIError()
 end subroutine initialise_mpi
 
 subroutine finalise_mpi()
     implicit none
     call MPI_FINALIZE(ierror)
+    call checkMPIError()
 end subroutine
 
 subroutine checkMPIError()
