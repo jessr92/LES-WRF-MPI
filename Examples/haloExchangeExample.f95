@@ -78,12 +78,11 @@ subroutine exchange2DHalos(processArray, colDim, rowDim)
     call checkMPIError()
     call MPI_TYPE_COMMIT(rowType, ierror)
     call checkMPIError()
-    
     if (rowDim .ne. 1) then
         ! Top edge to send, bottom edge to receive
         communicateWith = rank - (rows / rowSize)
         print*, 'Process ', rank, ' needs to send top edge to ', communicateWith
-        call mpi_sendrecv(processArray(2, 2), 1, rowType, communicateWith, rowTag, & 
+        call MPI_SendRecv(processArray(2, 2), 1, rowType, communicateWith, rowTag, & 
                           processArray(1, 2), 1, rowType, communicateWith, rowTag, &
                           MPI_COMM_WORLD, ierror)
     end if
@@ -93,7 +92,7 @@ subroutine exchange2DHalos(processArray, colDim, rowDim)
         if (communicateWith .lt. mpi_size) then
         print*, 'Process ', rank, ' needs to send bottom edge to ', communicateWith
                                   print*, 'Process ', rank, ' needs to send right edge to ', communicateWith
-        call mpi_sendrecv(processArray(colSize+1, 2), 1, rowType, communicateWith, rowTag, & 
+        call MPI_SendRecv(processArray(colSize+1, 2), 1, rowType, communicateWith, rowTag, & 
                           processArray(colSize+2, 2), 1, rowType, communicateWith, rowTag, & 
                           MPI_COMM_WORLD, ierror)
         end if
@@ -102,7 +101,7 @@ subroutine exchange2DHalos(processArray, colDim, rowDim)
         ! Left edge to send, right edge to receive
         communicateWith = rank - 1
         print*, 'Process ', rank, ' needs to send left edge to ', communicateWith
-        call mpi_sendrecv(processArray(2, 2), 1, colType, communicateWith, colTag, & 
+        call MPI_SendRecv(processArray(2, 2), 1, colType, communicateWith, colTag, & 
                           processArray(2, 1), 1, colType, communicateWith, colTag, &
                           MPI_COMM_WORLD, ierror)
     end if
@@ -110,12 +109,16 @@ subroutine exchange2DHalos(processArray, colDim, rowDim)
         ! Right edge to send, left edge to receive
         communicateWith = rank + 1
         print*, 'Process ', rank, ' needs to send right edge to ', communicateWith
-        call mpi_sendrecv(processArray(2, rowSize+1), 1, colType, communicateWith, colTag, & 
+        call MPI_SendRecv(processArray(2, rowSize+1), 1, colType, communicateWith, colTag, & 
                           processArray(2, rowSize+2), 1, colType, communicateWith, colTag, & 
                           MPI_COMM_WORLD, ierror)
     end if
     call sleep(rank)
     call outputArray(processArray)
+    call MPI_Type_Free(rowType, ierror)
+    call checkMPIError()
+    call MPI_Type_Free(colType, ierror)
+    call checkMPIError()
 end subroutine exchange2DHalos
 
 subroutine outputArray(array)
