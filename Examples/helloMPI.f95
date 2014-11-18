@@ -28,9 +28,7 @@ subroutine main()
         print*, 'node', rank, ': received ', recv
     end if
     print*, 'node', rank, ': Hello world'
-    if (rank .eq. 1) then
-        call MPI_FINALIZE(ierror)
-    end if
+    call MPI_FINALIZE(ierror)
 end subroutine main
 
 end program helloMPI
