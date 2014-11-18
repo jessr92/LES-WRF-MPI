@@ -4,8 +4,10 @@ implicit none
 integer, parameter :: rows = 10
 integer, parameter :: columns = 8
 integer :: colSize, rowSize ! Ignoring the halo boundaries, actual sizes will be + 2
-integer, parameter :: rowTag = 1
-integer, parameter :: colTag = 2
+integer, parameter :: topTag = 1
+integer, parameter :: bottomTag = 2
+integer, parameter :: leftTag = 3
+integer, parameter :: rightTag = 4
 
 ! Mapping desired (excluding boundaries)
 ! 0 0 0 0 0 1 1 1 1 1
@@ -26,8 +28,8 @@ subroutine main()
         call finalise_mpi()
         return
     endif
-    colSize = columns/(mpi_size/2)
-    rowSize = rows/(mpi_size/2)
+    colSize = columns/2
+    rowSize = rows/2
     call haloExchange()
     call finalise_mpi()
 end subroutine main
@@ -82,32 +84,32 @@ subroutine exchange2DHalos(processArray, colDim, rowDim)
         ! Top edge to send, bottom edge to receive
         communicateWith = rank - (rows / rowSize)
         print*, 'Process ', rank, ' needs to send top edge to ', communicateWith
-        call MPI_SendRecv(processArray(2, 2), 1, rowType, communicateWith, rowTag, & 
-                          processArray(1, 2), 1, rowType, communicateWith, rowTag, &
+        call MPI_SendRecv(processArray(2, 2), 1, rowType, communicateWith, topTag, & 
+                          processArray(1, 2), 1, rowType, communicateWith, bottomTag, &
                           MPI_COMM_WORLD, ierror)
     end if
-    if (rowDim + rowSize - 1 .ne. rows) then
+    if ((rowDim + rowSize - 1) .ne. rows) then
         ! Bottom edge to send, top edge to receive
         communicateWith = rank + (rows / rowSize)
         print*, 'Process ', rank, ' needs to send bottom edge to ', communicateWith
-        call MPI_SendRecv(processArray(colSize+1, 2), 1, rowType, communicateWith, rowTag, & 
-                          processArray(colSize+2, 2), 1, rowType, communicateWith, rowTag, & 
+        call MPI_SendRecv(processArray(colSize+1, 2), 1, rowType, communicateWith, bottomTag, & 
+                          processArray(colSize+2, 2), 1, rowType, communicateWith, topTag, & 
                           MPI_COMM_WORLD, ierror)
     end if
     if (colDim .ne. 1) then
         ! Left edge to send, right edge to receive
         communicateWith = rank - 1
         print*, 'Process ', rank, ' needs to send left edge to ', communicateWith
-        call MPI_SendRecv(processArray(2, 2), 1, colType, communicateWith, colTag, & 
-                          processArray(2, 1), 1, colType, communicateWith, colTag, &
+        call MPI_SendRecv(processArray(2, 2), 1, colType, communicateWith, leftTag, & 
+                          processArray(2, 1), 1, colType, communicateWith, rightTag, &
                           MPI_COMM_WORLD, ierror)
     end if
-    if (colDim + colSize - 1 .ne. columns) then
+    if ((colDim + colSize - 1) .ne. columns) then
         ! Right edge to send, left edge to receive
         communicateWith = rank + 1
         print*, 'Process ', rank, ' needs to send right edge to ', communicateWith
-        call MPI_SendRecv(processArray(2, rowSize+1), 1, colType, communicateWith, colTag, & 
-                          processArray(2, rowSize+2), 1, colType, communicateWith, colTag, & 
+        call MPI_SendRecv(processArray(2, rowSize+1), 1, colType, communicateWith, rightTag, & 
+                          processArray(2, rowSize+2), 1, colType, communicateWith, leftTag, & 
                           MPI_COMM_WORLD, ierror)
     end if
     call sleep(rank)
