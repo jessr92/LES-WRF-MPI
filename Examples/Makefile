@@ -1,5 +1,5 @@
 FC = mpifort
-FCFLAGS = -fopenmp -W -Wall -Wno-unused-parameter
+FCFLAGS = -fopenmp -W -Wall -Wno-unused-parameter -O1
 PROGRAMS = helloMPI helloOpenMP helloMPIOpenMP haloExchangeExample
 HELLO_MPI_OBJS = helloMPI.o
 HELLO_OPEN_MP_OBJS = helloOpenMP.o
