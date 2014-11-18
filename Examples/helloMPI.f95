@@ -25,7 +25,6 @@ subroutine main()
     end if
     if (rank .eq. destination) then
         !call MPI_RECV(recv, elements, MPI_INTEGER, source, tag, MPI_COMM_WORLD, ierror)
-        print*, 'node', rank, ': received ', recv
     end if
     print*, 'node', rank, ': Hello world'
     call MPI_FINALIZE(ierror)
