@@ -91,7 +91,6 @@ subroutine exchange2DHalos(processArray, colDim, rowDim)
         communicateWith = rank + (rows / rowSize)
         if (communicateWith .lt. mpi_size) then
         print*, 'Process ', rank, ' needs to send bottom edge to ', communicateWith
-                                  print*, 'Process ', rank, ' needs to send right edge to ', communicateWith
         call MPI_SendRecv(processArray(colSize+1, 2), 1, rowType, communicateWith, rowTag, & 
                           processArray(colSize+2, 2), 1, rowType, communicateWith, rowTag, & 
                           MPI_COMM_WORLD, ierror)
