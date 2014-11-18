@@ -70,13 +70,13 @@ subroutine exchange2DHalos(processArray, colDim, rowDim)
     integer, dimension(colSize + 2,rowSize + 2), intent(inout) :: processArray
     integer, intent(in) :: colDim, rowDim
     integer :: communicateWith, colType, rowType
-    call MPI_TYPE_CONTIGUOUS(colSize, MPI_INT, colType, ierror)
-    call checkMPIError()
-    call MPI_TYPE_COMMIT(colType, ierror)
-    call checkMPIError()
-    call MPI_TYPE_VECTOR(rowSize, 1, colSize+2, MPI_INT, rowType, ierror)
+    call MPI_TYPE_CONTIGUOUS(colSize, MPI_INT, rowType, ierror)
     call checkMPIError()
     call MPI_TYPE_COMMIT(rowType, ierror)
+    call checkMPIError()
+    call MPI_TYPE_VECTOR(rowSize, 1, colSize+2, MPI_INT, colType, ierror)
+    call checkMPIError()
+    call MPI_TYPE_COMMIT(colType, ierror)
     call checkMPIError()
     
     if (rowDim .ne. 1) then
@@ -102,7 +102,7 @@ subroutine exchange2DHalos(processArray, colDim, rowDim)
         communicateWith = rank - 1
         print*, 'Process ', rank, ' needs to send left edge to ', communicateWith
         call mpi_sendrecv(processArray(2, 2), 1, colType, communicateWith, colTag, & 
-                          processArray(2, 1), 1, colType, communicateWith, colTag, &
+                          processArray(1, 2), 1, colType, communicateWith, colTag, &
                           MPI_COMM_WORLD, ierror)
     end if
     if (colDim + colSize - 1 .ne. columns) then
@@ -123,7 +123,11 @@ subroutine outputArray(array)
     integer :: col, row
     do col = 1, size(array,1)
         do row = 1, size(array, 2)
-            write(*,"(I4)",advance="no") array(col,row)
+            if (array(col,row) .ne. -1) then
+                write(*,"(I4)",advance="no") array(col,row)
+            else
+                write(*,"(A4)",advance="no") '-'
+            end if
         end do
         write (*,*)
     end do
