@@ -8,24 +8,25 @@ contains
 
 subroutine initialise_mpi()
     implicit none
-    call MPI_INIT(ierror)
+    call MPI_Init(ierror)
     call checkMPIError()
-    call MPI_COMM_SIZE(MPI_COMM_WORLD, mpi_size, ierror)
+    call MPI_COMM_Size(MPI_COMM_WORLD, mpi_size, ierror)
     call checkMPIError()
-    call MPI_COMM_RANK(MPI_COMM_WORLD, rank, ierror)
+    call MPI_COMM_Rank(MPI_COMM_WORLD, rank, ierror)
     call checkMPIError()
 end subroutine initialise_mpi
 
 subroutine finalise_mpi()
     implicit none
-    call MPI_FINALIZE(ierror)
+    call MPI_Finalize(ierror)
     call checkMPIError()
 end subroutine
 
 subroutine checkMPIError()
     implicit none
     if (ierror .ne. MPI_SUCCESS) then
-        print*, ierror, "MPI error"
+        print*, ierror, " MPI error!"
+        call MPI_Abort(MPI_COMM_WORLD, ierror)
     end if
 end subroutine checkMPIError
 
