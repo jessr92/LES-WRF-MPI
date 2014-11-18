@@ -1,7 +1,7 @@
 program haloExchangeExample
 use mpi_helper
 implicit none
-integer, parameter :: rows = 4
+integer, parameter :: rows = 10
 integer, parameter :: columns = 8
 integer :: colSize, rowSize ! Ignoring the halo boundaries, actual sizes will be + 2
 integer, parameter :: rowTag = 1
@@ -70,13 +70,13 @@ subroutine exchange2DHalos(processArray, colDim, rowDim)
     integer, dimension(colSize + 2,rowSize + 2), intent(inout) :: processArray
     integer, intent(in) :: colDim, rowDim
     integer :: communicateWith, colType, rowType
-    call MPI_TYPE_CONTIGUOUS(colSize, MPI_INT, rowType, ierror)
-    call checkMPIError()
-    call MPI_TYPE_COMMIT(rowType, ierror)
-    call checkMPIError()
-    call MPI_TYPE_VECTOR(rowSize, 1, colSize+2, MPI_INT, colType, ierror)
+    call MPI_TYPE_CONTIGUOUS(colSize, MPI_INT, colType, ierror)
     call checkMPIError()
     call MPI_TYPE_COMMIT(colType, ierror)
+    call checkMPIError()
+    call MPI_TYPE_VECTOR(rowSize, 1, colSize+2, MPI_INT, rowType, ierror)
+    call checkMPIError()
+    call MPI_TYPE_COMMIT(rowType, ierror)
     call checkMPIError()
     
     if (rowDim .ne. 1) then
@@ -84,7 +84,7 @@ subroutine exchange2DHalos(processArray, colDim, rowDim)
         communicateWith = rank - (rows / rowSize)
         print*, 'Process ', rank, ' needs to send top edge to ', communicateWith
         call mpi_sendrecv(processArray(2, 2), 1, rowType, communicateWith, rowTag, & 
-                          processArray(2, 1), 1, rowType, communicateWith, rowTag, &
+                          processArray(1, 2), 1, rowType, communicateWith, rowTag, &
                           MPI_COMM_WORLD, ierror)
     end if
     if (rowDim + rowSize - 1 .ne. rows) then
@@ -92,8 +92,9 @@ subroutine exchange2DHalos(processArray, colDim, rowDim)
         communicateWith = rank + (rows / rowSize)
         if (communicateWith .lt. mpi_size) then
         print*, 'Process ', rank, ' needs to send bottom edge to ', communicateWith
-        call mpi_sendrecv(processArray(2, rowSize+1), 1, rowType, communicateWith, rowTag, & 
-                          processArray(2, rowSize+2), 1, rowType, communicateWith, rowTag, & 
+                                  print*, 'Process ', rank, ' needs to send right edge to ', communicateWith
+        call mpi_sendrecv(processArray(colSize+1, 2), 1, rowType, communicateWith, rowTag, & 
+                          processArray(colSize+2, 2), 1, rowType, communicateWith, rowTag, & 
                           MPI_COMM_WORLD, ierror)
         end if
     end if
@@ -102,15 +103,15 @@ subroutine exchange2DHalos(processArray, colDim, rowDim)
         communicateWith = rank - 1
         print*, 'Process ', rank, ' needs to send left edge to ', communicateWith
         call mpi_sendrecv(processArray(2, 2), 1, colType, communicateWith, colTag, & 
-                          processArray(1, 2), 1, colType, communicateWith, colTag, &
+                          processArray(2, 1), 1, colType, communicateWith, colTag, &
                           MPI_COMM_WORLD, ierror)
     end if
     if (colDim + colSize - 1 .ne. columns) then
         ! Right edge to send, left edge to receive
         communicateWith = rank + 1
         print*, 'Process ', rank, ' needs to send right edge to ', communicateWith
-        call mpi_sendrecv(processArray(colSize+1, 2), 1, colType, communicateWith, colTag, & 
-                          processArray(colSize+2, 2), 1, colType, communicateWith, colTag, & 
+        call mpi_sendrecv(processArray(2, rowSize+1), 1, colType, communicateWith, colTag, & 
+                          processArray(2, rowSize+2), 1, colType, communicateWith, colTag, & 
                           MPI_COMM_WORLD, ierror)
     end if
     call sleep(rank)
