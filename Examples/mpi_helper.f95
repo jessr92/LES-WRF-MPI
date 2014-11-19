@@ -114,6 +114,25 @@ subroutine exchange2DHalos(processArray)
                           processArray(2, colSize+2), 1, colType, communicateWith, leftTag, & 
                           MPI_COMM_WORLD, status, ierror)
     end if
+    if (.not. isTopRow() .and. .not. isLeftmostColumn()) then
+        ! There is a top left corner to specify
+        processArray(1,1) = (processArray(2, 1) + processArray(1, 2)) / 2
+    end if
+    if (.not. isTopRow() .and. .not. isRightmostColumn()) then
+        ! There is a top right corner to specify
+        processArray(1, colSize + 2) = (processArray(2, colSize + 2) + &
+                                        processArray(1, colSize + 1)) / 2
+    end if
+    if (.not. isBottomRow() .and. .not. isLeftmostColumn()) then
+        ! There is a bottom left corner to specify
+        processArray(rowSize + 2, 1) = (processArray(rowSize + 2, 1) + &
+                                        processArray(rowSize + 2, 2)) / 2
+    end if
+    if (.not. isBottomRow() .and. .not. isRightmostColumn()) then
+        ! There is a bottom right corner to specify
+        processArray(rowSize + 2, colSize + 2) = (processArray(rowSize + 2, colSize + 1) + &
+                                                  processArray(rowSize + 1, colSize + 2)) / 2
+    end if
     call sleep(rank + 1) ! to try and prevent process output being mangled by each other
     call outputArray(processArray)
     call MPI_Type_Free(rowType, ierror)
