@@ -1,8 +1,14 @@
 module mpi_helper
+use mpi
 implicit none
-include 'mpif.h'
-integer :: rank, mpi_size, ierror
-public :: initialise_mpi, finalise_mpi, rank, mpi_size, ierror
+integer(kind=4) :: rank, mpi_size, ierror
+integer, parameter :: topTag = 1
+integer, parameter :: bottomTag = 2
+integer, parameter :: leftTag = 3
+integer, parameter :: rightTag = 4
+public :: initialise_mpi, finalise_mpi, checkMPIError
+public :: rank, mpi_size, ierror
+public :: topTag, bottomTag, leftTag, rightTag
 
 contains
 
@@ -10,9 +16,9 @@ subroutine initialise_mpi()
     implicit none
     call MPI_Init(ierror)
     call checkMPIError()
-    call MPI_COMM_Size(MPI_COMM_WORLD, mpi_size, ierror)
-    call checkMPIError()
     call MPI_COMM_Rank(MPI_COMM_WORLD, rank, ierror)
+    call checkMPIError()
+    call MPI_COMM_Size(MPI_COMM_WORLD, mpi_size, ierror)
     call checkMPIError()
 end subroutine initialise_mpi
 
@@ -26,7 +32,7 @@ subroutine checkMPIError()
     implicit none
     if (ierror .ne. MPI_SUCCESS) then
         print*, ierror, " MPI error!"
-        call MPI_Abort(MPI_COMM_WORLD, ierror)
+        call MPI_Abort(MPI_COMM_WORLD, ierror, ierror)
     end if
 end subroutine checkMPIError
 
