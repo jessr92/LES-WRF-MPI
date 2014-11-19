@@ -1,4 +1,6 @@
 #!/bin/sh
+make clean
+set -e
 echo '**********'
 echo 'Compiling examples'
 echo '**********'
