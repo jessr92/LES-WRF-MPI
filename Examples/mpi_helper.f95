@@ -1,7 +1,7 @@
 module mpi_helper
 use mpi
 implicit none
-integer(kind=4) :: rank, mpi_size, ierror
+integer(kind=4) :: rank, mpi_size, ierror, status(MPI_STATUS_SIZE)
 integer, parameter :: topTag = 1
 integer, parameter :: bottomTag = 2
 integer, parameter :: leftTag = 3

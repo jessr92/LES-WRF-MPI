@@ -1,17 +1,14 @@
 program helloMPIOpenMP
+use mpi_helper
 implicit none
-include 'mpif.h'
 call main()
 
 contains
 
 subroutine main()
     implicit none
-    integer rank, size, ierror
     integer nthreads, tid, omp_get_num_threads, omp_get_thread_num
-    call MPI_INIT(ierror)
-    call MPI_COMM_SIZE(MPI_COMM_WORLD, size, ierror)
-    call MPI_COMM_RANK(MPI_COMM_WORLD, rank, ierror)
+    call initialise_mpi()
     print*, 'node', rank, ': Hello world'
     !$OMP PARALLEL PRIVATE(nthreads, tid)
     tid = omp_get_thread_num()
@@ -20,7 +17,7 @@ subroutine main()
         print *, 'Number of threads = ', nthreads, 'in node', rank
     end if
     !$OMP END PARALLEL
-    call MPI_FINALIZE(ierror)
+    call finalise_mpi()
 end subroutine main
 
 end program helloMPIOpenMP

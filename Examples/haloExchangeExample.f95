@@ -109,7 +109,7 @@ subroutine exchange2DHalos(processArray, colDim, rowDim)
         print*, 'Process ', rank, ' needs to send top edge to ', communicateWith
         call MPI_SendRecv(processArray(2, 2), 1, rowType, communicateWith, topTag, & 
                           processArray(1, 2), 1, rowType, communicateWith, bottomTag, &
-                          MPI_COMM_WORLD, ierror)
+                          MPI_COMM_WORLD, status, ierror)
     end if
     if (.not. isBottomRow(rowDim)) then
         ! Bottom edge to send, top edge to receive
@@ -117,7 +117,7 @@ subroutine exchange2DHalos(processArray, colDim, rowDim)
         print*, 'Process ', rank, ' needs to send bottom edge to ', communicateWith
         call MPI_SendRecv(processArray(rowSize+1, 2), 1, rowType, communicateWith, bottomTag, & 
                           processArray(rowSize+2, 2), 1, rowType, communicateWith, topTag, & 
-                          MPI_COMM_WORLD, ierror)
+                          MPI_COMM_WORLD, status, ierror)
     end if
     if (.not. isLeftmostColumn(colDim)) then
         ! Left edge to send, right edge to receive
@@ -125,7 +125,7 @@ subroutine exchange2DHalos(processArray, colDim, rowDim)
         print*, 'Process ', rank, ' needs to send left edge to ', communicateWith
         call MPI_SendRecv(processArray(2, 2), 1, colType, communicateWith, leftTag, & 
                           processArray(2, 1), 1, colType, communicateWith, rightTag, &
-                          MPI_COMM_WORLD, ierror)
+                          MPI_COMM_WORLD, status, ierror)
     end if
     if (.not. isRightmostColumn(colDim)) then
         ! Right edge to send, left edge to receive
@@ -133,7 +133,7 @@ subroutine exchange2DHalos(processArray, colDim, rowDim)
         print*, 'Process ', rank, ' needs to send right edge to ', communicateWith
         call MPI_SendRecv(processArray(2, colSize+1), 1, colType, communicateWith, rightTag, & 
                           processArray(2, colSize+2), 1, colType, communicateWith, leftTag, & 
-                          MPI_COMM_WORLD, ierror)
+                          MPI_COMM_WORLD, status, ierror)
     end if
     call sleep(rank) ! to try and prevent process output being mangled by each other
     call outputArray(processArray)
