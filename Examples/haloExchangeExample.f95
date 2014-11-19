@@ -10,7 +10,7 @@ subroutine main()
     implicit none
     integer, dimension(:,:), allocatable :: processArray
     call initialise_mpi()
-    if (.NOT. (mpi_size .EQ. 24)) then
+    if (.NOT. (mpi_size .EQ. (procPerRow * procPerCol))) then
         call finalise_mpi()
         return
     endif
@@ -38,3 +38,4 @@ subroutine initArray(processArray)
 end subroutine initArray
 
 end program haloExchangeExample
+
