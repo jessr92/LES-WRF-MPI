@@ -30,9 +30,10 @@ end subroutine
 
 subroutine checkMPIError()
     implicit none
+    integer :: abortError
     if (ierror .ne. MPI_SUCCESS) then
         print*, ierror, " MPI error!"
-        call MPI_Abort(MPI_COMM_WORLD, ierror, ierror)
+        call MPI_Abort(MPI_COMM_WORLD, ierror, abortError)
     end if
 end subroutine checkMPIError
 
