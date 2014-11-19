@@ -20,5 +20,5 @@ mpiexec -n 4 ~/LES-WRF-MPI/Examples/helloMPIOpenMP
 echo '**********'
 echo 'Running MPI Halo Exchange Example'
 echo '*********'
-mpiexec -n 4 ~/LES-WRF-MPI/Examples/haloExchangeExample
+mpiexec -n 24 ~/LES-WRF-MPI/Examples/haloExchangeExample
 echo '*********'
