@@ -1,5 +1,5 @@
 FC = mpifort
-FCFLAGS = -fopenmp -W -Wall -Wno-unused-parameter -O2
+FCFLAGS += -fopenmp -cpp -Wall -Wextra -Wconversion -pedantic -std=f95 -fall-intrinsics -O2 -march=native -DVERBOSE
 PROGRAMS = helloMPI helloOpenMP helloMPIOpenMP haloExchangeExample
 HELLO_MPI_OBJS = helloMPI.o mpi_helper.o
 HELLO_OPEN_MP_OBJS = helloOpenMP.o
