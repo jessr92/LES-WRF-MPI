@@ -332,6 +332,14 @@ url = {http://www.cerfacs.fr/globc/PALM\_WEB/EN/OVERVIEW/ endpointcommunications
 urldate = {11th November 2014},
 year = {2007}
 }
+@article{StephanFrickenhausReneRedler2001,
+author = {{Stephan Frickenhaus, Rene Redler}, Peter Post},
+file = {:Users/gordonreid/Dropbox/University/5th Year/Project/Papers/Fri2001b.pdf:pdf},
+journal = {World Scientific},
+pages = {1--13},
+title = {{Parallel Coupling of Regional Atmosphere and Ocean Models}},
+year = {2001}
+}
 @article{Jeannot2014,
 author = {Jeannot, Emmanuel and Mercier, Guillaume},
 file = {:Users/gordonreid/Library/Application Support/Mendeley Desktop/Downloaded/Jeannot, Mercier - 2014 - Process Placement in Multicore Clusters Algorithmic Issues and Practical Techniques.pdf:pdf},
@@ -353,6 +361,12 @@ title = {{Productive parallel linear algebra programming with unstructured topol
 volume = {4},
 year = {2012}
 }
+@book{Hutchison,
+author = {Hutchison, David and Mitchell, John C},
+file = {:Users/gordonreid/Dropbox/University/5th Year/Project/Papers/Gropp - Unknown - MPI 3 and Beyond Why MPI is Successful and What Challenges it Faces What MPI-3 Already !.pdf:pdf},
+isbn = {9783642335174},
+title = {{Recent Advanced in the Message Passing Interface}}
+}
 @article{Hoefler2010a,
 abstract = {Many large-scale parallel programs follow a bulk synchronous parallel (BSP) structure with distinct computation and communication phases. Although the communication phase in such programs may involve all (or large numbers) of the participating processes, the actual communication operations are usually sparse in nature. As a result, communication phases are typically expressed explicitly using point-to-point communication operations or collective operations. We define the dynamic sparse data-exchange (DSDE) problem and derive bounds in the well known LogGP model. While current approaches work well with static applications, they run into limitations as modern applications grow in scale, and as the problems that are being solved become increasingly irregular and dynamic.$\backslash$nTo enable the compact and efficient expression of the communication phase, we develop suitable sparse communication protocols for irregular applications at large scale. We discuss different irregular applications and show the sparsity in the communication for$\backslash$nreal-world input data.We discuss the time and memory complexity of commonly used protocols for the DSDE problem and develop NBX—a novel fast algorithm with constant memory overhead for solving it. Algorithm NBX improves the runtime of a sparse data-$\backslash$nexchange among 8,192 processors on BlueGene/P by a factor of 5.6. In an application study, we show improvements of up to a factor of 28.9 for a parallel breadth first search on 8,192 BlueGene/P processors.$\backslash$n},
 author = {Hoefler, Torsten and Siebert, Christian and Lumsdaine, Andrew},
@@ -369,7 +383,7 @@ year = {2010}
 @article{Thakur2009,
 abstract = {As parallel systems are commonly being built out of increasingly large multicore chips, application programmers are exploring the use of hybrid programming models combining MPI across nodes and multithreading within a node. Many MPI implementations, however, are just starting to support multithreaded MPI communication, often focussing on correctness first and performance later. As a result, both users and implementers need some measure for evaluating the multithreaded performance of an MPI implementation. In this paper, we propose a number of performance tests that are motivated by typical application scenarios. These tests cover the overhead of providing the MPI\_THREAD\_MULTIPLE level of thread safety for user programs, the amount of concurrency in different threads making MPI calls, the ability to overlap communication with computation, and other features. We present performance results with this test suite on several platforms (Linux cluster, Sun and IBM SMPs) and MPI implementations (MPICH2, Open MPI, IBM, and Sun). ?? 2009 Elsevier B.V.},
 author = {Thakur, Rajeev and Gropp, William},
-file = {:Users/gordonreid/Library/Application Support/Mendeley Desktop/Downloaded/Thakur, Gropp - 2009 - Test Suite for Evaluating Performance of Multithreaded MPI Communication.pdf:pdf},
+file = {:Users/gordonreid/Library/Application Support/Mendeley Desktop/Downloaded//Thakur, Gropp - 2009 - Test Suite for Evaluating Performance of Multithreaded MPI Communication.pdf:pdf},
 journal = {Parallel Computing},
 keywords = {Benchmarks,Message passing interface (MPI),Multithreading,Performance measurement,benchmarks,measurement,message passing interface,mpi,multithreading,performance},
 number = {January 2009},
@@ -377,17 +391,6 @@ pages = {608--617},
 title = {{Test Suite for Evaluating Performance of Multithreaded MPI Communication}},
 volume = {35},
 year = {2009}
-}
-@article{Ramework2004,
-abstract = { The Earth System Modeling Framework (ESMF) project is developing a standard software platform for Earth system models. The standard, which defines a component architecture and a support infrastructure, is being developed under open-software practices. Target applications range from operational numerical weather prediction to climate-system change and predictability studies.},
-author = {Ramework, S Ystem M Odeling F and Hill, Chris and DeLuca, Cecelia and Balaji and Suarez, Max and {Da Silva}, Arlindo},
-file = {:Users/gordonreid/Library/Application Support/Mendeley Desktop/Downloaded//Ramework et al. - 2004 - The Architecture of the Earth System Modeling Framework.pdf:pdf},
-journal = {Computing in Science and Engineering},
-number = {1},
-pages = {18--28},
-title = {{The Architecture of the Earth System Modeling Framework}},
-volume = {6},
-year = {2004}
 }
 @article{Larson2005,
 abstract = {Many problems in science and engineering are best simulated as a set of mutually interacting models, resulting in a coupled or multiphysics model. These models present challenges stemming from their interdisciplinary nature and from their computational and algorithmic complexities. The computational complexity of individual models, combined with the popularity of the distributed-memory parallel programming model used on commodity microprocessor-based clusters, results in a parallel coupling problem when building a coupled model. We define and elucidate this problem and how it results in a set of requirements for software capable of simplifying the construction of parallel coupled models. We describe the package, the Model Coupling Toolkit (MCT), which we have developed to meet these general requirements and the specific requirements of a parallel climate model. We present the MCT programming model with illustrative code examples. We present representative results that measure MCT's scalability, performance portability, and a proxy for coupling overhead.},
@@ -449,4 +452,21 @@ number = {May},
 title = {{Using OASIS-MCT to couple the ORCHIDEE land surface model.}},
 url = {http://dods.ipsl.jussieu.fr/orchidee/WIKI/Polcher\_OrchideeDays\_OASIS\_Coupling.pdf},
 year = {2013}
+}
+@article{Mogensen,
+author = {Mogensen, Kristian S},
+file = {:Users/gordonreid/Dropbox/University/5th Year/Project/Papers/HPC-WS-Mogensen\_0.pdf:pdf},
+pages = {1--25},
+title = {{The coupled ocean ‐ atmosphere model at ECMWF : overview and technical challenges}}
+}
+@article{Ramework2004,
+abstract = { The Earth System Modeling Framework (ESMF) project is developing a standard software platform for Earth system models. The standard, which defines a component architecture and a support infrastructure, is being developed under open-software practices. Target applications range from operational numerical weather prediction to climate-system change and predictability studies.},
+author = {Ramework, S Ystem M Odeling F and Hill, Chris and DeLuca, Cecelia and Balaji and Suarez, Max and {Da Silva}, Arlindo},
+file = {:Users/gordonreid/Library/Application Support/Mendeley Desktop/Downloaded//Ramework et al. - 2004 - The Architecture of the Earth System Modeling Framework.pdf:pdf},
+journal = {Computing in Science and Engineering},
+number = {1},
+pages = {18--28},
+title = {{The Architecture of the Earth System Modeling Framework}},
+volume = {6},
+year = {2004}
 }

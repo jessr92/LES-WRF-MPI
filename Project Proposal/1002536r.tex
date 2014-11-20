@@ -1,6 +1,7 @@
 \documentclass{acm_proc_article-sp}
 
 \usepackage{hyperref}
+\usepackage{pgfgantt}
 
 \title{Exploring coupling the distributed Large Eddy Simulation and Weather
 Research and Forecasting model}
@@ -38,7 +39,7 @@ to allow greater performance on heterogeneous systems.
 
 \end{abstract}
 
-\section*{Introduction}
+\section{Introduction}
 
 Our planet's ecosystem is highly complex. Geoscientists that are interested in
 modelling this ecosystem have created numerous systems which each model one
@@ -79,7 +80,7 @@ going into an in-depth literature review for the state of the art in distributed
 and coupled applications. The proposed approach and work plan for the project is
 then given to conclude the proposal.
 
-\section*{Statement of Problem}
+\section{Statement of Problem}
 
 Individuals models for ocean, land, atmosphere, etc are useful in ther own right
 however geoscientists are now wanting to model more complex scenarios that
@@ -104,7 +105,7 @@ distributed memory system such as a Beowulf cluster. The coupling of MPI LES
 with WRF will create a system that benefits from scalable performance and high
 accuracy results.
 
-\section*{Literature Review}
+\section{Literature Review}
 
 Previous work falls under two related but largely independent areas: distributed
 computing using MPI for data sharing via message passing, and model coupling.
@@ -113,7 +114,7 @@ generally hidden to the user under an API offered by the model coupling
 framework. MPI specific work will be discussed followed by a section dedicated
 to related work on model coupling.
 
-\subsection*{Message Passing Interface}
+\subsection{Message Passing Interface}
 
 Message Passing Interface (MPI) is a recognised standard for sharing data
 between processes on parallel systems by supporting message passing between
@@ -125,7 +126,7 @@ MPI to be viewed as the \textit{de facto} standard for inter-process
 communication, especially across multiple nodes. There are implementations of
 the standard for many languages including C, Fortran, Java, and Python.
 
-\subsubsection*{Multithreaded MPI Communication}
+\subsubsection{Multithreaded MPI Communication}
 
 In addition to computer systems making use of multiple machines, each individual
 node now has multiple CPU cores and sometimes even multiple CPU sockets. This
@@ -185,7 +186,7 @@ multithreaded MPI applications. The authors also make their benchmark test suite
 available online for others to repeat their tests and see how different hardware
 setups react and how later versions of MPI libraries improve.
 
-\subsection*{Model Coupling}
+\subsection{Model Coupling}
 
 Applications currently exist that model a single aspect of our Earth's
 ecosystem. Each model is useful in their own right however more accurate and
@@ -264,7 +265,7 @@ Each of the listed model couplers have many similarities however they also have
 a number of differences in terms of how they couple models and the tools
 offered. A comparison of model couplers is given below.
 
-\subsubsection*{Model Couplers}
+\subsubsection{Model Couplers}
 
 The Model Coupling Toolkit (MCT) \cite{Larson2005,Jacob2005} is a simple
 coupling framework which has been very successful. It has been used to couple
@@ -345,7 +346,7 @@ The next version of OASIS3-MCT will bring a GUI for creating the namcouple file
 automatically and a performance analysis tool, LUCIA \cite{Maisonnave}, which
 may bring its feature set more inline with OpenPALM's offerings.
 
-\subsubsection*{Comparison of Model Couplers}
+\subsubsection{Comparison of Model Couplers}
 
 Each model coupler takes a different approach to the overall coupling
 architecture and communication strategies.
@@ -439,7 +440,7 @@ transferred a 2D array between two models.
 Given OASIS3-MCTs simple namcouple file format and active development, it was
 chosen as the preferred model coupling framework to use.
 
-\section*{Proposed Approach}
+\section{Proposed Approach}
 
 As stated before, there are a number of distinct stages to the project and each
 stage requires a different approach.
@@ -472,25 +473,78 @@ OASIS3-MCT coupling to the GMCF coupling. GMCF is in a proof-of-concept stage
 however has already been used to couple OpenMP WRF with the OpenCL accelerated
 LES variant successfully.
 
-\section*{Work Plan}
+\section{Project Plan}
 
 The project has a number of distinct stages with deliverables at the end of each
-stage. The following major deliverables have been identified with the estimated
-delivery date given in bold:
+stage. There a number of major deliverables that have been identified. These
+will be listed in the following section with the estimated delivery date in
+bold. The estimated delivery dates correspond to an academic week.
+
+\subsection{Deliverable Dates}
 
 \begin{description}
-	\item[2nd December] Distributed LES implementation
-	\item[19th December] Coupled system of LES and WRF using OASIS3-MCT
-	\item[3rd February] Performance evaluation for:
-    \begin{itemize}
-        \item MPI LES (using multiple MPI libraries if available)
-        \item Coupled System
-    \end{itemize}
-	\item[31st March] Performance evaluation and qualitative comparison between
-    the OASIS3-MCT coupling and the GMCF coupling
-    \item[Week beginning 20th April] Final deliverable in the form of a paper
-    and a presentation or poster describing work completed.
+    \item
+    \item[Week 13] Implementation
+    \begin{description}
+	    \item[Week 11] Distributed LES using MPI
+	    \item[Week 13] Coupled system of LES and WRF using OASIS3-MCT
+    \end{description}
+	\item[Week 27] Evaluation:
+    \begin{description}
+        \item[Week 18] MPI LES Performance using multiple MPI implementations
+        \item[Week 20] LES WRF Coupling Performance
+        \item[Week 27] Performance evaluation and qualitative comparison between
+        the OASIS3-MCT coupling and the GMCF coupling
+    \end{description}
+    \item[Week 31] Final deliverable in the form of a paper and a presentation
+    describing work completed.
 \end{description}
+
+Figure~\ref{fig:workPlan} displays this work plan as a Gantt chart.
+
+\begin{figure*}
+    \begin{ganttchart}[vgrid, y unit chart=0.5cm]{10}{31}
+        \gantttitle{Academic Weeks}{22} \\
+        \gantttitlelist{10,...,31}{1} \\
+        \ganttgroup{Implementation}{10}{13} \\
+        \ganttbar{Distributed LES}{10}{11} \\
+        \ganttlinkedbar{LES WRF Coupling}{12}{13} \\
+        \ganttmilestone{Implementation Complete}{13} \\
+        \ganttgroup{Evaluation}{17}{27} \\
+        \ganttbar{MPI LES Performance}{17}{18} \\
+        \ganttlinkedbar{LES WRF Coupling Performance}{19}{20} \\
+        \ganttlinkedbar{OASIS3-MCT and GMCF Comparison}{21}{27} \\
+        \ganttmilestone{Evaluation Complete}{27} \\
+        \ganttbar{Paper and presentation deliverable}{28}{31}
+        \ganttlink{elem2}{elem3}
+        \ganttlink{elem3}{elem5}
+        \ganttlink{elem7}{elem8}
+        \ganttlink{elem8}{elem9}
+    \end{ganttchart}
+    \caption{Gantt Chart for Work Plan}
+    \label{fig:workPlan}
+\end{figure*}
+
+\subsection{Contingencies}
+
+The project plan dates are based on a short feasibility study involving simple
+MPI applications and dummy model couplings. If problems are encountered, due to
+technical or temporal restrictions, alternative deliverables have been proposed.
+
+The MPI LES Performance investigation would ideally span a range of node sizes
+(up to 64 planned) and using different MPI implementations such as MPICH and
+OpenMPI. Using multiple libraries could be too time consuming and, depending on
+the implementations available, may be infeasible. Using one MPI implementation
+would not be ideal however would still allow an in-depth review of the
+scalability of a distribued LES to take place.
+
+Given the lack of literature investigating the performance overheads of model
+coupling in general and overhead of specific model couplers, an alternative
+deliverable to the OASIS3-MCT and GMCF comparison would be to conduct a review
+of the performance overhead of OASIS3-MCT. Since the current literature
+\cite{StephanFrickenhausReneRedler2001, Mogensen} is at a disagreement between
+model couplers having insignificant overhead to around 10\% overhead, this
+alternative deliverable would be worthwhile work.
 
 \bibliographystyle{IEEEannot}
 \bibliography{1002536r}
