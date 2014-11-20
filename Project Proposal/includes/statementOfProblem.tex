@@ -1,0 +1,22 @@
+Individuals models for ocean, land, atmosphere, etc are useful in ther own right
+however geoscientists are now wanting to model more complex scenarios that
+require collaboration from multiple models. This collaboration can also lead to
+more accurate results since additional effects from other models can be added to
+the overall system. For example, coupling WRF and LES led to greater wind
+velocity being predicted compared with running WRF on its own
+\cite{Kinbara2010,Nakayama1998}.
+
+Currently, WRF and LES are independent models and LES has two variants: the
+original single threaded code and the OpenCL accelerated variant
+\cite{Vanderbauwhede2014}. Both LES variants can only make use of the resources
+of a single node. Vanderbauwhede and Takemi \cite{Vanderbauwhede2013} have also
+investigated the benefits of GPU accelerating WRF and found this to be
+``feasible and worthwhile'' however this is out of scope for this proposal.
+
+The problem to be addressed is two-fold: creating a MPI variant of LES to allow
+LES to run on multiple nodes in a computer cluster and then coupling this
+variant of LES with WRF. The MPI variant of the LES will increase the
+performance of the simulator since it will allow it to make use of a multi-node
+distributed memory system such as a Beowulf cluster. The coupling of MPI LES
+with WRF will create a system that benefits from scalable performance and high
+accuracy results.

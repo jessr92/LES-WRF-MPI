@@ -1,0 +1,70 @@
+The project has a number of distinct stages with deliverables at the end of each
+stage. There a number of major deliverables that have been identified. These
+will be listed in the following section with the estimated delivery date in
+bold. The estimated delivery dates correspond to an academic week.
+
+\subsection{Deliverable Dates}
+
+\begin{description}
+    \item
+    \item[Week 13] Implementation
+    \begin{description}
+        \item[Week 11] Distributed LES using MPI
+        \item[Week 13] Coupled system of LES and WRF using OASIS3-MCT
+    \end{description}
+    \item[Week 27] Evaluation:
+    \begin{description}
+        \item[Week 18] MPI LES Performance using multiple MPI implementations
+        \item[Week 20] LES WRF Coupling Performance
+        \item[Week 27] Performance evaluation and qualitative comparison between
+        the OASIS3-MCT coupling and the GMCF coupling
+    \end{description}
+    \item[Week 31] Final deliverable in the form of a paper and a presentation
+    describing work completed.
+\end{description}
+
+Figure~\ref{fig:workPlan} displays this work plan as a Gantt chart.
+
+\begin{figure*}
+    \begin{ganttchart}[vgrid, y unit chart=0.5cm]{10}{31}
+        \gantttitle{Academic Weeks}{22} \\
+        \gantttitlelist{10,...,31}{1} \\
+        \ganttgroup{Implementation}{10}{13} \\
+        \ganttbar{Distributed LES}{10}{11} \\
+        \ganttlinkedbar{LES WRF Coupling}{12}{13} \\
+        \ganttmilestone{Implementation Complete}{13} \\
+        \ganttgroup{Evaluation}{17}{27} \\
+        \ganttbar{MPI LES Performance}{17}{18} \\
+        \ganttlinkedbar{LES WRF Coupling Performance}{19}{20} \\
+        \ganttlinkedbar{OASIS3-MCT and GMCF Comparison}{21}{27} \\
+        \ganttmilestone{Evaluation Complete}{27} \\
+        \ganttbar{Paper and presentation deliverable}{28}{31}
+        \ganttlink{elem2}{elem3}
+        \ganttlink{elem3}{elem5}
+        \ganttlink{elem7}{elem8}
+        \ganttlink{elem8}{elem9}
+    \end{ganttchart}
+    \caption{Gantt Chart for Work Plan}
+    \label{fig:workPlan}
+\end{figure*}
+
+\subsection{Contingencies}
+
+The project plan dates are based on a short feasibility study involving simple
+MPI applications and dummy model couplings. If problems are encountered, due to
+technical or temporal restrictions, alternative deliverables have been proposed.
+
+The MPI LES Performance investigation would ideally span a range of node sizes
+(up to 64 planned) and using different MPI implementations such as MPICH and
+OpenMPI. Using multiple libraries could be too time consuming and, depending on
+the implementations available, may be infeasible. Using one MPI implementation
+would not be ideal however would still allow an in-depth review of the
+scalability of a distribued LES to take place.
+
+Given the lack of literature investigating the performance overheads of model
+coupling in general and overhead of specific model couplers, an alternative
+deliverable to the OASIS3-MCT and GMCF comparison would be to conduct a review
+of the performance overhead of OASIS3-MCT. Since the current literature
+\cite{StephanFrickenhausReneRedler2001, Mogensen} is at a disagreement between
+model couplers having insignificant overhead to around 10\% overhead, this
+alternative deliverable would be worthwhile work.
