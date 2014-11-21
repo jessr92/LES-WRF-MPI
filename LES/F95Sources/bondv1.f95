@@ -74,7 +74,7 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
             bbb = amin1(bbb,u(im,j,k))
         end do
     end do
-    uout = (aaa+bbb)/2
+    uout = (aaa+bbb)/2.
 #ifdef WV_DEBUG
     print *, 'F95: UOUT: ',uout
 #endif
