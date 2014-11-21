@@ -1,5 +1,7 @@
 module module_boundp
 
+! GR: Ignore boundp for halo exchange. This would kill performance!
+
 contains
 
       subroutine boundp2(jm,im,p,km)
