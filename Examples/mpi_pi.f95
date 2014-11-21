@@ -9,14 +9,13 @@ contains
 subroutine main()
     implicit none
     real(kind=8) :: homepi, pi, avepi, pisum
-    integer :: i, master = 0
+    integer :: i
     call initialise_mpi()
     call checkMPIError()
     avepi = 0.0
     do i = 1, rounds
         homepi = dboard()
-        call MPI_Reduce(homepi, pisum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
-                        master, MPI_COMM_WORLD, ierror)
+        call MPI_Reduce(homepi, pisum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, 0, MPI_COMM_WORLD, ierror)
         call checkMPIError()
         if (isMaster()) then
             pi = pisum / mpi_size
