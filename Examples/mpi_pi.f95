@@ -1,7 +1,7 @@
 program mpi_pi
 use mpi_helper
 implicit none
-integer, parameter :: darts = 50000, rounds = 5000, master = 0
+integer, parameter :: darts = 5000, rounds = 50000, master = 0
 call main()
 
 contains
@@ -20,13 +20,11 @@ subroutine main()
         if (rank .eq. master) then
             pi = pisum / mpi_size
             avepi = ((avepi*(i-1)) + pi) / i
-            print*,'After ', i,' rounds, average value of pi = ', pi 
+            print*,'After ', i,' rounds, average value of pi = ', avepi
         endif
     end do
     if (rank .eq. master) then
-        print *, ' '
         print *,'Real value of PI: 3.1415926535897'
-        print *, ' '
     endif
     call finalise_mpi()
     call checkMPIError()
@@ -34,9 +32,8 @@ end subroutine main
 
 real(kind=8) function dboard()
     implicit none
-    integer :: score = 0, n
-    real(kind=4) :: r
-    real(kind=8) :: x_coord, x_sqr, y_coord, y_sqr, pi
+    integer :: score, n
+    real(kind=8) :: r, x_coord, x_sqr, y_coord, y_sqr
     do n = 1, darts
         call random_number(r)
         x_coord = (2.0 * r) - 1.0
@@ -48,8 +45,7 @@ real(kind=8) function dboard()
             score = score + 1
         endif
     end do
-    pi = 4.0 * score / darts
-    dboard = pi
+    dboard = 4.0 * score / darts
 end function dboard
 
 end program mpi_pi
