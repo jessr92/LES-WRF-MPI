@@ -50,6 +50,11 @@ subroutine checkMPIError()
     end if
 end subroutine checkMPIError
 
+logical function isMaster()
+    implicit none
+    isMaster = rank .eq. 0
+end function isMaster
+
 logical function isTopRow()
     implicit none
     isTopRow = rank .lt. procPerRow

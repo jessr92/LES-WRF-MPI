@@ -1,7 +1,7 @@
 program mpi_pi
 use mpi_helper
 implicit none
-integer, parameter :: darts = 5000, rounds = 50000, master = 0
+integer, parameter :: darts = 5000, rounds = 5000
 call main()
 
 contains
@@ -9,7 +9,7 @@ contains
 subroutine main()
     implicit none
     real(kind=8) :: homepi, pi, avepi, pisum
-    integer :: i
+    integer :: i, master = 0
     call initialise_mpi()
     call checkMPIError()
     avepi = 0.0
@@ -17,13 +17,14 @@ subroutine main()
         homepi = dboard()
         call MPI_Reduce(homepi, pisum, 1, MPI_DOUBLE_PRECISION, MPI_SUM, &
                         master, MPI_COMM_WORLD, ierror)
-        if (rank .eq. master) then
+        call checkMPIError()
+        if (isMaster()) then
             pi = pisum / mpi_size
             avepi = ((avepi*(i-1)) + pi) / i
             print*,'After ', i,' rounds, average value of pi = ', avepi
         endif
     end do
-    if (rank .eq. master) then
+    if (isMaster()) then
         print *,'Real value of PI: 3.1415926535897'
     endif
     call finalise_mpi()
