@@ -18,6 +18,10 @@ echo 'Running MPI OpenMP Hello World'
 echo '**********'
 mpiexec -n 4 $(pwd)/helloMPIOpenMP
 echo '**********'
+echo 'Running MPI PI Example'
+echo '**********'
+mpiexec -n 4 $(pwd)/mpi_pi
+echo '**********'
 echo 'Running MPI Halo Exchange Example'
 echo '*********'
 mpiexec -n 24 $(pwd)/haloExchangeExample

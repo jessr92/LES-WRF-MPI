@@ -1,10 +1,11 @@
 FC = mpifort
 FCFLAGS += -fopenmp -cpp -Wall -Wextra -Wconversion -pedantic -std=f95 -fall-intrinsics -O2 -march=native
-PROGRAMS = helloMPI helloOpenMP helloMPIOpenMP haloExchangeExample
+PROGRAMS = helloMPI helloOpenMP helloMPIOpenMP haloExchangeExample mpi_pi
 HELLO_MPI_OBJS = helloMPI.o mpi_helper.o
 HELLO_OPEN_MP_OBJS = helloOpenMP.o
 HELLO_MPI_OPEN_MP_OBJS = helloMPIOpenMP.o mpi_helper.o
 HALO_EXCHANGE_EXAMPLE_OBJS = haloExchangeExample.o mpi_helper.o
+MPI_PI_OBJS = mpi_pi.o mpi_helper.o
 
 all: $(PROGRAMS)
 
@@ -20,7 +21,11 @@ helloMPIOpenMP.o: helloMPIOpenMP.f95 mpi_helper.mod
 
 haloExchangeExample: $(HALO_EXCHANGE_EXAMPLE_OBJS)
 
-haloExchangeExample.o : haloExchangeExample.f95 mpi_helper.mod
+haloExchangeExample.o: haloExchangeExample.f95 mpi_helper.mod
+
+mpi_pi: $(MPI_PI_OBJS)
+
+mpi_pi.o: mpi_pi.f95 mpi_helper.mod
 
 %: %.o
 	$(FC) $(FCFLAGS) -o $@ $^ $(LDFLAGS)
