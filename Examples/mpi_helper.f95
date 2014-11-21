@@ -22,8 +22,13 @@ contains
 
 subroutine initialise_mpi()
     implicit none
-    call MPI_Init(ierror)
+    logical :: alreadyInitialised
+    call MPI_Initialized(alreadyInitialised, ierror)
     call checkMPIError()
+    if (.not. alreadyInitialised) then
+        call MPI_Init(ierror)
+        call checkMPIError()
+    end if
     call MPI_COMM_Rank(MPI_COMM_WORLD, rank, ierror)
     call checkMPIError()
     call MPI_COMM_Size(MPI_COMM_WORLD, mpi_size, ierror)
