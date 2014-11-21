@@ -15,7 +15,7 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
     real(kind=4), dimension(kp+2) , intent(In) :: z2
     real(kind=4) :: u_val
     integer :: i, j, k
-    real(kind=4) :: aaa, bbb, uout = 0.0
+    real(kind=4) :: aaa, bbb, uout
 ! 
 ! 
 ! -------------------inflow-------------------
@@ -74,7 +74,7 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
             bbb = amin1(bbb,u(im,j,k))
         end do
     end do
-
+    uout = (aaa+bbb)/2
 #ifdef WV_DEBUG
     print *, 'F95: UOUT: ',uout
 #endif
