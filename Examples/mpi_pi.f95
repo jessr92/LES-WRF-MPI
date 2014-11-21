@@ -8,10 +8,8 @@ contains
 
 subroutine main()
     implicit none
-    real(kind=4) :: seednum
     real(kind=8) :: homepi, pi, avepi, pisum
     integer :: i
-    external  d_vadd
     call initialise_mpi()
     call checkMPIError()
     avepi = 0.0
@@ -36,7 +34,7 @@ end subroutine main
 
 real(kind=8) function dboard()
     implicit none
-    integer :: score, n
+    integer :: score = 0, n
     real(kind=4) :: r
     real(kind=8) :: x_coord, x_sqr, y_coord, y_sqr, pi
     do n = 1, darts
