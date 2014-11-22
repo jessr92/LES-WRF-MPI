@@ -7,7 +7,12 @@ with_mpi = getOpt('mpi','Use MPI','0')
 if with_mpi == '1':
     WITH_MPI = '-DMPI'
 
-fsources = ['./mpi_helper.f95','./adam.f95','./anime.f95','./aveflow.f95','./bondFG.f95','./bondv1.f95','./boundp.f95','./boundsm.f95','./feedbf.f95','./feedbfm.f95','./grid.f95','./ifdata.f95','./init.f95','./les.f95','./main.f95','./press.f95','./set.f95','./timdata.f95','./vel2.f95','./velFG.f95','./velnw.f95','common_sn.f95','params_common_sn.f95'] 
+fsources = []
+
+if with_mpi == '1':
+    fsources+=['./mpi_helper.f95']
+
+fsources+= ['./adam.f95','./anime.f95','./aveflow.f95','./bondFG.f95','./bondv1.f95','./boundp.f95','./boundsm.f95','./feedbf.f95','./feedbfm.f95','./grid.f95','./ifdata.f95','./init.f95','./les.f95','./main.f95','./press.f95','./set.f95','./timdata.f95','./vel2.f95','./velFG.f95','./velnw.f95','common_sn.f95','params_common_sn.f95'] 
 
 #FFLAGS  = ['-Wall', '-cpp','-ffree-form','-Ofast','-floop-parallelize-all','-ftree-parallelize-loops=24',  '-fopenmp','-pthread']
 FFLAGS  = ['-Wall','-cpp', '-ffree-form','-Ofast'] 
