@@ -3,14 +3,8 @@ use mpi
 implicit none
 
 integer(kind=4) :: rank, mpi_size, ierror, status(MPI_STATUS_SIZE)
-
+integer :: communicator
 integer, parameter :: topTag = 1, bottomTag = 2, leftTag = 3, rightTag = 4
-integer, parameter :: rows = 20, columns = 30
-integer, parameter :: procPerRow = 4, procPerCol = 6
-
-! Ignoring the halo boundaries, actual sizes will be + 2
-integer, parameter :: rowSize = rows / procPerRow
-integer, parameter :: colSize = columns / procPerCol
 
 ! Process Mapping
 ! 0 1 2 3
@@ -23,15 +17,16 @@ contains
 subroutine initialise_mpi()
     implicit none
     logical :: alreadyInitialised
+    communicator = MPI_COMM_WORLD
     call MPI_Initialized(alreadyInitialised, ierror)
     call checkMPIError()
     if (.not. alreadyInitialised) then
         call MPI_Init(ierror)
         call checkMPIError()
     end if
-    call MPI_COMM_Rank(MPI_COMM_WORLD, rank, ierror)
+    call MPI_COMM_Rank(communicator, rank, ierror)
     call checkMPIError()
-    call MPI_COMM_Size(MPI_COMM_WORLD, mpi_size, ierror)
+    call MPI_COMM_Size(communicator, mpi_size, ierror)
     call checkMPIError()
 end subroutine initialise_mpi
 
@@ -46,7 +41,7 @@ subroutine checkMPIError()
     integer :: abortError
     if (ierror .ne. MPI_SUCCESS) then
         print*, ierror, " MPI error!"
-        call MPI_Abort(MPI_COMM_WORLD, ierror, abortError)
+        call MPI_Abort(communicator, ierror, abortError)
     end if
 end subroutine checkMPIError
 
@@ -55,28 +50,33 @@ logical function isMaster()
     isMaster = rank .eq. 0
 end function isMaster
 
-logical function isTopRow()
+logical function isTopRow(procPerRow)
     implicit none
+    integer, intent(in) :: procPerRow
     isTopRow = rank .lt. procPerRow
 end function isTopRow
 
-logical function isBottomRow()
+logical function isBottomRow(procPerRow)
     implicit none
+    integer, intent(in) :: procPerRow
     isBottomRow = rank .gt. (mpi_size - procPerRow - 1)
 end function isBottomRow
 
-logical function isLeftmostColumn()
+logical function isLeftmostColumn(procPerRow)
     implicit none
+    integer, intent(in) :: procPerRow
     isLeftmostColumn = modulo(rank, procPerRow) .eq. 0
 end function isLeftmostColumn
 
-logical function isRightmostColumn()
+logical function isRightmostColumn(procPerRow)
     implicit none
+    integer, intent(in) :: procPerRow
     isRightmostColumn = modulo(rank, procPerRow) .eq. (procPerRow - 1)
 end function isRightmostColumn
 
-subroutine exchange2DHalos(array)
+subroutine exchange2DHalos(array, rowSize, colSize, procPerRow)
     implicit none
+    integer, intent(in) :: rowSize, colSize, procPerRow
     integer, dimension(rowSize + 2, colSize + 2), intent(inout) :: array
     integer :: commWith, colType, rowType
     call MPI_TYPE_CONTIGUOUS(rowSize, MPI_INT, colType, ierror)
@@ -87,53 +87,53 @@ subroutine exchange2DHalos(array)
     call checkMPIError()
     call MPI_TYPE_COMMIT(rowType, ierror)
     call checkMPIError()
-    if (.not. isTopRow()) then
+    if (.not. isTopRow(procPerRow)) then
         ! Top edge to send, bottom edge to receive
         commWith = rank - procPerRow
         print*, 'Process ', rank, ' needs to send top edge to ', commWith
         call MPI_SendRecv(array(2, 2), 1, rowType, commWith, topTag, & 
                           array(1, 2), 1, rowType, commWith, bottomTag, &
-                          MPI_COMM_WORLD, status, ierror)
+                          communicator, status, ierror)
     end if
-    if (.not. isBottomRow()) then
+    if (.not. isBottomRow(procPerRow)) then
         ! Bottom edge to send, top edge to receive
         commWith = rank + procPerRow
         print*, 'Process ', rank, ' needs to send bottom edge to ', commWith
         call MPI_SendRecv(array(rowSize+1, 2), 1, rowType, commWith, bottomTag, & 
                           array(rowSize+2, 2), 1, rowType, commWith, topTag, & 
-                          MPI_COMM_WORLD, status, ierror)
+                          communicator, status, ierror)
     end if
-    if (.not. isLeftmostColumn()) then
+    if (.not. isLeftmostColumn(procPerRow)) then
         ! Left edge to send, right edge to receive
         commWith = rank - 1
         print*, 'Process ', rank, ' needs to send left edge to ', commWith
         call MPI_SendRecv(array(2, 2), 1, colType, commWith, leftTag, & 
                           array(2, 1), 1, colType, commWith, rightTag, &
-                          MPI_COMM_WORLD, status, ierror)
+                          communicator, status, ierror)
     end if
-    if (.not. isRightmostColumn()) then
+    if (.not. isRightmostColumn(procPerRow)) then
         ! Right edge to send, left edge to receive
         commWith = rank + 1
         print*, 'Process ', rank, ' needs to send right edge to ', commWith
         call MPI_SendRecv(array(2, colSize+1), 1, colType, commWith, rightTag, & 
                           array(2, colSize+2), 1, colType, commWith, leftTag, & 
-                          MPI_COMM_WORLD, status, ierror)
+                          communicator, status, ierror)
     end if
-    if (.not. isTopRow() .and. .not. isLeftmostColumn()) then
+    if (.not. isTopRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
         ! There is a top left corner to specify
         array(1,1) = (array(2, 1) + array(1, 2)) / 2
     end if
-    if (.not. isTopRow() .and. .not. isRightmostColumn()) then
+    if (.not. isTopRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
         ! There is a top right corner to specify
         array(1, colSize + 2) = (array(2, colSize + 2) + &
                                  array(1, colSize + 1)) / 2
     end if
-    if (.not. isBottomRow() .and. .not. isLeftmostColumn()) then
+    if (.not. isBottomRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
         ! There is a bottom left corner to specify
         array(rowSize + 2, 1) = (array(rowSize + 1, 1) + &
                                  array(rowSize + 2, 2)) / 2
     end if
-    if (.not. isBottomRow() .and. .not. isRightmostColumn()) then
+    if (.not. isBottomRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
         ! There is a bottom right corner to specify
         array(rowSize + 2, colSize + 2) = (array(rowSize + 2, colSize + 1) + &
                                            array(rowSize + 1, colSize + 2)) / 2

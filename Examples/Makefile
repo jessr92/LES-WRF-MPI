@@ -27,6 +27,9 @@ mpi_pi: $(MPI_PI_OBJS)
 
 mpi_pi.o: mpi_pi.f95 mpi_helper.mod
 
+mpi_helper.mod: ../LES/F95Sources/mpi_helper.f95
+	$(FC) $(FCFLAGS) -c $<
+
 %: %.o
 	$(FC) $(FCFLAGS) -o $@ $^ $(LDFLAGS)
 

@@ -1,6 +1,12 @@
 program haloExchangeExample
 use mpi_helper
 implicit none
+integer, parameter :: rows = 20, columns = 30
+integer, parameter :: procPerRow = 4, procPerCol = 6
+
+! Ignoring the halo boundaries, actual sizes will be + 2
+integer, parameter :: rowSize = rows / procPerRow
+integer, parameter :: colSize = columns / procPerCol
 
 call main()
 
@@ -16,7 +22,7 @@ subroutine main()
     endif
     allocate(processArray(rowSize + 2, colSize + 2))
     call initArray(processArray)
-    call exchange2DHalos(processArray)
+    call exchange2DHalos(processArray, rowSize, colSize, procPerRow)
     deallocate(processArray)
     call finalise_mpi()
 end subroutine main

@@ -1,4 +1,7 @@
 module params_common_sn
+#ifdef MPI
+    use mpi_helper
+#endif
     integer, parameter :: ipmax = 150, jpmax = 150
     !integer, parameter :: ipmax = 254, jpmax = 253
 #ifndef TEST_SMALL_DOMAIN

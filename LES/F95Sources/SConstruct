@@ -32,6 +32,14 @@ else:
     TIMINGS=''
     if other !='':
         TIMINGS = '-D'+other
+
+# GR: MPI specific build config
+WITH_MPI=''
+with_mpi = getOpt('mpi','Use MPI','0')
+if with_mpi == '1':
+    WITH_MPI = '-DMPI'
+    envF['F95']='mpifort'
+    envF['LINK']='mpifort'
         
 NO_FILE_IO='-DNO_FILE_IO'
 ICAL = '-DICAL=0'
@@ -40,7 +48,7 @@ IANIME='-DIANIME=0'
 IADAM='-DIADAM=0'
 
 
-FFLAGS  = [ WITH_OCL,  NO_FILE_IO, ICAL, IFBF,IANIME, IADAM] 
+FFLAGS  = [WITH_MPI, WITH_OCL, NO_FILE_IO, ICAL, IFBF,IANIME, IADAM] 
 
 if with_ocl == '0':
     FFLAGS += ['-cpp','-Ofast', '-m64', '-Wall','-ffree-form', '-fconvert=big-endian', VERBOSE,TIMINGS]
@@ -52,9 +60,10 @@ envC=Environment(CC=CC)
 if csources:
     envC.Library('csubs',csources)
 
-fsources = ['./anime.f95','./aveflow.f95','./bondFG.f95','./bondv1.f95','./boundp.f95','./boundsm.f95','./vel2.f95','./velFG.f95','./feedbf.f95','./feedbfm.f95','./les.f95','./grid.f95','./ifdata.f95','./init.f95','./main.f95','./set.f95','./timdata.f95','./common_sn.f95','./params_common_sn.f95']
+fsources = ['./mpi_helper.f95','./anime.f95','./aveflow.f95','./bondFG.f95','./bondv1.f95','./boundp.f95','./boundsm.f95','./vel2.f95','./velFG.f95','./feedbf.f95','./feedbfm.f95','./les.f95','./grid.f95','./ifdata.f95','./init.f95','./main.f95','./set.f95','./timdata.f95','./common_sn.f95','./params_common_sn.f95']
 
 ffsources=[]
+
 if with_ocl == '1':
     ffsources = fsources + ['./module_LES_conversions.f95','./module_LES_combined_ocl.f95','./oclWrapper.o']
 else:

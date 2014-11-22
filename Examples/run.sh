@@ -26,3 +26,4 @@ echo 'Running MPI Halo Exchange Example'
 echo '*********'
 mpiexec -n 24 $(pwd)/haloExchangeExample
 echo '*********'
+
