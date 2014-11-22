@@ -38,7 +38,9 @@ OASIS3-MCT-GUI/
 bug_Report.txt
 haloExchangeExample
 les_main_ocl
+les_main_ocl_mpi
 les_main
+les_main_mpi
 *.a
 *.dat
 *.dblite

@@ -7,12 +7,7 @@ with_mpi = getOpt('mpi','Use MPI','0')
 if with_mpi == '1':
     WITH_MPI = '-DMPI'
 
-fsources = ['./adam.f95','./anime.f95','./aveflow.f95','./bondFG.f95','./bondv1.f95','./boundp.f95','./boundsm.f95','./feedbf.f95','./feedbfm.f95','./grid.f95','./ifdata.f95','./init.f95','./les.f95','./main.f95','./press.f95','./set.f95','./timdata.f95','./vel2.f95','./velFG.f95','./velnw.f95','common_sn.f95','params_common_sn.f95'] 
-
-if with_mpi == '1':
-    fsources = fsources + ['./mpi_helper.f95']
-
-
+fsources = ['./mpi_helper.f95','./adam.f95','./anime.f95','./aveflow.f95','./bondFG.f95','./bondv1.f95','./boundp.f95','./boundsm.f95','./feedbf.f95','./feedbfm.f95','./grid.f95','./ifdata.f95','./init.f95','./les.f95','./main.f95','./press.f95','./set.f95','./timdata.f95','./vel2.f95','./velFG.f95','./velnw.f95','common_sn.f95','params_common_sn.f95'] 
 
 #FFLAGS  = ['-Wall', '-cpp','-ffree-form','-Ofast','-floop-parallelize-all','-ftree-parallelize-loops=24',  '-fopenmp','-pthread']
 FFLAGS  = ['-Wall','-cpp', '-ffree-form','-Ofast'] 
@@ -34,7 +29,13 @@ LDFLAGS= [] # '-fopenmp']
 #FFLAGS  = [ '-fpp','-O3', '-parallel']
 
 # pgf95 =>  you need to rename all source to '.F95'!
-#FFLAGS  = ['-O3','-fast', '-Mvect=simd:256'] 
+#FFLAGS  = ['-O3','-fast', '-Mvect=simd:256']
+if with_mpi == '1':
+    FC='mpifort'
 envF=Environment(F95=FC,LINK=FC,LINKFLAGS=LDFLAGS,F95FLAGS=FFLAGS,F95PATH=['.','/opt/local/include','/usr/local/include'])
 
-envF.Program('les_main',fsources,LIBS=['m'],LIBPATH=['.','/opt/local/lib','/usr/local/lib'])
+mpi_ext = ''
+if with_mpi == '1':
+    mpi_ext='_mpi'
+
+envF.Program('les_main'+mpi_ext,fsources,LIBS=['m'],LIBPATH=['.','/opt/local/lib','/usr/local/lib'])
