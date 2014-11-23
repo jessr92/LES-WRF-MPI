@@ -1,41 +1,52 @@
 \begin{figure*}
-    \begin{tabular}{|l|l|l|l|}
+    \begin{tabular}{|l|l|p{4cm}|l|}
         \hline
         & ESMF & OpenPALM & OASIS3-MCT\\
         \hline
         Coupling Type & Static & Dynamic & Static\\
         \hline
-        Coupling Behaviour & Sequential \& Concurrent & Sequential \& Concurrent & Sequential \& Concurrent\\
+        Coupling Behaviour & Sequential \& Concurrent & Sequential \&
+        Concurrent & Sequential \& Concurrent\\
         \hline
         Single Executable & Supported & Supported & Supported\\
         \hline
         Multiple Executable & Limited Support & Supported & Supported\\
         \hline
-        Local Parallelism & OpenMP \& MPI & OpenMP \& MPI & OpenMP \& MPI\\
+        Model Internal Parallelism & OpenMP \& MPI & OpenMP \& MPI & OpenMP
+        \& MPI\\
         \hline
-        Explicit Coupler Component & Yes & No & No\\
+        Explicit Coupler Component & Yes & No but separate coupler component
+        defined in GUI and automatically generated & No - defined
+        in plain text\\
+        \hline
+        Includes GUI & No & Yes & Under development\\
+        \hline
+        Includes Performance Analysis Tool & No & Yes & Under development\\
         \hline
     \end{tabular}
-    \caption{Comparison of model coupling frameworks}
+    \caption{Comparison of model coupling framework support}
     \label{table:modelCouplerComparison}
 \end{figure*}
 
 Overall all frameworks are functionally similar however they employ different
 approaches in how coupling is expressed and behaves.
-Table~\ref{table:modelCouplerComparison} gives a feature set comparison.
+Figure~\ref{table:modelCouplerComparison} gives a feature set comparison.
 
 As the table shows, OpenPALM is the only model coupling framework investigated
 that supports dynamic coupling. With the LES and WRF both running at the same
-time, the coupling would receive no benefit from being dynamic.
+time, the coupling would receive no benefit from being dynamic so ESMF and
+OpenPALM's lack of support isn't necessarily an issue in this case.
 
 A coupled model system can be compiled to a single or multiple executable. With
 the exception of ESMF, all model coupling frameworks offer full support for
-multiple executables. Each model and, if exists, the coupler component, are
-compiled to their own executables. The benefit of this is minor but very useful,
+multiple executables. Each model and, if exists, the coupler components are
+compiled to their own executables. The benefit of this is minor but very useful:
 each model's build system can be used without significant modification (usually
-just linking in the appropriate libraries). ESMF currently allow each component
-(model) to be compiled to its own executable however the coupler component must
-be linked into each executable for data exchange.
+just linking in the appropriate libraries) whereas compiling to a single
+executable may require a completely new build script. ESMF currently allows each
+component (model) to be compiled to its own executable however the coupler
+component must be linked into each executable for data exchange hence the
+``limited support'' for multiple executables.
 
 ESMF has a dedicated coupler component expressed in Fortran with explicit API
 calls in each model, the coupler, and master thread for the coupling setup and

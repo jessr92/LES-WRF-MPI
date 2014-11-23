@@ -10,19 +10,20 @@ since MPI is mostly backward compatible. The dummy OASIS3-MCT coupling created
 as part of the feasibility study was compiled with MPICH 3.1.2, an MPI3 capable
 library, without issue.
 
-The second stage involves coupling LES with WRF. For each timestep of WRF, LES
-will run about one hundred times before data is exchanged. This will need to be
-expressed in the coupling mechanism to avoid unnecessary data transfers and
-minimal requirement for I/O operations. There are also potential problems with
-modifying WRF for the OASIS coupling since WRF is a highly complex piece of
-software and thus making changes, especially with a lack of experience with the
-code base, could be challenging.
+The first stages second task involves coupling LES with WRF. For each timestep
+of WRF, LES will run about one hundred times before data is exchanged. This will
+need to be expressed in the coupling mechanism to avoid unnecessary data
+transfers and minimal requirement for I/O operations. There are also potential
+problems with modifying WRF for the OASIS coupling since WRF is a highly complex
+piece of software and thus making changes, especially with a lack of experience
+with the code base, could be challenging.
 
-The evaluation of performance will have two parts: evaluating the MPI LES and
-the coupled system performance as node count increases, perhaps with different
-MPI implementations (say MPICH and OpenMPI). MPI libraries aren't strictly
-interchangeable however with the availability of the wrapper compiler
-\textit{mpifort} mixing MPI implementations may be straightforward.
+The second stage is the evaluation of performance which will have two parts:
+evaluating the MPI LES and the coupled system performance as node count
+increases, perhaps with different MPI implementations (say MPICH and OpenMPI).
+MPI libraries aren't strictly interchangeable however with the availability of
+the wrapper compiler \textit{mpifort} mixing MPI implementations may be
+straightforward.
 
 The third stage involves comparing the differences in performance of the
 OASIS3-MCT coupling to the GMCF coupling. GMCF is in a proof-of-concept stage
