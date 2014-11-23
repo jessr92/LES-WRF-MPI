@@ -22,7 +22,7 @@ subroutine main()
     endif
     allocate(processArray(rowSize + 2, colSize + 2, depth))
     call initArray(processArray)
-    call exchange2DHalos3DArray(processArray, rowSize, colSize, depth, procPerRow, 1)
+    call exchange2DHalos(processArray(:,:,1), rowSize, colSize, procPerRow)
     deallocate(processArray)
     call finalise_mpi()
 end subroutine main
