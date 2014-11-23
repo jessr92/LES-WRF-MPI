@@ -1,38 +1,42 @@
-Our planet's ecosystem is highly complex. Geoscientists that are interested in
-modelling this ecosystem have created numerous systems which each model one
-aspect, for instance a Large Eddy Simulator (LES) to study turbulent air flows
-\cite{Nakayama2011,Nakayama2012} and the Weather Research and Forecasting Model
-(WRF) for mesoscale weather prediction \cite{Michalakes2000}. For the last
-decade or so, interest has evolved from individual models to combining models
-\cite{Michalakes2010} to obtain more accurate results and to model more complex
-aspects of our planet's ecosystem. With this trend, a number of model coupling
-frameworks have been created to support the desire for co-simulation. These
-model couplers allow a single application to make use of multiple models without
-significant changes to the individual models' code bases. Models communicate
-with each other via data exchanges at each timestep which are handled by the
-coupling framework. The coupling frameworks typically use the Message Passing
-Interface (MPI) for communication since MPI is the \textit{de facto} standard
-for parallel communication.
+The ecosystem of our planet is highly complex. Climate scientists that are
+interested in modelling this ecosystem have created a number of independent
+systems which each model one aspect, for instance a Large Eddy Simulator to
+study turbulent air flows \cite{Nakayama2011,Nakayama2012} and the Weather
+Research and Forecasting Model for mesoscale weather prediction
+\cite{Michalakes2000}. For the last decade or so, interest has evolved from
+individual models to combining models \cite{Michalakes2010} to obtain more
+accurate results and to model more complex aspects of our planet's ecosystem.
+With this trend, a number of model coupling frameworks have been developed to
+support the desire for co-simulation. These model couplers allow a single
+application to make use of multiple models without significant changes to the
+code bases of the individual models. Models communicate with each other via data
+exchanges at each timestep which are handled by the coupling framework. The
+coupling frameworks typically use MPI for communication since MPI is the
+\textit{de facto} standard for parallel communication.
 
 The proposed work for the project involves three distinct stages. The first
 requires the modification of the existing LES code to create a distributed
 version that makes use of MPI to allow performance to scale on large computer
-clusters. An additional aim of the first stage is to facilitate the use of the
+clusters. An additional aim for this task is to facilitate the use of the
 OpenCL-accelerated LES \cite{Vanderbauwhede2014} in the distributed system to
-improve the model's throughput further on heterogeneous systems. The second
-stage involves coupling the distributed LES with WRF using a model coupling
-framework. The third stage involves comparing the coupling from the second stage
-to a coupling using the Glasgow Model Coupling Framework (GMCF)
-\cite{Vanderbauwhede2014}.
+improve the model's throughput further on heterogeneous systems. The second task
+of the first stage involves coupling the distributed LES with WRF using a model
+coupling framework. The second stage involves a performance evaluation of both
+the distributed LES and the LES-WRF coupling. The third stage involves comparing
+the coupling from the first stage to a coupling using the Glasgow Model Coupling
+Framework (GMCF) \cite{Vanderbauwhede2014}.
 
-A number of modeling frameworks have been looked at, including: the Model
-Coupling Toolkit (MCT) \cite{Larson2005,Jacob2005}; OASIS (specifically
-OASIS3-MCT) \cite{Valcke,Valcke2013}; the Earth System Modeling Framework (ESMF)
+A number of modeling frameworks have been looked at: the Model Coupling Toolkit
+(MCT) \cite{Larson2005,Jacob2005}; OASIS (specifically OASIS3-MCT)
+\cite{Valcke,Valcke2013}; the Earth System Modeling Framework (ESMF)
 \cite{Ramework2004}; and OpenPALM \cite{Piacentini2011}. After comparing these
 model coupling frameworks, OASIS3-MCT was chosen as the preferred framework
 given its continued development and simple coupling mechanism.
 
-The remainder of this document discusses the research problem in detail before
-going into an in-depth literature review for the state of the art in distributed
-and coupled applications. The proposed approach and work plan for the project is
-then given to conclude the proposal.
+The rest of the document is structured as follows:
+Section~\ref{sec:statementOfProblem} discusses the research problem in detail;
+Section~\ref{sec:literatureReview} is an in-depth literature review for the
+state of the art in distributed and coupled applications;
+Section~\ref{sec:proposedApproach} contains the proposed approach for working on
+the research problem and Section~\ref{sec:projectPlan} describes the work plan
+for the approach including estimated deliverable dates.
