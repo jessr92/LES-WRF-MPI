@@ -34,6 +34,8 @@ just linking in the appropriate libraries). ESMF currently allow each component
 (model) to be compiled to its own executable however the coupler component must
 be linked into each executable for data exchange.
 
+\textbf{Architecture and Communication}
+
 Each model coupler takes a different approach to the overall coupling
 architecture and communication strategies.
 
@@ -51,7 +53,7 @@ required, for instance a hub-and-spokes or pair-wise coupling, and does not
 restrict modes of execution to just solely sequential or solely concurrent.
 Hub-and-spokes coupling allows a single coupler to have data exchanges between
 all models whereas a pairwise coupling forces each coupler to be the
-man-in-the-middle for exchanges between two models. 
+man-in-the-middle for exchanges between two models.
 
 For communication, ESMF is also very flexible, even allowing model
 communications to occur in the middle of a time step. There is no communication
@@ -103,6 +105,25 @@ OASIS3-MCT's method of dealing with the \textit{M-by-N problem} is the same as
 OpenPALM and `put' calls are also non-blocking with `get' calls blocking.
 OASIS3-MCT also allows buffering of data through the use of coupler restart
 files stored on disk during runtime.
+
+\textbf{Coupling Overhead and Scaling}
+
+In terms of coupling overhead caused by model coupling frameworks, there are few
+pieces of literature discussing it in detail, especially for the model coupling
+frameworks currently in use. For instance, Frickenhaus, Redler, and Post
+\cite{StephanFrickenhausReneRedler2001} found an overhead of 10\% caused by the
+MpCCI coupling library whereas \cite{Mogensen} found insignificant overhead in
+their OASIS3 coupling. The OASIS team themselves found there to be insignificant
+overhead in their toy example \cite{Valcke} however they also discuss an
+un-cited example where a 6\% coupling overhead was observed. There were no
+peer-reviewed articles discussing ESMF and OpenPALM overhead found.
+
+In terms of scaling, similar problems exist with respect to peer-reviewed
+articles. The respective model coupling frameworks show, for dummy examples,
+that the framework scales well up to around 1000 processes, with increasing
+overhead above that.
+
+\textbf{Using the frameworks}
 
 To get a feel for how each framework is used and behaves, a coupling was created
 using all three frameworks.
