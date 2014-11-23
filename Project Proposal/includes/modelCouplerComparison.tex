@@ -1,24 +1,27 @@
 \begin{figure*}
-    \begin{tabular}{|l|l|l|l|l|l|}
+    \begin{tabular}{|l|l|l|l|}
         \hline
-        & Coupling Type & Coupling Behaviour & Single Executable & Multiple
-        Executable & Local Parallelism\\
+        & ESMF & OpenPALM & OASIS3-MCT\\
         \hline
-        ESMF & Static & Sequential \& Concurrent & Supported & Limited Support &
-        OpenMP \& MPI\\
+        Coupling Type & Static & Dynamic & Static\\
         \hline
-        OpenPALM & Dynamic & Sequential \& Concurrent & Supported & Supported &
-        OpenMP \& MPI\\
+        Coupling Behaviour & Sequential \& Concurrent & Sequential \& Concurrent & Sequential \& Concurrent\\
         \hline
-        OASIS3-MCT & Static & Sequential \& Concurrent & Supported & Supported &
-        OpenMP \& MPI\\
+        Single Executable & Supported & Supported & Supported\\
+        \hline
+        Multiple Executable & Limited Support & Supported & Supported\\
+        \hline
+        Local Parallelism & OpenMP \& MPI & OpenMP \& MPI & OpenMP \& MPI\\
+        \hline
+        Explicit Coupler Component & Yes & No & No\\
         \hline
     \end{tabular}
     \caption{Comparison of model coupling frameworks}
     \label{table:modelCouplerComparison}
 \end{figure*}
 
-Overall, the model coupling frameworks offer the same features.
+Overall all frameworks are functionally similar however they employ different
+approaches in how coupling is expressed and behaves.
 Table~\ref{table:modelCouplerComparison} gives a feature set comparison.
 
 As the table shows, OpenPALM is the only model coupling framework investigated
@@ -33,6 +36,15 @@ each model's build system can be used without significant modification (usually
 just linking in the appropriate libraries). ESMF currently allow each component
 (model) to be compiled to its own executable however the coupler component must
 be linked into each executable for data exchange.
+
+ESMF has a dedicated coupler component expressed in Fortran with explicit API
+calls in each model, the coupler, and master thread for the coupling setup and
+data transfer. OASIS3-MCT and OpenPALM use a plain text file to express the
+coupling in a much simpler, condensed format however OpenPALM generates `glue
+code' to create a master process whereas OASIS3-MCT requires no extra process.
+OASIS3-MCT allows changes to be made to the coupling configuration without
+requiring recompilation whereas OpenPALM may require recompilation due to
+changes in the GUI-created `glue code' for the coupling.
 
 \textbf{Architecture and Communication}
 

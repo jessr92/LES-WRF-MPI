@@ -1,37 +1,38 @@
 Applications currently exist that model a single aspect of our Earth's
 ecosystem. Each model is useful in their own right however more accurate and
-detailed analysis can be conducted by making use of multiple models. This isn't
-viable by using the models independently so there is significant motivation to
-construct an efficient method of allowing applications to interact.
+detailed analysis can be conducted by making use of multiple models together.
+This isn't viable by using the models independently so there is significant
+motivation to construct an efficient method of allowing applications to
+interact.
 
 There are three ways applications can be coupled together \cite{Thevenin}. The
 first involves merging the two code bases. This solution is very efficient and
-portable as a single process is created. Data is shared via memory exchanges
-which are lightweight however the process of merging is complicated and the two
-code bases are no longer independent making continued development of each model
-difficult. Merging also causes problems for parallelism since each model's
-parallel abilities are dictated by the overarching code that controls both
-models. For these reasons this solution is not an appropriate way to couple
+portable. A single process is created so data is shared via memory exchanges
+which are lightweight however the process of merging code bases is complicated
+and the two code bases are no longer independent making continued development of
+each model difficult. Merging also causes problems for parallelism since each
+model's parallel abilities are dictated by the overarching code that controls
+both models. For these reasons this solution is not an appropriate way to couple
 models.
 
 The second solution \cite{Thevenin} is to use a communication library directly,
 such as MPI. This allows each model to be kept independent with the only code
 changes involved being related to the communication between models. The solution
-still suffers from many problems. The coupling code isn't generic since each
+still suffers from many problems. The coupling code is not generic since each
 model needs to know exactly what model it is sending data to. Also, since the
 MPI API is fairly low level, knowledge of parallel computing techniques is
 required for efficient coupling. The problems of complexity and generality
-increase if there are many models involved in the coupling with complicated
-exchanges required. Using MPI for data exchanges is definitely a viable way
-forward however a higher level solution is required to make coupling many models
-viable.
+increase if there are more than two models involved in the coupling with
+complicated exchanges required. Using MPI for data exchanges is definitely a
+viable way forward however a higher level solution is required to make coupling
+many models viable.
 
 The third solution \cite{Thevenin} follows on from the second. Instead of using
 an MPI library directly, a coupling library is employed to abstract the low
 level complexities of coupling away from the developer. A coupling library is a
 separate piece of software that acts as the ``middle man'' between models and
 facilitates data exchanges between models using a framework-specific interface.
-Coupling libraries can also provide tools for interpolation such as regridding
+Coupling libraries can also provide tools for interpolation such as re-gridding
 \cite{Kuinghttons} if there are differences in data representation between
 communicating models. Some coupling libraries also supply tools for performance
 analysis with graphical representations of runtime execution characteristics.
@@ -73,7 +74,8 @@ and scalable solution for all possible communication patterns.
 
 Each of the listed model couplers have many similarities however they also have
 a number of differences in terms of how they couple models and the tools
-offered. A comparison of model couplers is given below.
+offered. A brief overview of the model coupling frameworks is given below with a
+comparison following afterwards.
 
 \subsubsection{Model Couplers}
 
@@ -87,19 +89,8 @@ commit to the MCT repository in December 2012. However, the OASIS team have
 integrated MCT code with their latest framework, OASIS3-MCT, so the framework is
 still in active use. For these reasons MCT will not be considered in its own
 right, instead considered with respect to OASIS3-MCT which is in active
-development.
-
-The remaining three coupling frameworks have been looked at in detail. Overall
-all frameworks are functionally similar however they employ different approaches
-in how coupling is expressed and behaves. ESMF has a dedicated coupler component
-expressed in Fortran with explicit API calls in each model, the coupler, and
-master thread for the coupling setup and data transfer. OASIS3-MCT and OpenPALM
-use a plain text file to express the coupling in a much simpler, condensed
-format however OpenPALM generates `glue code' to create a master process whereas
-OASIS3-MCT requires no extra process. OASIS3-MCT allows changes to be made to
-the coupling configuration without requiring recompilation whereas OpenPALM may
-require recompilation due to changes in the GUI-created `glue code' for the
-coupling.
+development. The remaining three coupling frameworks have been looked at in
+detail.
 
 \textbf{ESMF} is in active development with an extensive API. The API is the
 largest out of the three (the reference documentation is 1140 pages long, an
@@ -123,18 +114,20 @@ are read by the GUI to help setup the coupling. The GUI generates many files
 including a text file defining the coupling setup and a number of glue code
 files to allow the coupling configuration to be compiled and run. When compared
 with OASIS3-MCT this seems fairly complex and overall heavyweight however the
-tool generates a Makefile so that the end user only needs to interact with the
+tool generates a Makefile so that the developer only needs to interact with the
 GUI and doesn't need to look at the several files created by the GUI.
 
-OpenPALM also offers a feature to log and automatically analyse the runtime of
-the coupled system. The GUI offers views on CPU time for each model, a timeline
-of what model ran when, and even a `playback' feature where the flow of
-execution can be viewed graphically.
+OpenPALM's GUI also offers a feature to log and automatically analyse the
+runtime of the coupled system. The GUI offers views on CPU time for each model,
+a timeline of what model ran when, and even a `playback' feature where the flow
+of execution can be viewed graphically. This can be very useful in analysing and
+debugging performance issues.
 
 \textbf{OASIS3-MCT} is in active development, with the latest release in May
 2013. Also, from May 2014, WRF has added OASIS3-MCT coupling code in its version
 3.6 release \cite{ENES2014}. This official coupling support makes using
-OASIS3-MCT for the LES-WRF coupling a more attractive option.
+OASIS3-MCT for the LES-WRF coupling a more attractive option since some of the
+code changes required in WRF may already be completed.
 
 The previous version of OASIS was OASIS3. The move from OASIS3 to OASIS3-MCT
 brought a lot of changes due to the integration of MCT code, for instance the
@@ -144,13 +137,14 @@ coupling framework but does given the impression that the OASIS framework could
 benefit from a clean up of documentation and the framework code base.
 
 Depending on the coupling configuration, OASIS3-MCT may require the use of
-coupling `restart files' which are netCDF \cite{Unidata} files containing data
+`coupling restart files' which are netCDF \cite{Unidata} files containing data
 in use. This is used to read data initially and for storing data to be sent to
 another model if the recipient model doesn't need it yet. This reliance on I/O
 operations is a potential performance concern which will need to be investigated
-during runtime. On the other hand, Polcher et al.\ \cite{Polcher2013} did not
-find I/O to be a bottleneck in their ORCHIDEE coupling when executed on a
-cluster with up to 20 CPUs.
+from runtime execution statistics. On the other hand, Polcher et al.\
+\cite{Polcher2013} did not find I/O to be a bottleneck in their ORCHIDEE
+coupling when executed on a cluster with up to 20 CPUs which is a promising
+result.
 
 The next version of OASIS3-MCT will bring a GUI for creating the namcouple file
 automatically and a performance analysis tool, LUCIA \cite{Maisonnave}, which
