@@ -16,9 +16,9 @@ bold. The estimated delivery dates correspond to an academic week.
     \begin{description}
         \item[Week 20] MPI LES Performance using multiple MPI implementations
         \item[Week 23] LES WRF Coupling Performance
-        \item[Week 27] Performance evaluation and qualitative comparison between
-        the OASIS3-MCT coupling and the GMCF coupling
     \end{description}
+    \item[Week 27] Performance evaluation and qualitative comparison between
+    the OASIS3-MCT coupling and the GMCF coupling
     \item[Week 31] Final deliverable in the form of a paper and a presentation
     describing work completed.
 \end{description}
@@ -33,15 +33,15 @@ Figure~\ref{fig:workPlan} displays this work plan as a Gantt chart.
         \ganttbar{Distributed LES}{10}{12} \\
         \ganttlinkedbar{LES WRF Coupling}{13}{18} \\
         \ganttmilestone{Implementation Complete}{18} \\
-        \ganttgroup{Evaluation}{19}{27} \\
+        \ganttgroup{Evaluation}{19}{23} \\
         \ganttbar{MPI LES Performance}{19}{20} \\
         \ganttlinkedbar{LES WRF Coupling Performance}{21}{23} \\
+        \ganttmilestone{Evaluation Complete}{23} \\
         \ganttlinkedbar{OASIS3-MCT and GMCF Comparison}{24}{27} \\
-        \ganttmilestone{Evaluation Complete}{27} \\
         \ganttbar{Paper and presentation deliverable}{28}{31}
         \ganttlink{elem2}{elem3}
         \ganttlink{elem3}{elem5}
-        \ganttlink{elem7}{elem8}
+        \ganttlink{elem6}{elem7}
         \ganttlink{elem8}{elem9}
     \end{ganttchart}
     \caption{Gantt Chart for Work Plan}
