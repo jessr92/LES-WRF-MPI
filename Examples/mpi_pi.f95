@@ -1,7 +1,7 @@
 program mpi_pi
 use mpi_helper
 implicit none
-integer, parameter :: darts = 5000, rounds = 5000
+integer, parameter :: darts = 5000, rounds = 500
 call main()
 
 contains

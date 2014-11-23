@@ -46,3 +46,4 @@ les_main_mpi
 *.dblite
 
 mpi_pi
+haloExchange3DExample
