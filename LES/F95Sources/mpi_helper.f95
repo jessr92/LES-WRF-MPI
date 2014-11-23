@@ -131,7 +131,7 @@ subroutine exchange2DHalos(array, rowSize, colSize, procPerRow)
                        communicator, requests(7), ierror)
         call checkMPIError()
         call MPI_IRecv(array(2, colSize+2), 1, colType, commWith, leftTag, & 
-                          communicator, requests(8), ierror)
+                       communicator, requests(8), ierror)
         call checkMPIError()
     end if
     do i = 1, 8
@@ -224,7 +224,7 @@ subroutine exchange2DHalos3DArray(array, rowSize, colSize, depthSize, procPerRow
                        communicator, requests(7), ierror)
         call checkMPIError()
         call MPI_IRecv(array(2, colSize+2, k), 1, colType, commWith, leftTag, & 
-                          communicator, requests(8), ierror)
+                       communicator, requests(8), ierror)
         call checkMPIError()
     end if
     do i = 1, 8
@@ -260,6 +260,15 @@ subroutine exchange2DHalos3DArray(array, rowSize, colSize, depthSize, procPerRow
     call checkMPIError()
 end subroutine exchange2DHalos3DArray
 
+subroutine exchangeAll2DHalos3DArray(array, rowSize, colSize, depthSize, procPerRow)
+    implicit none
+    integer, intent(in) :: rowSize, colSize, depthSize, procPerRow
+    integer, dimension(rowSize + 2, colSize + 2, depthSize), intent(inout) :: array
+    integer :: i
+    do i=1, depthSize
+        call exchange2DHalos3DArray(array, rowSize, colSize, depthSize, procPerRow, i)
+    end do
+end subroutine exchangeAll2DHalos3DArray
 
 subroutine outputArray(array)
     implicit none
