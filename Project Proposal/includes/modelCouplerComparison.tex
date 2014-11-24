@@ -15,9 +15,8 @@
         Model Internal Parallelism & OpenMP \& MPI & OpenMP \& MPI & OpenMP
         \& MPI\\
         \hline
-        Explicit Coupler Component & Yes & No but separate coupler component
-        defined in GUI and automatically generated & No - defined
-        in plain text\\
+        Explicit Coupler Component & Yes & Separate coupler component defined
+        in GUI and automatically generated & No - defined in plain text\\
         \hline
         Includes GUI & No & Yes & Under development\\
         \hline
@@ -35,18 +34,18 @@ Figure~\ref{table:modelCouplerComparison} gives a feature set comparison.
 As the table shows, OpenPALM is the only model coupling framework investigated
 that supports dynamic coupling. With the LES and WRF both running at the same
 time, the coupling would receive no benefit from being dynamic so ESMF and
-OpenPALM's lack of support isn't necessarily an issue in this case.
+OASIS's lack of support is not necessarily an issue in this case.
 
-A coupled model system can be compiled to a single or multiple executable. With
-the exception of ESMF, all model coupling frameworks offer full support for
-multiple executables. Each model and, if exists, the coupler components are
-compiled to their own executables. The benefit of this is minor but very useful:
-each model's build system can be used without significant modification (usually
-just linking in the appropriate libraries) whereas compiling to a single
-executable may require a completely new build script. ESMF currently allows each
-component (model) to be compiled to its own executable however the coupler
-component must be linked into each executable for data exchange hence the
-``limited support'' for multiple executables.
+A model coupling system can be compiled to a single executable or multiple
+executables. With the exception of ESMF, all model coupling frameworks offer
+full support for multiple executables. Each model and, if exists, the coupler
+components are compiled to their own executables. The benefit of this is minor
+but very useful: each model's build system can be used without significant
+modification (usually just linking in the appropriate libraries) whereas
+compiling to a single executable may require a completely new build script. ESMF
+currently allows each component (model) to be compiled to its own executable
+however the coupler component must be linked into each executable for data
+exchange hence the ``limited support'' for multiple executables.
 
 ESMF has a dedicated coupler component expressed in Fortran with explicit API
 calls in each model, the coupler, and master thread for the coupling setup and
@@ -55,28 +54,30 @@ coupling in a much simpler, condensed format however OpenPALM generates `glue
 code' to create a master process whereas OASIS3-MCT requires no extra process.
 OASIS3-MCT allows changes to be made to the coupling configuration without
 requiring recompilation whereas OpenPALM may require recompilation due to
-changes in the GUI-created `glue code' for the coupling.
+changes in the GUI-created `glue code' for the coupling. OASIS3-MCT is thus the
+simplest to use, with limited changes required to existing code bases.
 
 \textbf{Architecture and Communication}
 
 Each model coupler takes a different approach to the overall coupling
 architecture and communication strategies.
 
-ESMF has two layers, `superstructure' and `infrastructure' which sandwich the
-user code being coupled. The superstructure is the upper layer which provides
-high level components to the developer, such as Gridded Components to associate
-with each model, Coupler Components to define how two models interact, and
-States to encapsulate data between models. The infrastructure layer is the lower
-layer which provides tools to manage the complexity of the different time steps
-and data representations between models. The architecture is designed such that
-each ESMF component doesn't need to know anything about the models it is coupled
-with allowing component reuse and limited changes to the model code itself. The
-design is also very flexible, allowing components to be coupled in any manner
-required, for instance a hub-and-spokes or pair-wise coupling, and does not
-restrict modes of execution to just solely sequential or solely concurrent.
-Hub-and-spokes coupling allows a single coupler to have data exchanges between
-all models whereas a pairwise coupling forces each coupler to be the
-man-in-the-middle for exchanges between two models.
+ESMF has two layers, the `superstructure' and the `infrastructure' which
+sandwich the user code being coupled. The superstructure is the upper layer
+which provides high level components to the developer, such as Gridded
+Components to associate with each model, Coupler Components to define how two
+models interact, and States to encapsulate data between models. The
+infrastructure layer is the lower layer which provides tools to manage the
+complexity of the different time steps and data representations between models.
+The architecture is designed such that each ESMF component doesn't need to know
+anything about the models it is coupled with allowing component reuse and
+limited changes to the model code itself. The design is also very flexible,
+allowing components to be coupled in any manner required, for instance a
+hub-and-spokes or pair-wise coupling, and does not restrict modes of execution
+to just solely sequential or solely concurrent. Hub-and-spokes coupling allows a
+single coupler to have data exchanges between all models whereas a pairwise
+coupling forces each coupler to be the man-in-the-middle for exchanges between
+two models.
 
 For communication, ESMF is also very flexible, even allowing model
 communications to occur in the middle of a time step. There is no communication
@@ -103,8 +104,8 @@ means that when a model produces data that it would like to make available to a
 component, it executes a non-blocking `PALM\_Put' call. If another model
 requires data at some point, it executes a blocking `PALM\_Get' call. At the
 model level, there is no need for the calls to match up with another model, it
-is only when the coupling is being created are the get and put calls matched up.
-The primary benefit of this is that if a model is being reused in another
+is only when the coupling is being generated are the get and put calls matched
+up. The primary benefit of this is that if a model is being reused in another
 coupling, it is unlikely that many of the calls themselves will need to be
 modified, just the configuration in the GUI. Another benefit is that this also
 means data transfer doesn't need to happen straight away, the recipient could be
@@ -135,34 +136,42 @@ In terms of coupling overhead caused by model coupling frameworks, there are few
 pieces of literature discussing it in detail, especially for the model coupling
 frameworks currently in use. For instance, Frickenhaus, Redler, and Post
 \cite{StephanFrickenhausReneRedler2001} found an overhead of 10\% caused by the
-MpCCI coupling library whereas \cite{Mogensen} found insignificant overhead in
-their OASIS3 coupling. The OASIS team themselves found there to be insignificant
-overhead in their toy example \cite{Valcke} however they also discuss an
-un-cited example where a 6\% coupling overhead was observed. There were no
+MpCCI coupling library whereas Mogensen \cite{Mogensen} found insignificant
+overhead in their OASIS3 coupling. The OASIS team themselves found there to be
+insignificant overhead in their toy example \cite{Valcke} however they also
+discuss an un-cited example where a 6\% coupling overhead was observed. Neither
+are explicit as to what they mean by `insignificant'. There were no
 peer-reviewed articles discussing ESMF and OpenPALM overhead found.
 
 In terms of scaling, similar problems exist with respect to peer-reviewed
 articles. The respective model coupling frameworks show, for dummy examples,
 that the framework scales well up to around 1000 processes, with increasing
-overhead above that.
+overhead above that. Individual model couplings have brief performance analysis
+however none are in-depth enough to make concrete conclusions about the general
+performance scalability of each model coupling framework.
 
-\textbf{Using the frameworks}
+\textbf{Choice of Framework}
 
-To get a feel for how each framework is used and behaves, a coupling was created
-using all three frameworks.
+The fact that there is nearly feature parity between model couplers meant the
+decision came down to usability of the frameworks so, to get a feel for how each
+framework is used and behaves, a coupling was created using all three
+frameworks.
 
 A dummy coupling was created between two components in ESMF
 \footnote{\url{https://github.com/gordon1992/LES-WRF-MPI/tree/master/
 Examples/ESMF}}. The dummy coupling required around 350 source lines of code
 just to set up a `no-op' model coupling. Due to the overly large amount of code
-required to create a simple coupling, ESMF was not chosen as the preferred model
-coupling framework to use.
+required to create a simple coupling with no feature set benefit, ESMF was not
+chosen as the preferred model coupling framework to use.
 
 For OpenPALM, the reliance on the GUI meant that a sampling coupling was not
 created specifically for comparison between ESMF and OASIS3-MCT in terms of
 required code changes, instead solely for getting a feel for the framework.
 Overall, due to the seemingly heavyweight approach to creating a model coupling,
-OpenPALM was not chosen as the preferred model coupling framework to use.
+OpenPALM was not chosen as the preferred model coupling framework to use. The
+additional features such as the GUI and the performance analysis tools did make
+OpenPALM an attractive option however this was outweighed by the additional work
+required to create a coupling compared to OASIS3-MCT.
 
 A dummy coupling was created between two components in OASIS3-MCT
 \footnote{\url{https://github.com/gordon1992/LES-WRF-MPI/tree/master/
@@ -171,4 +180,7 @@ code (including the plain text namcouple file) to create a coupling that
 transferred a 2D array between two models.
 
 Given OASIS3-MCTs simple namcouple file format and active development, it was
-chosen as the preferred model coupling framework to use.
+chosen as the preferred model coupling framework to use. Depending on time and
+the availability of the GUI and performance analysis tool under development, the
+additional features offered may be investigated since it was clear from using
+similar tools in OpenPALM that they can be worthwhile.
