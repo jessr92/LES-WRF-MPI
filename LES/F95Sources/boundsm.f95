@@ -12,19 +12,49 @@ subroutine boundsm(km,jm,sm,im)
     integer :: i, j, k
 ! 
 ! =================================
-    do k = 0,km+1
-        do j = -1,jm+1
-            sm(   0,j,k) = sm(1 ,j,k)
-            sm(im+1,j,k) = sm(im,j,k)
+#ifdef MPI
+    if (isTopRow(procPerRow) .or. isBottomRow(procPerRow)) then
+#endif
+        do k = 0,km+1
+            do j = -1,jm+1
+#ifdef MPI
+                if (isTopRow(procPerRow)) then
+#endif
+                    sm(   0,j,k) = sm(1 ,j,k)
+#ifdef MPI
+                else
+#endif
+                    sm(im+1,j,k) = sm(im,j,k)
+#ifdef MPI
+                end if
+#endif
+            end do
         end do
-    end do
+#ifdef MPI
+    end if
+#endif
 ! --side flow condition
-    do k = 0,km+1
-        do i = 0,im+1
-            sm(i,jm+1,k) = sm(i,jm  ,k)
-            sm(i,0,k) = sm(i,1   ,k)
+#ifdef MPI
+    if (isLeftmostColumn(procPerRow) .or. isRightmostColumn(procPerRow)) then
+#endif
+        do k = 0,km+1
+            do i = 0,im+1
+#ifdef MPI
+                if (isRightmostColumn(procPerRow)) then
+#endif
+                    sm(i,jm+1,k) = sm(i,jm  ,k)
+#ifdef MPI
+                else
+#endif
+                    sm(i,0,k) = sm(i,1   ,k)
+#ifdef MPI
+                end if
+#endif
+            end do
         end do
-    end do
+#ifdef MPI
+    end if
+#endif
 ! --underground condition
     do j = -1,jm+1
         do i = 0,im+1
@@ -32,6 +62,10 @@ subroutine boundsm(km,jm,sm,im)
             sm(i,j,km+1) = sm(i,j,km)
         end do
     end do
+#ifdef MPI
+! --halo exchanges
+    !call exchangeAll2DHalos3DRealArray(sm, ip-1, jp-1, kp-1, procPerRow)
+#endif
 end subroutine boundsm
 
 end module module_boundsm

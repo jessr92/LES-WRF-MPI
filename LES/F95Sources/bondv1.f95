@@ -142,6 +142,12 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
     end do
 
 ! =================================
+#ifdef MPI
+! --halo exchanges
+  !  call exchangeAll2DHalos3DRealArray(u, ip-1, jp-1, kp-1, procPerRow)
+  !  call exchangeAll2DHalos3DRealArray(v, ip-1, jp-1, kp-1, procPerRow)
+  !  call exchangeAll2DHalos3DRealArray(w, ip-1, jp-1, kp-1, procPerRow)
+#endif
 #ifdef WV_DEBUG
     print *,'F95 UVWSUM after bondv1:',sum(u)+sum(v)+sum(w)
 #endif
