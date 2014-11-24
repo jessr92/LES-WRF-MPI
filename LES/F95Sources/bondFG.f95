@@ -46,7 +46,6 @@ subroutine bondfg(km,jm,f,im,g,h)
 ! --halo exchanges
     call exchangeAll2DHalos3DRealArray(f, ip-1, jp-1, kp-1, procPerRow)
     call exchangeAll2DHalos3DRealArray(g, ip-1, jp-1, kp-1, procPerRow)
-    call exchangeAll2DHalos3DRealArray(h, ip-1, jp-1, kp-1, procPerRow)
 #endif
 end subroutine bondFG                                    
 
