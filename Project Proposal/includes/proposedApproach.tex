@@ -8,15 +8,22 @@ Even though OASIS3-MCT itself is limited to MPI1 capabilities, there should be
 no issue using MPI2, or even MPI3 capabilities for the model-local parallelism
 since MPI is mostly backward compatible. The dummy OASIS3-MCT coupling created
 as part of the feasibility study was compiled with MPICH 3.1.2, an MPI3 capable
-library, without issue.
+library, without issue. It is thought that the overhead caused by the MPI data
+exchanges should not be too significant and should scale for tens of nodes. It
+may be the case that boundary exchanges will have to be limited to once per
+timestep, rather than the four exchanges per timestep currently in place for the
+open and periodic boundaries. This could reduce the accuracy of the results
+calculated however any differences should not be significant compared to the
+single threaded case.
 
-The first stages second task involves coupling LES with WRF. For each timestep
-of WRF, LES will run about one hundred times before data is exchanged. This will
-need to be expressed in the coupling mechanism to avoid unnecessary data
-transfers and minimal requirement for I/O operations. There are also potential
-problems with modifying WRF for the OASIS coupling since WRF is a highly complex
-piece of software and thus making changes, especially with a lack of experience
-with the code base, could be challenging.
+The first stage's second task involves coupling LES with WRF. For each timestep
+of WRF, LES will run about one hundred times before data is exchanged since
+WRF's calculations take significantly longer than LES's. This will need to be
+expressed in the coupling mechanism to avoid unnecessary data transfers and
+minimal requirement for I/O operations. There are also potential problems with
+modifying WRF for the OASIS coupling since WRF is a highly complex piece of
+software and thus making changes, especially with a lack of experience with the
+code base, could be challenging.
 
 The second stage is the evaluation of performance which will have two parts:
 evaluating the MPI LES and the coupled system performance as node count
