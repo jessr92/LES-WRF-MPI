@@ -1,7 +1,7 @@
 Applications currently exist that model a single aspect of our Earth's
-ecosystem. Each model is useful in their own right however more accurate and
+ecosystem. Each model is useful in its own right however more accurate and
 detailed analysis can be conducted by making use of multiple models together.
-This isn't viable by using the models independently so there is significant
+This is not viable by using the models independently so there is significant
 motivation to construct an efficient method of allowing applications to
 interact.
 
@@ -45,7 +45,7 @@ There are two main types of coupling: static and dynamic
 \cite{Thevenin,Piacentini2011}. In static coupling, all of the coupled
 components have to start simultaneously at the beginning of the simulation. This
 means any memory and CPU resources required by each model are allocated and
-locked until the end of the simulation, even if a model doesn't start using the
+locked until the end of the simulation, even if a model does not start using the
 resources until midway through the simulation. Dynamic coupling allows each
 coupled component to start and end as required, freeing up resources when not in
 use. Instead, resources are managed by the coupler. Generally there is a fixed
@@ -104,18 +104,20 @@ the extensive and granular API makes the framework arguably more flexible and
 potentially easier to read since everything is in Fortran and explicitly
 defined.
 
-\textbf{OpenPALM} hasn't had a new release since January 2013, nearly two years
-ago at the time of writing. OpenPALM uses a GUI, called PrePALM, for defining
-the coupling configuration. There is an API with tens of possible calls that
-need to be added to the models to be coupled. Each model also requires specially
-defined Fortran comments that are `ID cards' that define information on the
-model and what fields it has that can be sent to other models. These comments
-are read by the GUI to help setup the coupling. The GUI generates many files
-including a text file defining the coupling setup and a number of glue code
-files to allow the coupling configuration to be compiled and run. When compared
-with OASIS3-MCT this seems fairly complex and overall heavyweight however the
-tool generates a Makefile so that the developer only needs to interact with the
-GUI and doesn't need to look at the several files created by the GUI.
+\textbf{OpenPALM} has not had a new release since January 2013, nearly two years
+ago at the time of writing however seems to be in active use given that a
+training session is scheduled for January 2015. OpenPALM uses a GUI, called
+PrePALM, for defining the coupling configuration. There is an API with tens of
+possible calls that need to be added to the models to be coupled. Each model
+also requires specially defined Fortran comments that are `ID cards' that define
+information on the model and what fields it has that can be sent to other
+models. These comments are read by the GUI to help setup the coupling. The GUI
+generates many files including a text file defining the coupling setup and a
+number of glue code files to allow the coupling configuration to be compiled and
+run. When compared with OASIS3-MCT this seems fairly complex and overall
+heavyweight however the tool generates a Makefile so that the developer only
+needs to interact with the GUI and doesn't need to look at the several files
+created by the GUI.
 
 OpenPALM's GUI also offers a feature to log and automatically analyse the
 runtime of the coupled system. The GUI offers views on CPU time for each model,
