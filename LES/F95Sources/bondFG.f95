@@ -26,7 +26,7 @@ subroutine bondfg(km,jm,f,im,g,h)
 ! --sideflow condition
 #ifdef MPI
     if (isLeftMostColumn(procPerRow) .or. isRightMostColumn(procPerRow)) then
-        call sideflowMPIAllExchange(g, ip, jp, kp, procPerRow)
+        call sideflowMPIAllExchange(g, ip-1, jp-1, kp-1, procPerRow)
     end if
 #else
     do k = 1,km
@@ -44,9 +44,9 @@ subroutine bondfg(km,jm,f,im,g,h)
     end do
 #ifdef MPI
 ! --halo exchanges
-    call exchangeAll2DHalos3DRealArray(f, ip, jp, kp, procPerRow)
-    call exchangeAll2DHalos3DRealArray(g, ip, jp, kp, procPerRow)
-    call exchangeAll2DHalos3DRealArray(h, ip, jp, kp, procPerRow)
+    call exchangeAll2DHalos3DRealArray(f, ip-1, jp-1, kp-1, procPerRow)
+    call exchangeAll2DHalos3DRealArray(g, ip-1, jp-1, kp-1, procPerRow)
+    call exchangeAll2DHalos3DRealArray(h, ip-1, jp-1, kp-1, procPerRow)
 #endif
 end subroutine bondFG                                    
 
