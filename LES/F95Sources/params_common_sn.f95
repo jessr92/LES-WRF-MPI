@@ -7,7 +7,7 @@ module params_common_sn
     !integer, parameter :: ipmax = 254, jpmax = 253
 #ifndef TEST_SMALL_DOMAIN
 #ifdef MPI
-    integer, parameter :: ip = (ipmax/procPerRow) + 2, jp=(jpmax/procPerCol) + 2, kp=90
+    integer, parameter :: ip = ipmax/procPerRow, jp=jpmax/procPerCol, kp=90
 #else
     integer, parameter :: ip = 150, jp = 150, kp = 90
 #endif
