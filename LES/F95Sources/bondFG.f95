@@ -12,17 +12,29 @@ subroutine bondfg(km,jm,f,im,g,h)
     integer :: i, j, k
 ! 
 ! --inflow condition
-    do k = 1,km
-        do j = 1,jm
-            f( 0,j,k) = f(1  ,j,k)
+#ifdef MPI
+    if (isTopRow(procPerRow)) then
+#endif
+        do k = 1,km
+            do j = 1,jm
+                f( 0,j,k) = f(1  ,j,k)
+            end do
         end do
-    end do
+#ifdef MPI
+    end if
+#endif
 ! --sideflow condition
+#ifdef MPI
+    if (isLeftMostColumn(procPerRow) .or. isRightMostColumn(procPerRow)) then
+        call sideflowMPIAllExchange(g, ip, jp, kp, procPerRow)
+    end if
+#else
     do k = 1,km
         do i = 1,im
             g(i, 0,k) = g(i,jm  ,k)
         end do
     end do
+#endif
 ! --ground and top condition
     do j = 1,jm
         do i = 1,im
@@ -30,6 +42,12 @@ subroutine bondfg(km,jm,f,im,g,h)
             h(i,j,km) = 0.0
         end do
     end do
+#ifdef MPI
+! --halo exchanges
+    call exchangeAll2DHalos3DRealArray(f, ip, jp, kp, procPerRow)
+    call exchangeAll2DHalos3DRealArray(g, ip, jp, kp, procPerRow)
+    call exchangeAll2DHalos3DRealArray(h, ip, jp, kp, procPerRow)
+#endif
 end subroutine bondFG                                    
 
 end module module_bondFG

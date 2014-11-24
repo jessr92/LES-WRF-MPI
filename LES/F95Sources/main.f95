@@ -157,6 +157,10 @@
 #ifdef MPI
 ! GR: MPI Start
       call initialise_mpi()
+      if (mpi_size .ne. procPerRow * procPerCol) then
+          print*, 'Needed ', (procPerRow * procPerCol), ' processes, got ', mpi_size
+          call MPI_Abort(communicator, 1, ierror)
+      end if
 #endif
       call set(data10,data11,data20,data21,data22,data23,data24,data25,data26,data27,data30,data31, &
       im,jm,km,ifbf,ianime,ical,n0,n1,nmax,dt,ro,vn,alpha,beta)
