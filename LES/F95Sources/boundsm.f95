@@ -5,9 +5,9 @@ contains
 subroutine boundsm(km,jm,sm,im)
     use common_sn ! create_new_include_statements() line 102
     implicit none
-    integer, intent(In) :: im
-    integer, intent(In) :: jm
-    integer, intent(In) :: km
+    integer, intent(In) :: im ! GR: always equal to ip?
+    integer, intent(In) :: jm ! GR: always equal to jp?
+    integer, intent(In) :: km ! GR: always equal to kp?
     real(kind=4), dimension(-1:ip+1,-1:jp+1,0:kp+1) , intent(InOut) :: sm
     integer :: i, j, k
 ! 
@@ -20,7 +20,7 @@ subroutine boundsm(km,jm,sm,im)
 #ifdef MPI
                 if (isTopRow(procPerRow)) then
 #endif
-                    sm(   0,j,k) = sm(1 ,j,k)
+                    sm(   0,j,k) = sm(1 ,j,k) ! GR: Why not sm(-1,,) = sm(0,,)?
 #ifdef MPI
                 else
 #endif
@@ -46,7 +46,7 @@ subroutine boundsm(km,jm,sm,im)
 #ifdef MPI
                 else
 #endif
-                    sm(i,0,k) = sm(i,1   ,k)
+                    sm(i,0,k) = sm(i,1   ,k) ! GR: Why not sm(,-1,) = sm(,0,)?
 #ifdef MPI
                 end if
 #endif
@@ -64,7 +64,7 @@ subroutine boundsm(km,jm,sm,im)
     end do
 #ifdef MPI
 ! --halo exchanges
-    !call exchangeAll2DHalos3DRealArray(sm, ip-1, jp-1, kp-1, procPerRow)
+    !call exchangeAll2DHalos3DRealArray(sm, size(sm, 1) - 2, size(sm, 2) - 2, size(sm, 3), procPerRow)
 #endif
 end subroutine boundsm
 

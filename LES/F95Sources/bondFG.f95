@@ -8,7 +8,7 @@ subroutine bondfg(km,jm,f,im,g,h)
     real(kind=4), dimension(0:ip,0:jp,0:kp) , intent(InOut) :: f
     real(kind=4), dimension(0:ip,0:jp,0:kp) , intent(InOut) :: g
     real(kind=4), dimension(0:ip,0:jp,0:kp) , intent(Out) :: h
-    integer, intent(In) :: im, jm, km
+    integer, intent(In) :: im, jm, km ! GR: always equal to ip, jp, kp?
     integer :: i, j, k
 ! 
 ! --inflow condition
@@ -26,12 +26,12 @@ subroutine bondfg(km,jm,f,im,g,h)
 ! --sideflow condition
 #ifdef MPI
     if (isLeftMostColumn(procPerRow) .or. isRightMostColumn(procPerRow)) then
-        call sideflowMPIAllExchange(g, ip-1, jp-1, kp-1, procPerRow)
+        call sideflowMPIAllExchange(g, size(g, 1) - 2, size(g, 2) - 2, size(g, 3), procPerRow)
     end if
 #else
     do k = 1,km
         do i = 1,im
-            g(i, 0,k) = g(i,jm  ,k)
+            g(i, 0,k) = g(i,jm  ,k) ! GR: Why only right->left? What about left->right?
         end do
     end do
 #endif
@@ -44,8 +44,8 @@ subroutine bondfg(km,jm,f,im,g,h)
     end do
 #ifdef MPI
 ! --halo exchanges
-    call exchangeAll2DHalos3DRealArray(f, ip-1, jp-1, kp-1, procPerRow)
-    call exchangeAll2DHalos3DRealArray(g, ip-1, jp-1, kp-1, procPerRow)
+    call exchangeAll2DHalos3DRealArray(f, size(f, 1) - 2, size(f, 2) - 2, size(f, 3), procPerRow)
+    call exchangeAll2DHalos3DRealArray(g, size(g, 1) - 2, size(g, 2) - 2, size(g, 3), procPerRow)
 #endif
 end subroutine bondFG                                    
 
