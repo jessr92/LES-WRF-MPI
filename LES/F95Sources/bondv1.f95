@@ -52,24 +52,24 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
 
 #if ICAL == 0
     !if(ical == 0.and.n == 1) then
+#ifdef MPI
+    if (isTopRow(procPerRow)) then
+        startI = 2
+    else
+        startI = 0
+    end if
+    if (isBottomRow(procPerRow)) then
+        endI = ip
+    else
+        endI = ip + 1
+    end if
+#else
+    startI = 2
+    endI = im
+#endif
     if(n == 1) then
         do k = 1,km
             do j = 1,jm
-#ifdef MPI
-                if (isTopRow(procPerRow)) then
-                    startI = 2
-                else
-                    startI = 0
-                end if
-                if (isBottomRow(procPerRow)) then
-                    endI = ip
-                else
-                    endI = ip + 1
-                end if
-#else
-                startI = 2
-                endI = im
-#endif
                 do i = startI, endI
                     u(i,j,k) = u(1,j,k)
                     v(i,j,k) = v(1,j,k)
