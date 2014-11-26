@@ -142,22 +142,25 @@ subroutine exchange2DHalos(array, rowSize, colSize, procPerRow)
     end do
     if (.not. isTopRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
         ! There is a top left corner to specify
-        array(1,1) = (array(2, 1) + array(1, 2)) / 2
+        array(1,1) = (array(2, 1) + array(1, 2) - array(2,2)) / 2
     end if
     if (.not. isTopRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
         ! There is a top right corner to specify
         array(1, colSize + 2) = (array(2, colSize + 2) + &
-                                 array(1, colSize + 1)) / 2
+                                 array(1, colSize + 1) - &
+                                 array(2, colSize + 1)) / 2
     end if
     if (.not. isBottomRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
         ! There is a bottom left corner to specify
         array(rowSize + 2, 1) = (array(rowSize + 1, 1) + &
-                                 array(rowSize + 2, 2)) / 2
+                                 array(rowSize + 2, 2) - &
+                                 array(rowSize + 1, 2)) / 2
     end if
     if (.not. isBottomRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
         ! There is a bottom right corner to specify
         array(rowSize + 2, colSize + 2) = (array(rowSize + 2, colSize + 1) + &
-                                           array(rowSize + 1, colSize + 2)) / 2
+                                           array(rowSize + 1, colSize + 2) - &
+                                           array(rowSize + 1, colSize + 1)) / 2
     end if
     !call sleep(rank + 1) ! to try and prevent process output being mangled by each other
     !call outputArray(array)
@@ -245,22 +248,25 @@ subroutine exchange2DHalosReal(array, rowSize, colSize, procPerRow)
     end do
     if (.not. isTopRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
         ! There is a top left corner to specify
-        array(1,1) = (array(2, 1) + array(1, 2)) / 2
+        array(1,1) = (array(2, 1) + array(1, 2) - array(2,2)) / 2
     end if
     if (.not. isTopRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
         ! There is a top right corner to specify
         array(1, colSize + 2) = (array(2, colSize + 2) + &
-                                 array(1, colSize + 1)) / 2
+                                 array(1, colSize + 1) - &
+                                 array(2, colSize + 1)) / 2
     end if
     if (.not. isBottomRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
         ! There is a bottom left corner to specify
         array(rowSize + 2, 1) = (array(rowSize + 1, 1) + &
-                                 array(rowSize + 2, 2)) / 2
+                                 array(rowSize + 2, 2) - &
+                                 array(rowSize + 1, 2)) / 2
     end if
     if (.not. isBottomRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
         ! There is a bottom right corner to specify
         array(rowSize + 2, colSize + 2) = (array(rowSize + 2, colSize + 1) + &
-                                           array(rowSize + 1, colSize + 2)) / 2
+                                           array(rowSize + 1, colSize + 2) - &
+                                           array(rowSize + 1, colSize + 1)) / 2
     end if
     !call sleep(rank + 1) ! to try and prevent process output being mangled by each other
     !call outputArrayReal(array)
@@ -295,7 +301,6 @@ subroutine sideflowMPIExchange(array, rowSize, procPerRow)
         call MPI_Send(array, rowSize + 2, MPI_REAL, commWith, leftTag, &
                       communicator, ierror)
     end if
-    ! TODO - VERIFY THIS WORKS
 end subroutine sideflowMPIExchange
 
 subroutine sideflowMPIAllExchange(array, rowSize, colSize, depthSize, procPerRow)
