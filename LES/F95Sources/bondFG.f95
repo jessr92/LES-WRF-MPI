@@ -26,7 +26,7 @@ subroutine bondfg(km,jm,f,im,g,h)
 ! --sideflow condition
 #ifdef MPI
     if (isLeftMostColumn(procPerRow) .or. isRightMostColumn(procPerRow)) then
-        call sideflowMPIAllExchange(g, size(g, 1) - 2, size(g, 2) - 2, size(g, 3), procPerRow)
+        !call sideRightToLeftMPIAllExchange(g, size(g, 1) - 2, size(g, 2) - 2, size(g, 3), procPerRow)
     end if
 #else
     do k = 1,km

@@ -64,7 +64,7 @@ subroutine boundsm(km,jm,sm,im)
     end do
 #ifdef MPI
 ! --halo exchanges
-    !call exchangeAll2DHalos3DRealArray(sm, size(sm, 1) - 2, size(sm, 2) - 2, size(sm, 3), procPerRow)
+    call exchangeAll2DHalos3DRealArray(sm, size(sm, 1) - 2, size(sm, 2) - 2, size(sm, 3), procPerRow)
 #endif
 end subroutine boundsm
 

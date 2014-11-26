@@ -144,9 +144,9 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
 ! =================================
 #ifdef MPI
 ! --halo exchanges
-    !call exchangeAll2DHalos3DRealArray(u, size(u, 1) - 2, size(u, 2) - 2, size(u, 3), procPerRow)
-    !call exchangeAll2DHalos3DRealArray(v, size(v, 1) - 2, size(v, 2) - 2, size(v, 3), procPerRow)
-    !call exchangeAll2DHalos3DRealArray(w, size(w, 1) - 2, size(w, 2) - 2, size(w, 3), procPerRow)
+    call exchangeAll2DHalos3DRealArray(u, size(u, 1) - 2, size(u, 2) - 2, size(u, 3), procPerRow)
+    call exchangeAll2DHalos3DRealArray(v, size(v, 1) - 2, size(v, 2) - 2, size(v, 3), procPerRow)
+    call exchangeAll2DHalos3DRealArray(w, size(w, 1) - 2, size(w, 2) - 2, size(w, 3), procPerRow)
 #endif
 #ifdef WV_DEBUG
     print *,'F95 UVWSUM after bondv1:',sum(u)+sum(v)+sum(w)

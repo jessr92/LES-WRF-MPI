@@ -286,7 +286,7 @@ subroutine exchangeAll2DHalos3DRealArray(array, rowSize, colSize, depthSize, pro
     end do
 end subroutine exchangeAll2DHalos3DRealArray
 
-subroutine sideflowMPIExchange(array, rowSize, procPerRow)
+subroutine sideRightToLeftMPIExchange(array, rowSize, procPerRow)
     implicit none
     integer, intent(in) :: rowSize, procPerRow
     real(kind=4), dimension(rowSize + 2), intent(inout) :: array
@@ -301,9 +301,9 @@ subroutine sideflowMPIExchange(array, rowSize, procPerRow)
         call MPI_Send(array, rowSize + 2, MPI_REAL, commWith, leftTag, &
                       communicator, ierror)
     end if
-end subroutine sideflowMPIExchange
+end subroutine sideRightToLeftMPIExchange
 
-subroutine sideflowMPIAllExchange(array, rowSize, colSize, depthSize, procPerRow)
+subroutine sideRightToLeftMPIAllExchange(array, rowSize, colSize, depthSize, procPerRow)
     implicit none
     integer, intent(in) :: rowSize, colSize, depthSize, procPerRow
     real(kind=4), dimension(rowSize + 2, colSize + 2, depthSize), intent(inout) :: array
@@ -311,12 +311,44 @@ subroutine sideflowMPIAllExchange(array, rowSize, colSize, depthSize, procPerRow
     if (isLeftmostColumn(procPerRow)) then
         j = 0
     else
+        j = colSize
+    end if
+    do i=1, depthSize
+        call sideRightToLeftMPIExchange(array(:,j,i), rowSize, procPerRow)
+    end do
+end subroutine sideRightToLeftMPIAllExchange
+
+subroutine sideLeftToRightMPIExchange(array, rowSize, procPerRow)
+    implicit none
+    integer, intent(in) :: rowSize, procPerRow
+    real(kind=4), dimension(rowSize + 2), intent(inout) :: array
+    integer :: commWith
+    if (isLeftmostColumn(procPerRow)) then
+        commWith = rank + procPerRow - 1
+        call MPI_Send(array, rowSize + 2, MPI_REAL, commWith, rightTag, &
+                      communicator, ierror)
+        call checkMPIError()
+    else if (isRightmostColumn(procPerRow)) then
+        commWith = rank - procPerRow + 1
+        call MPI_Recv(array, rowSize + 2, MPI_REAL, commWith, rightTag, &
+                      communicator, status, ierror)
+    end if
+end subroutine sideLeftToRightMPIExchange
+
+subroutine sideLeftToRightMPIAllExchange(array, rowSize, colSize, depthSize, procPerRow)
+    implicit none
+    integer, intent(in) :: rowSize, colSize, depthSize, procPerRow
+    real(kind=4), dimension(rowSize + 2, colSize + 2, depthSize), intent(inout) :: array
+    integer :: i, j
+    if (isLeftmostColumn(procPerRow)) then
+        j = 1
+    else
         j = colSize + 1
     end if
     do i=1, depthSize
-        call sideflowMPIExchange(array(:,j,i), rowSize, procPerRow)
+        call sideLeftToRightMPIExchange(array(:,j,i), rowSize, procPerRow)
     end do
-end subroutine sideflowMPIAllExchange
+end subroutine sideLeftToRightMPIAllExchange
 
 subroutine outputArray(array)
     implicit none
