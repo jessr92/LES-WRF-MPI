@@ -290,31 +290,32 @@ subroutine sideRightToLeftMPIExchange(array, rowSize, procPerRow)
     implicit none
     integer, intent(in) :: rowSize, procPerRow
     real(kind=4), dimension(rowSize + 2), intent(inout) :: array
-    integer :: commWith
+    integer :: commWith, colType
+    call MPI_TYPE_CONTIGUOUS(rowSize, MPI_REAL, colType, ierror)
+    call checkMPIError()
+    call MPI_TYPE_COMMIT(colType, ierror)
+    call checkMPIError()
     if (isLeftmostColumn(procPerRow)) then
         commWith = rank + procPerRow - 1
-        call MPI_Recv(array, rowSize + 2, MPI_REAL, commWith, leftTag, &
-                      communicator, status, ierror)
+        call MPI_Recv(array(2), 1, colType, commWith, leftTag, communicator, &
+                      status, ierror)
         call checkMPIError()
     else if (isRightmostColumn(procPerRow)) then
         commWith = rank - procPerRow + 1
-        call MPI_Send(array, rowSize + 2, MPI_REAL, commWith, leftTag, &
-                      communicator, ierror)
+        call MPI_Send(array(2), 1, colType, commWith, leftTag, communicator, &
+                      ierror)
     end if
+    call MPI_Type_Free(colType, ierror)
+    call checkMPIError()
 end subroutine sideRightToLeftMPIExchange
 
-subroutine sideRightToLeftMPIAllExchange(array, rowSize, colSize, depthSize, procPerRow)
+subroutine sideRightToLeftMPIAllExchange(array, rowSize, colSize, depthSize, procPerRow, columnToSendRecv)
     implicit none
-    integer, intent(in) :: rowSize, colSize, depthSize, procPerRow
+    integer, intent(in) :: rowSize, colSize, depthSize, procPerRow, columnToSendRecv
     real(kind=4), dimension(rowSize + 2, colSize + 2, depthSize), intent(inout) :: array
-    integer :: i, j
-    if (isLeftmostColumn(procPerRow)) then
-        j = 0
-    else
-        j = colSize
-    end if
+    integer :: i
     do i=1, depthSize
-        call sideRightToLeftMPIExchange(array(:,j,i), rowSize, procPerRow)
+        call sideRightToLeftMPIExchange(array(:,columnToSendRecv,i), rowSize, procPerRow)
     end do
 end subroutine sideRightToLeftMPIAllExchange
 
@@ -322,31 +323,32 @@ subroutine sideLeftToRightMPIExchange(array, rowSize, procPerRow)
     implicit none
     integer, intent(in) :: rowSize, procPerRow
     real(kind=4), dimension(rowSize + 2), intent(inout) :: array
-    integer :: commWith
+    integer :: commWith, colType
+    call MPI_TYPE_CONTIGUOUS(rowSize, MPI_REAL, colType, ierror)
+    call checkMPIError()
+    call MPI_TYPE_COMMIT(colType, ierror)
+    call checkMPIError()
     if (isLeftmostColumn(procPerRow)) then
         commWith = rank + procPerRow - 1
-        call MPI_Send(array, rowSize + 2, MPI_REAL, commWith, rightTag, &
-                      communicator, ierror)
+        call MPI_Send(array(2), 1, colType, commWith, rightTag, communicator, &
+                      ierror)
         call checkMPIError()
     else if (isRightmostColumn(procPerRow)) then
         commWith = rank - procPerRow + 1
-        call MPI_Recv(array, rowSize + 2, MPI_REAL, commWith, rightTag, &
-                      communicator, status, ierror)
+        call MPI_Recv(array(2), 1, colType, commWith, rightTag, communicator, &
+                      status, ierror)
     end if
+    call MPI_Type_Free(colType, ierror)
+    call checkMPIError()
 end subroutine sideLeftToRightMPIExchange
 
-subroutine sideLeftToRightMPIAllExchange(array, rowSize, colSize, depthSize, procPerRow)
+subroutine sideLeftToRightMPIAllExchange(array, rowSize, colSize, depthSize, procPerRow, columnToSendRecv)
     implicit none
-    integer, intent(in) :: rowSize, colSize, depthSize, procPerRow
+    integer, intent(in) :: rowSize, colSize, depthSize, procPerRow, columnToSendRecv
     real(kind=4), dimension(rowSize + 2, colSize + 2, depthSize), intent(inout) :: array
-    integer :: i, j
-    if (isLeftmostColumn(procPerRow)) then
-        j = 1
-    else
-        j = colSize + 1
-    end if
+    integer :: i
     do i=1, depthSize
-        call sideLeftToRightMPIExchange(array(:,j,i), rowSize, procPerRow)
+        call sideLeftToRightMPIExchange(array(:,columnToSendRecv,i), rowSize, procPerRow)
     end do
 end subroutine sideLeftToRightMPIAllExchange
 

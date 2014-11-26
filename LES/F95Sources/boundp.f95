@@ -65,10 +65,13 @@ subroutine boundp1(km,jm,p,im)
 #endif
 ! --side flow exchanges
 #ifdef MPI
-    if (isLeftMostColumn(procPerRow) .or. isRightMostColumn(procPerRow)) then
-        !call sideRightToLeftMPIAllExchange(p, size(p, 1) - 2, size(p, 2) - 2, size(p, 3), procPerRow)
-        !call sideLeftToRightMPIAllExchange(p, size(p, 1) - 2, size(p, 2) - 2, size(p, 3), procPerRow)
-    end if    
+    if (isLeftMostColumn(procPerRow)) then
+        call sideRightToLeftMPIAllExchange(p, size(p, 1) - 2, size(p, 2) - 2, size(p, 3), procPerRow, 1)
+        call sideLeftToRightMPIAllExchange(p, size(p, 1) - 2, size(p, 2) - 2, size(p, 3), procPerRow, 2)
+    else if (isRightMostColumn(procPerRow)) then
+        call sideRightToLeftMPIAllExchange(p, size(p, 1) - 2, size(p, 2) - 2, size(p, 3), procPerRow, jp+1)
+        call sideLeftToRightMPIAllExchange(p, size(p, 1) - 2, size(p, 2) - 2, size(p, 3), procPerRow, jp+2)
+    end if
 #else
     do k = 0,km+1
         do i = 0,im+1
