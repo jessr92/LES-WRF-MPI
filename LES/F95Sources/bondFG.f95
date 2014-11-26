@@ -8,7 +8,7 @@ subroutine bondfg(km,jm,f,im,g,h)
     real(kind=4), dimension(0:ip,0:jp,0:kp) , intent(InOut) :: f
     real(kind=4), dimension(0:ip,0:jp,0:kp) , intent(InOut) :: g
     real(kind=4), dimension(0:ip,0:jp,0:kp) , intent(Out) :: h
-    integer, intent(In) :: im, jm, km ! GR: always equal to ip, jp, kp?
+    integer, intent(In) :: im, jm, km
     integer :: i, j, k
 ! 
 ! --inflow condition

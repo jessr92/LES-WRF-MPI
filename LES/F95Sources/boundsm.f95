@@ -5,9 +5,9 @@ contains
 subroutine boundsm(km,jm,sm,im)
     use common_sn ! create_new_include_statements() line 102
     implicit none
-    integer, intent(In) :: im ! GR: always equal to ip?
-    integer, intent(In) :: jm ! GR: always equal to jp?
-    integer, intent(In) :: km ! GR: always equal to kp?
+    integer, intent(In) :: im
+    integer, intent(In) :: jm
+    integer, intent(In) :: km
     real(kind=4), dimension(-1:ip+1,-1:jp+1,0:kp+1) , intent(InOut) :: sm
     integer :: i, j, k
 ! 

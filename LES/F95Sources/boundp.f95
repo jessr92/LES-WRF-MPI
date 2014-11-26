@@ -6,7 +6,7 @@ module module_boundp
 
 contains
 
-    subroutine boundp2(jm,im,p,km)
+subroutine boundp2(jm,im,p,km)
     use common_sn ! create_new_include_statements() line 102
     implicit none
     integer, intent(In) :: im
