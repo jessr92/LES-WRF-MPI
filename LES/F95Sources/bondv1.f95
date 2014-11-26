@@ -151,7 +151,6 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
 #ifdef WV_DEBUG
     print *,'F95 UVWSUM after bondv1:',sum(u)+sum(v)+sum(w)
 #endif
-
 end subroutine bondv1
 
 end module module_bondv1

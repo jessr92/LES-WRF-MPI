@@ -35,10 +35,10 @@ subroutine boundp1(km,jm,p,im)
     integer, intent(In) :: jm
     integer, intent(In) :: km
     real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1) , intent(InOut) :: p
-#ifdef MPI
-    integer :: j, k
-#else
+#if !defined(MPI) || (PROC_PER_ROW==1)
     integer :: i, j, k
+#else
+    integer :: j, k
 #endif
 ! 
 ! --computational boundary(neumann condition)
@@ -64,7 +64,14 @@ subroutine boundp1(km,jm,p,im)
     end if
 #endif
 ! --side flow exchanges
-#ifdef MPI
+#if !defined(MPI) || (PROC_PER_ROW==1)
+    do k = 0,km+1
+        do i = 0,im+1
+            p(i,   0,k) = p(i,jm,k) ! right to left
+            p(i,jm+1,k) = p(i, 1,k) ! left to right
+        end do
+    end do
+#else
     if (isLeftMostColumn(procPerRow)) then
         call sideRightToLeftMPIAllExchange(p, size(p, 1) - 2, size(p, 2) - 2, size(p, 3), procPerRow, 1)
         call sideLeftToRightMPIAllExchange(p, size(p, 1) - 2, size(p, 2) - 2, size(p, 3), procPerRow, 2)
@@ -72,13 +79,6 @@ subroutine boundp1(km,jm,p,im)
         call sideRightToLeftMPIAllExchange(p, size(p, 1) - 2, size(p, 2) - 2, size(p, 3), procPerRow, jp+1)
         call sideLeftToRightMPIAllExchange(p, size(p, 1) - 2, size(p, 2) - 2, size(p, 3), procPerRow, jp+2)
     end if
-#else
-    do k = 0,km+1
-        do i = 0,im+1
-            p(i,   0,k) = p(i,jm,k) ! right to left
-            p(i,jm+1,k) = p(i, 1,k) ! left to right
-        end do
-    end do
 #endif
 #ifdef MPI
 ! --halo exchanges

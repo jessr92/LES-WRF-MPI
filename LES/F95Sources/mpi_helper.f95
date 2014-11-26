@@ -281,9 +281,11 @@ subroutine exchangeAll2DHalos3DRealArray(array, rowSize, colSize, depthSize, pro
     integer, intent(in) :: rowSize, colSize, depthSize, procPerRow
     real(kind=4), dimension(rowSize + 2, colSize + 2, depthSize), intent(inout) :: array
     integer :: i
+    !print *, 'rank ', rank, ' starting exchangeAll2DHalos3DRealArray'
     do i=1, depthSize
         call exchange2DHalosReal(array(:,:,i), rowSize, colSize, procPerRow)
     end do
+    !print *, 'rank ', rank, ' finished exchangeAll2DHalos3DRealArray'
 end subroutine exchangeAll2DHalos3DRealArray
 
 subroutine sideRightToLeftMPIExchange(array, rowSize, procPerRow)
