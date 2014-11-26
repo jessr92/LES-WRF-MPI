@@ -39,7 +39,7 @@ PROC_PER_ROW=''
 PROC_PER_COL=''
 with_mpi = getOpt('mpi','Use MPI','0')
 if with_mpi == '1':
-    PROC_PER_ROW = '-DPROC_PER_ROW=2'
+    PROC_PER_ROW = '-DPROC_PER_ROW=4'
     PROC_PER_COL = '-DPROC_PER_COL=2'
     WITH_MPI = '-DMPI'
     envF['F95']='mpifort'
