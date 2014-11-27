@@ -162,8 +162,6 @@ subroutine exchange2DHalos(array, rowSize, colSize, procPerRow)
                                            array(rowSize + 1, colSize + 2) - &
                                            array(rowSize + 1, colSize + 1)) / 2
     end if
-    !call sleep(rank + 1) ! to try and prevent process output being mangled by each other
-    !call outputArray(array)
     call MPI_Type_Free(rowType, ierror)
     call checkMPIError()
     call MPI_Type_Free(colType, ierror)
@@ -177,6 +175,10 @@ subroutine exchangeAll2DHalos3DArray(array, rowSize, colSize, depthSize, procPer
     integer :: i
     do i=1, depthSize
         call exchange2DHalos(array(:,:,i), rowSize, colSize, procPerRow)
+        call MPI_Barrier(communicator, ierror)
+        call checkMPIError()
+        call sleep(rank)
+        call outputArray(array(:,:,i))
     end do
 end subroutine exchangeAll2DHalos3DArray
 
