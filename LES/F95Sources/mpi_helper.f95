@@ -5,6 +5,7 @@ implicit none
 integer(kind=4) :: rank, mpi_size, ierror, status(MPI_STATUS_SIZE)
 integer :: communicator
 integer, parameter :: topTag = 1, bottomTag = 2, leftTag = 3, rightTag = 4
+integer, parameter :: zbmTag = 5
 
 ! Process Mapping
 ! 0 1 2 3
@@ -73,6 +74,18 @@ logical function isRightmostColumn(procPerRow)
     integer, intent(in) :: procPerRow
     isRightmostColumn = modulo(rank, procPerRow) .eq. (procPerRow - 1)
 end function isRightmostColumn
+
+integer function topLeftRowValue(process, procPerRow, rowSize)
+    implicit none
+    integer, intent(in) :: process, procPerRow, rowSize
+    topLeftRowValue = process / procPerRow * rowSize
+end function topLeftRowValue
+
+integer function topLeftColValue(process, procPerRow, colSize)
+    implicit none
+    integer, intent(in) :: process, procPerRow, colSize
+    topLeftColValue = modulo(process, procPerRow) * colSize
+end function topLeftColValue
 
 subroutine exchange2DHalos(array, rowSize, colSize, procPerRow)
     implicit none
@@ -355,6 +368,27 @@ subroutine sideLeftToRightMPIAllExchange(array, rowSize, colSize, depthSize, pro
         call sideLeftToRightMPIExchange(array(:,columnToSendRecv,i), rowSize, procPerRow)
     end do
 end subroutine sideLeftToRightMPIAllExchange
+
+subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow, procPerCol)
+    implicit none
+    real(kind=4), dimension(-1:ipmax+1,-1:jpmax+1) , intent(InOut) :: zbm
+    integer, intent(in) :: ip, jp, ipmax, jpmax, procPerRow, procPerCol
+    integer :: startRow, startCol, endRow, endCol, i, arraySize
+    if (isMaster()) then
+        ! Send appropriate 2D section to the other ranks
+        do i = 1, mpi_size - 1
+            startRow = topLeftRowValue(i, procPerRow, ip)
+            endRow = startRow + ip
+            startCol = topLeftColValue(i, procPerCol, jp)
+            endCol = startCol + jp
+            arraySize = (endRow - startRow) * (endCol - startCol)
+            call MPI_Send(zbm(startRow:endRow, startCol:endCol), arraySize, MPI_REAL, i, zbmTag, communicator, ierror)
+        end do
+    else
+        ! Receive appropriate 2D section from master
+        call MPI_Recv(zbm(1, 1), (ip*jp), MPI_REAL, 0, zbmTag, communicator, status, ierror)
+    end if
+end subroutine distributeZBM
 
 subroutine outputArray(array)
     implicit none

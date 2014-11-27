@@ -22,9 +22,11 @@ subroutine boundp2(jm,im,p,km)
             p(i,j,km+1) = p(i,j,km)
         end do
     end do
-#ifdef MPI && !defined(FAST_MPI)
+#ifdef MPI
+#ifndef FAST_MPI
 ! --halo exchanges
     call exchangeAll2DHalos3DRealArray(p, size(p, 1) - 2, size(p, 2) - 2, size(p, 3), procPerRow)
+#endif
 #endif
 end subroutine boundp2
 
@@ -42,26 +44,36 @@ subroutine boundp1(km,jm,p,im)
 #endif
 ! 
 ! --computational boundary(neumann condition)
-#ifdef MPI && !defined(FAST_MPI)
+#ifdef MPI
+#ifndef FAST_MPI
     if (isTopRow(procPerRow) .or. isBottomRow(procPerRow)) then
+#endif
 #endif
         do k = 0,km+1
             do j = 0,jm+1
-#ifdef MPI && !defined(FAST_MPI)
+#ifdef MPI
+#ifndef FAST_MPI
                 if (isTopRow(procPerRow)) then
 #endif
+#endif
                     p(   0,j,k) = p(1 ,j,k)
-#ifdef MPI && !defined(FAST_MPI)
+#ifdef MPI
+#ifndef FAST_MPI
                 else
 #endif
+#endif
                     p(im+1,j,k) = p(im,j,k)
-#ifdef MPI && !defined(FAST_MPI)
+#ifdef MPI
+#ifndef FAST_MPI
                 end if
+#endif
 #endif
             end do
         end do
-#ifdef MPI && !defined(FAST_MPI)
+#ifdef MPI
+#ifndef FAST_MPI
     end if
+#endif
 #endif
 ! --side flow exchanges
 #if !defined(MPI) || (PROC_PER_ROW==1) || defined(FAST_MPI)
