@@ -114,9 +114,12 @@ subroutine exchangeAll2DHalos3DArray(array, rowSize, colSize, depthSize, procPer
     implicit none
     integer, intent(in) :: rowSize, colSize, depthSize, procPerRow
     integer, dimension(rowSize + 2, colSize + 2, depthSize), intent(inout) :: array
-    integer :: i, commWith, r, c, d
+    integer :: i, commWith, r, c, d, requests(8)
     integer, dimension(rowSize, depthSize) :: leftRecv, leftSend, rightSend, rightRecv
     integer, dimension(colSize, depthSize) :: topRecv, topSend, bottomSend, bottomRecv
+    do i=1,8
+        requests(i)= -1
+    end do
     if (.not. isTopRow(procPerRow)) then
         ! Top edge to send, bottom edge to receive
         commWith = rank - procPerRow
@@ -125,17 +128,12 @@ subroutine exchangeAll2DHalos3DArray(array, rowSize, colSize, depthSize, procPer
                 topSend(c, d) = array(2, c+1, d)
             end do
         end do
-        call MPI_Send(topSend, colSize*depthSize, MPI_INT, commWith, topTag, &
-                      communicator, ierror)
+        call MPI_ISend(topSend, colSize*depthSize, MPI_INT, commWith, topTag, &
+                      communicator, requests(1), ierror)
         call checkMPIError()
-        call MPI_Recv(bottomRecv, colSize*depthSize, MPI_INT, commWith, bottomTag, &
-                      communicator, status, ierror)
+        call MPI_IRecv(bottomRecv, colSize*depthSize, MPI_INT, commWith, bottomTag, &
+                      communicator, requests(2), ierror)
         call checkMPIError()
-        do c=1, colSize
-            do d=1, depthSize
-                array(1, c+1, d) = bottomRecv(c, d)
-            end do
-        end do
     end if
     if (.not. isBottomRow(procPerRow)) then
         ! Bottom edge to send, top edge to receive
@@ -145,17 +143,12 @@ subroutine exchangeAll2DHalos3DArray(array, rowSize, colSize, depthSize, procPer
                 bottomSend(c, d) = array(rowSize+1, c+1, d)
             end do
         end do
-        call MPI_Recv(topRecv, colSize*depthSize, MPI_INT, commWith, topTag, &
-                      communicator, status, ierror)
+        call MPI_IRecv(topRecv, colSize*depthSize, MPI_INT, commWith, topTag, &
+                      communicator, requests(3), ierror)
         call checkMPIError()
-        call MPI_Send(bottomSend, colSize*depthSize, MPI_INT, commWith, bottomTag, &
-                      communicator, ierror)
+        call MPI_ISend(bottomSend, colSize*depthSize, MPI_INT, commWith, bottomTag, &
+                      communicator, requests(4), ierror)
         call checkMPIError()
-        do c=1, colSize
-            do d=1, depthSize
-                array(rowSize+2, c+1, d) = topRecv(c, d)
-            end do
-        end do
     end if
     if (.not. isLeftmostColumn(procPerRow)) then
         ! Left edge to send, right edge to receive
@@ -165,17 +158,12 @@ subroutine exchangeAll2DHalos3DArray(array, rowSize, colSize, depthSize, procPer
                 leftSend(r, d) = array(r+1, 2, d)
             end do
         end do
-        call MPI_Send(leftSend, rowSize*depthSize, MPI_INT, commWith, leftTag, &
-                      communicator, ierror)
+        call MPI_ISend(leftSend, rowSize*depthSize, MPI_INT, commWith, leftTag, &
+                      communicator, requests(5), ierror)
         call checkMPIError()
-        call MPI_Recv(rightRecv, rowSize*depthSize, MPI_INT, commWith, rightTag, &
-                      communicator, status, ierror)
+        call MPI_IRecv(rightRecv, rowSize*depthSize, MPI_INT, commWith, rightTag, &
+                      communicator, requests(6), ierror)
         call checkMPIError()
-        do r=1, rowSize
-            do d=1, depthSize
-                array(r+1, 1, d) = rightRecv(r, d)
-            end do
-        end do
     end if
     if (.not. isRightmostColumn(procPerRow)) then
         ! Right edge to send, left edge to receive
@@ -185,19 +173,52 @@ subroutine exchangeAll2DHalos3DArray(array, rowSize, colSize, depthSize, procPer
                 rightSend(r, d) = array(r+1, colSize+1, d)
             end do
         end do
-        call MPI_Recv(leftRecv, rowSize*depthSize, MPI_INT, commWith, leftTag, &
-                      communicator, status, ierror)
+        call MPI_IRecv(leftRecv, rowSize*depthSize, MPI_INT, commWith, leftTag, &
+                      communicator, requests(7), ierror)
         call checkMPIError()
-        call MPI_Send(rightSend, rowSize*depthSize, MPI_INT, commWith, rightTag, &
-                      communicator, ierror)
+        call MPI_ISend(rightSend, rowSize*depthSize, MPI_INT, commWith, rightTag, &
+                      communicator, requests(8), ierror)
         call checkMPIError()
+    end if
+    do i=1,8
+        if (.not. requests(i) .eq. -1) then
+            call MPI_Wait(requests(i), status, ierror)
+            call checkMPIError()
+        end if
+    end do
+    if (.not. isTopRow(procPerRow)) then
+        ! Top edge to send, bottom edge to receive
+        commWith = rank - procPerRow
+        do c=1, colSize
+            do d=1, depthSize
+                array(1, c+1, d) = bottomRecv(c, d)
+            end do
+        end do
+    end if
+    if (.not. isBottomRow(procPerRow)) then
+        ! Bottom edge to send, top edge to receive
+        do c=1, colSize
+            do d=1, depthSize
+                array(rowSize+2, c+1, d) = topRecv(c, d)
+            end do
+        end do
+    end if
+    if (.not. isLeftmostColumn(procPerRow)) then
+        ! Left edge to send, right edge to receive
+        do r=1, rowSize
+            do d=1, depthSize
+                array(r+1, 1, d) = rightRecv(r, d)
+            end do
+        end do
+    end if
+    if (.not. isRightmostColumn(procPerRow)) then
+        ! Right edge to send, left edge to receive
         do r=1, rowSize
             do d=1, depthSize
                 array(r+1, colSize+2, d) = leftRecv(r, d)
             end do
         end do
-    end if
-    
+    end if    
     do i=1, depthSize
         call calculateCorners(array(:,:,i), rowSize, colSize, procPerRow)
         call MPI_Barrier(communicator, ierror)
@@ -239,9 +260,12 @@ subroutine exchangeAll2DHalos3DRealArray(array, rowSize, colSize, depthSize, pro
     implicit none
     integer, intent(in) :: rowSize, colSize, depthSize, procPerRow
     real(kind=4), dimension(rowSize + 2, colSize + 2, depthSize), intent(inout) :: array
-    integer :: i, commWith, r, c, d
+    integer :: i, commWith, r, c, d, requests(8)
     real(kind=4), dimension(rowSize, depthSize) :: leftRecv, leftSend, rightSend, rightRecv
     real(kind=4), dimension(colSize, depthSize) :: topRecv, topSend, bottomSend, bottomRecv
+     do i=1,8
+        requests(i)= -1
+    end do
     if (.not. isTopRow(procPerRow)) then
         ! Top edge to send, bottom edge to receive
         commWith = rank - procPerRow
@@ -250,17 +274,12 @@ subroutine exchangeAll2DHalos3DRealArray(array, rowSize, colSize, depthSize, pro
                 topSend(c, d) = array(2, c+1, d)
             end do
         end do
-        call MPI_Send(topSend, colSize*depthSize, MPI_REAL, commWith, topTag, &
-                      communicator, ierror)
+        call MPI_ISend(topSend, colSize*depthSize, MPI_REAL, commWith, topTag, &
+                      communicator, requests(1), ierror)
         call checkMPIError()
-        call MPI_Recv(bottomRecv, colSize*depthSize, MPI_REAL, commWith, bottomTag, &
-                      communicator, status, ierror)
+        call MPI_IRecv(bottomRecv, colSize*depthSize, MPI_REAL, commWith, bottomTag, &
+                      communicator, requests(2), ierror)
         call checkMPIError()
-        do c=1, colSize
-            do d=1, depthSize
-                array(1, c+1, d) = bottomRecv(c, d)
-            end do
-        end do
     end if
     if (.not. isBottomRow(procPerRow)) then
         ! Bottom edge to send, top edge to receive
@@ -270,17 +289,12 @@ subroutine exchangeAll2DHalos3DRealArray(array, rowSize, colSize, depthSize, pro
                 bottomSend(c, d) = array(rowSize+1, c+1, d)
             end do
         end do
-        call MPI_Recv(topRecv, colSize*depthSize, MPI_REAL, commWith, topTag, &
-                      communicator, status, ierror)
+        call MPI_IRecv(topRecv, colSize*depthSize, MPI_REAL, commWith, topTag, &
+                      communicator, requests(3), ierror)
         call checkMPIError()
-        call MPI_Send(bottomSend, colSize*depthSize, MPI_REAL, commWith, bottomTag, &
-                      communicator, ierror)
+        call MPI_ISend(bottomSend, colSize*depthSize, MPI_REAL, commWith, bottomTag, &
+                      communicator, requests(4), ierror)
         call checkMPIError()
-        do c=1, colSize
-            do d=1, depthSize
-                array(rowSize+2, c+1, d) = topRecv(c, d)
-            end do
-        end do
     end if
     if (.not. isLeftmostColumn(procPerRow)) then
         ! Left edge to send, right edge to receive
@@ -290,17 +304,12 @@ subroutine exchangeAll2DHalos3DRealArray(array, rowSize, colSize, depthSize, pro
                 leftSend(r, d) = array(r+1, 2, d)
             end do
         end do
-        call MPI_Send(leftSend, rowSize*depthSize, MPI_REAL, commWith, leftTag, &
-                      communicator, ierror)
+        call MPI_ISend(leftSend, rowSize*depthSize, MPI_REAL, commWith, leftTag, &
+                      communicator, requests(5), ierror)
         call checkMPIError()
-        call MPI_Recv(rightRecv, rowSize*depthSize, MPI_REAL, commWith, rightTag, &
-                      communicator, status, ierror)
+        call MPI_IRecv(rightRecv, rowSize*depthSize, MPI_REAL, commWith, rightTag, &
+                      communicator, requests(6), ierror)
         call checkMPIError()
-        do r=1, rowSize
-            do d=1, depthSize
-                array(r+1, 1, d) = rightRecv(r, d)
-            end do
-        end do
     end if
     if (.not. isRightmostColumn(procPerRow)) then
         ! Right edge to send, left edge to receive
@@ -310,19 +319,52 @@ subroutine exchangeAll2DHalos3DRealArray(array, rowSize, colSize, depthSize, pro
                 rightSend(r, d) = array(r+1, colSize+1, d)
             end do
         end do
-        call MPI_Recv(leftRecv, rowSize*depthSize, MPI_REAL, commWith, leftTag, &
-                      communicator, status, ierror)
+        call MPI_IRecv(leftRecv, rowSize*depthSize, MPI_REAL, commWith, leftTag, &
+                      communicator, requests(7), ierror)
         call checkMPIError()
-        call MPI_Send(rightSend, rowSize*depthSize, MPI_REAL, commWith, rightTag, &
-                      communicator, ierror)
+        call MPI_ISend(rightSend, rowSize*depthSize, MPI_REAL, commWith, rightTag, &
+                      communicator, requests(8), ierror)
         call checkMPIError()
+    end if
+    do i=1,8
+        if (.not. requests(i) .eq. -1) then
+            call MPI_Wait(requests(i), status, ierror)
+            call checkMPIError()
+        end if
+    end do
+    if (.not. isTopRow(procPerRow)) then
+        ! Top edge to send, bottom edge to receive
+        commWith = rank - procPerRow
+        do c=1, colSize
+            do d=1, depthSize
+                array(1, c+1, d) = bottomRecv(c, d)
+            end do
+        end do
+    end if
+    if (.not. isBottomRow(procPerRow)) then
+        ! Bottom edge to send, top edge to receive
+        do c=1, colSize
+            do d=1, depthSize
+                array(rowSize+2, c+1, d) = topRecv(c, d)
+            end do
+        end do
+    end if
+    if (.not. isLeftmostColumn(procPerRow)) then
+        ! Left edge to send, right edge to receive
+        do r=1, rowSize
+            do d=1, depthSize
+                array(r+1, 1, d) = rightRecv(r, d)
+            end do
+        end do
+    end if
+    if (.not. isRightmostColumn(procPerRow)) then
+        ! Right edge to send, left edge to receive
         do r=1, rowSize
             do d=1, depthSize
                 array(r+1, colSize+2, d) = leftRecv(r, d)
             end do
         end do
     end if
-    
     do i=1, depthSize
         call calculateCornersReal(array(:,:,i), rowSize, colSize, procPerRow)
     end do
