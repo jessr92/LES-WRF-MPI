@@ -35,6 +35,7 @@ else:
 
 # GR: MPI specific build config
 WITH_MPI=''
+FAST_MPI=''
 PROC_PER_ROW=''
 PROC_PER_COL=''
 with_mpi = getOpt('mpi','Use MPI','0')
@@ -52,7 +53,7 @@ IANIME='-DIANIME=0'
 IADAM='-DIADAM=0'
 
 
-FFLAGS  = [WITH_MPI, PROC_PER_ROW, PROC_PER_COL, WITH_OCL, NO_FILE_IO, ICAL, IFBF,IANIME, IADAM] 
+FFLAGS  = [WITH_MPI, FAST_MPI, PROC_PER_ROW, PROC_PER_COL, WITH_OCL, NO_FILE_IO, ICAL, IFBF,IANIME, IADAM] 
 
 if with_ocl == '0':
     FFLAGS += ['-cpp','-Ofast', '-m64', '-Wall','-ffree-form', '-fconvert=big-endian', VERBOSE,TIMINGS]

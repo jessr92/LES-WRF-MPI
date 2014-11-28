@@ -7,6 +7,7 @@ integer(kind=4) :: rank, mpi_size, ierror, status(MPI_STATUS_SIZE)
 integer :: communicator
 integer, parameter :: topTag = 1, bottomTag = 2, leftTag = 3, rightTag = 4
 integer, parameter :: zbmTag = 5
+integer, parameter :: leftSideTag = 6, rightSideTag = 7
 
 contains
 
@@ -378,7 +379,7 @@ subroutine sideRightToLeftMPIAllExchange(array, rowSize, colSize, depthSize, pro
     integer :: r, d, commWith
     if (isLeftmostColumn(procPerRow)) then
         commWith = rank + procPerRow - 1
-        call MPI_Recv(leftRecv, rowSize*depthSize, MPI_Real, commWith, leftTag, &
+        call MPI_Recv(leftRecv, rowSize*depthSize, MPI_Real, commWith, rightSideTag, &
                       communicator, status, ierror)
         call checkMPIError()
         do r=1, rowSize
@@ -394,7 +395,7 @@ subroutine sideRightToLeftMPIAllExchange(array, rowSize, colSize, depthSize, pro
                 rightSend(r, d) = array(r+1, columnToSendRecv, d)
             end do
         end do
-        call MPI_Send(rightSend, rowSize*depthSize, MPI_Real, commWith, leftTag, &
+        call MPI_Send(rightSend, rowSize*depthSize, MPI_Real, commWith, rightSideTag, &
                       communicator, ierror)
         call checkMPIError()
     end if
@@ -413,13 +414,13 @@ subroutine sideLeftToRightMPIAllExchange(array, rowSize, colSize, depthSize, pro
                 leftSend(r, d) = array(r+1, columnToSendRecv, d)
             end do
         end do
-        call MPI_Send(leftSend, rowSize*depthSize, MPI_Real, commWith, leftTag, &
+        call MPI_Send(leftSend, rowSize*depthSize, MPI_Real, commWith, leftSideTag, &
                       communicator, ierror)
         call checkMPIError()
     end if
     if (isRightmostColumn(procPerRow)) then
         commWith = rank - procPerRow + 1
-        call MPI_Recv(rightRecv, rowSize*depthSize, MPI_Real, commWith, leftTag, &
+        call MPI_Recv(rightRecv, rowSize*depthSize, MPI_Real, commWith, leftSideTag, &
                       communicator, status, ierror)
         call checkMPIError()
         do r=1, rowSize
@@ -443,7 +444,8 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow, procPerCol)
             startCol = topLeftColValue(i, procPerCol, jp)
             endCol = startCol + jp
             arraySize = (endRow - startRow) * (endCol - startCol)
-            call MPI_Send(zbm(startRow:endRow, startCol:endCol), arraySize, MPI_REAL, i, zbmTag, communicator, ierror)
+            call MPI_Send(zbm(startRow:endRow, startCol:endCol), arraySize, &
+                          MPI_REAL, i, zbmTag, communicator, ierror)
         end do
     else
         ! Receive appropriate 2D section from master
