@@ -1,10 +1,9 @@
 FC = mpifort
 FCFLAGS += -fopenmp -cpp -Wall -Wextra -Wconversion -pedantic -std=f95 -fall-intrinsics -O2
-PROGRAMS = helloMPI helloOpenMP helloMPIOpenMP haloExchangeExample haloExchange3DExample mpi_pi
+PROGRAMS = helloMPI helloOpenMP helloMPIOpenMP haloExchange3DExample mpi_pi
 HELLO_MPI_OBJS = helloMPI.o mpi_helper.o fortran_helper.o
 HELLO_OPEN_MP_OBJS = helloOpenMP.o
 HELLO_MPI_OPEN_MP_OBJS = helloMPIOpenMP.o mpi_helper.o fortran_helper.o
-HALO_EXCHANGE_EXAMPLE_OBJS = haloExchangeExample.o mpi_helper.o fortran_helper.o
 HALO_EXCHANGE_3D_EXAMPLE_OBJS = haloExchange3DExample.o mpi_helper.o fortran_helper.o
 MPI_PI_OBJS = mpi_pi.o mpi_helper.o fortran_helper.o
 
@@ -19,10 +18,6 @@ helloOpenMP: $(HELLO_OPEN_MP_OBJS)
 helloMPIOpenMP: $(HELLO_MPI_OPEN_MP_OBJS)
 
 helloMPIOpenMP.o: helloMPIOpenMP.f95 mpi_helper.mod fortran_helper.mod
-
-haloExchangeExample: $(HALO_EXCHANGE_EXAMPLE_OBJS)
-
-haloExchangeExample.o: haloExchangeExample.f95 mpi_helper.mod fortran_helper.mod
 
 haloExchange3DExample: $(HALO_EXCHANGE_3D_EXAMPLE_OBJS)
 
