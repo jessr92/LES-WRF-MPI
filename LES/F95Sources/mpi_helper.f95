@@ -371,7 +371,7 @@ subroutine exchangeRealHalos(array, rowSize, colSize, depthSize, procPerRow)
     end do
 end subroutine exchangeRealHalos
 
-subroutine sideRightToLeftMPIAllExchange(array, rowSize, colSize, depthSize, procPerRow, columnToSendRecv)
+subroutine sideflowRightLeft(array, rowSize, colSize, depthSize, procPerRow, columnToSendRecv)
     implicit none
     integer, intent(in) :: rowSize, colSize, depthSize, procPerRow, columnToSendRecv
     real(kind=4), dimension(rowSize + 2, colSize + 2, depthSize), intent(inout) :: array
@@ -399,9 +399,9 @@ subroutine sideRightToLeftMPIAllExchange(array, rowSize, colSize, depthSize, pro
                       communicator, ierror)
         call checkMPIError()
     end if
-end subroutine sideRightToLeftMPIAllExchange
+end subroutine sideflowRightLeft
 
-subroutine sideLeftToRightMPIAllExchange(array, rowSize, colSize, depthSize, procPerRow, columnToSendRecv)
+subroutine sideflowLeftRight(array, rowSize, colSize, depthSize, procPerRow, columnToSendRecv)
     implicit none
     integer, intent(in) :: rowSize, colSize, depthSize, procPerRow, columnToSendRecv
     real(kind=4), dimension(rowSize + 2, colSize + 2, depthSize), intent(inout) :: array
@@ -417,8 +417,7 @@ subroutine sideLeftToRightMPIAllExchange(array, rowSize, colSize, depthSize, pro
         call MPI_Send(leftSend, rowSize*depthSize, MPI_Real, commWith, leftSideTag, &
                       communicator, ierror)
         call checkMPIError()
-    end if
-    if (isRightmostColumn(procPerRow)) then
+    else if (isRightmostColumn(procPerRow)) then
         commWith = rank - procPerRow + 1
         call MPI_Recv(rightRecv, rowSize*depthSize, MPI_Real, commWith, leftSideTag, &
                       communicator, status, ierror)
@@ -429,7 +428,7 @@ subroutine sideLeftToRightMPIAllExchange(array, rowSize, colSize, depthSize, pro
             end do
         end do
     end if
-end subroutine sideLeftToRightMPIAllExchange
+end subroutine sideflowLeftRight
 
 subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow, procPerCol)
     implicit none

@@ -32,9 +32,9 @@ subroutine bondfg(km,jm,f,im,g,h)
     end do
 #else
     if (isLeftmostColumn(procPerRow)) then
-        call sideRightToLeftMPIAllExchange(g, size(g, 1) - 2, size(g, 2) - 2, size(g, 3), procPerRow, 1)
+        call sideflowRightLeft(g, size(g, 1) - 2, size(g, 2) - 2, size(g, 3), procPerRow, 1)
     else if (isRightmostColumn(procPerRow)) then
-        call sideRightToLeftMPIAllExchange(g, size(g, 1) - 2, size(g, 2) - 2, size(g, 3), procPerRow, jp+1)
+        call sideflowRightLeft(g, size(g, 1) - 2, size(g, 2) - 2, size(g, 3), procPerRow, jp+1)
     end if
 #endif
 ! --ground and top condition
