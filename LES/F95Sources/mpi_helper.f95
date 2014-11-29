@@ -257,7 +257,7 @@ subroutine calculateCornersReal(array, rowSize, colSize, procPerRow)
     end if
 end subroutine calculateCornersReal
 
-subroutine exchangeAll2DHalos3DRealArray(array, rowSize, colSize, depthSize, procPerRow)
+subroutine exchangeRealHalos(array, rowSize, colSize, depthSize, procPerRow)
     implicit none
     integer, intent(in) :: rowSize, colSize, depthSize, procPerRow
     real(kind=4), dimension(rowSize + 2, colSize + 2, depthSize), intent(inout) :: array
@@ -369,7 +369,7 @@ subroutine exchangeAll2DHalos3DRealArray(array, rowSize, colSize, depthSize, pro
     do i=1, depthSize
         call calculateCornersReal(array(:,:,i), rowSize, colSize, procPerRow)
     end do
-end subroutine exchangeAll2DHalos3DRealArray
+end subroutine exchangeRealHalos
 
 subroutine sideRightToLeftMPIAllExchange(array, rowSize, colSize, depthSize, procPerRow, columnToSendRecv)
     implicit none
