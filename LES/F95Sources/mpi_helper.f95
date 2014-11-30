@@ -371,9 +371,9 @@ subroutine exchangeRealHalos(array, rowSize, colSize, depthSize, procPerRow)
     end do
 end subroutine exchangeRealHalos
 
-subroutine sideflowRightLeft(array, rowSize, colSize, depthSize, procPerRow, columnToSendRecv)
+subroutine sideflowRightLeft(array, rowSize, colSize, depthSize, procPerRow, colToSend, colToRecv)
     implicit none
-    integer, intent(in) :: rowSize, colSize, depthSize, procPerRow, columnToSendRecv
+    integer, intent(in) :: rowSize, colSize, depthSize, procPerRow, colToSend, colToRecv
     real(kind=4), dimension(rowSize + 2, colSize + 2, depthSize), intent(inout) :: array
     real(kind=4), dimension(rowSize, depthSize) :: rightSend, leftRecv
     integer :: r, d, commWith
@@ -384,15 +384,14 @@ subroutine sideflowRightLeft(array, rowSize, colSize, depthSize, procPerRow, col
         call checkMPIError()
         do r=1, rowSize
             do d=1, depthSize
-                array(r+1, columnToSendRecv, d) = leftRecv(r, d)
+                array(r+1, colToRecv, d) = leftRecv(r, d)
             end do
         end do
-    end if
-    if (isRightmostColumn(procPerRow)) then
+    else if (isRightmostColumn(procPerRow)) then
         commWith = rank - procPerRow + 1
         do r=1, rowSize
             do d=1, depthSize
-                rightSend(r, d) = array(r+1, columnToSendRecv, d)
+                rightSend(r, d) = array(r+1, colToSend, d)
             end do
         end do
         call MPI_Send(rightSend, rowSize*depthSize, MPI_Real, commWith, rightSideTag, &
@@ -401,9 +400,9 @@ subroutine sideflowRightLeft(array, rowSize, colSize, depthSize, procPerRow, col
     end if
 end subroutine sideflowRightLeft
 
-subroutine sideflowLeftRight(array, rowSize, colSize, depthSize, procPerRow, columnToSendRecv)
+subroutine sideflowLeftRight(array, rowSize, colSize, depthSize, procPerRow, colToSend, colToRecv)
     implicit none
-    integer, intent(in) :: rowSize, colSize, depthSize, procPerRow, columnToSendRecv
+    integer, intent(in) :: rowSize, colSize, depthSize, procPerRow, colToSend, colToRecv
     real(kind=4), dimension(rowSize + 2, colSize + 2, depthSize), intent(inout) :: array
     real(kind=4), dimension(rowSize, depthSize) :: leftSend, rightRecv
     integer :: r, d, commWith
@@ -411,7 +410,7 @@ subroutine sideflowLeftRight(array, rowSize, colSize, depthSize, procPerRow, col
         commWith = rank + procPerRow - 1
         do r=1, rowSize
             do d=1, depthSize
-                leftSend(r, d) = array(r+1, columnToSendRecv, d)
+                leftSend(r, d) = array(r+1, colToSend, d)
             end do
         end do
         call MPI_Send(leftSend, rowSize*depthSize, MPI_Real, commWith, leftSideTag, &
@@ -424,7 +423,7 @@ subroutine sideflowLeftRight(array, rowSize, colSize, depthSize, procPerRow, col
         call checkMPIError()
         do r=1, rowSize
             do d=1, depthSize
-                array(r+1, columnToSendRecv, d) = rightRecv(r, d)
+                array(r+1, colToRecv, d) = rightRecv(r, d)
             end do
         end do
     end if

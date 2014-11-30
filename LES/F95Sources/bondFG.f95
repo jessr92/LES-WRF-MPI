@@ -31,11 +31,7 @@ subroutine bondfg(km,jm,f,im,g,h)
         end do
     end do
 #else
-    if (isLeftmostColumn(procPerRow)) then
-        call sideflowRightLeft(g, size(g, 1) - 2, size(g, 2) - 2, size(g, 3), procPerRow, 1)
-    else if (isRightmostColumn(procPerRow)) then
-        call sideflowRightLeft(g, size(g, 1) - 2, size(g, 2) - 2, size(g, 3), procPerRow, jp+1)
-    end if
+    call sideflowRightLeft(g, size(g, 1) - 2, size(g, 2) - 2, size(g, 3), procPerRow, jp+1, 1)
 #endif
 ! --ground and top condition
     do j = 1,jm

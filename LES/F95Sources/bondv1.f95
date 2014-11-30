@@ -146,27 +146,12 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
         end do
     end do 
 #else
-    if (isLeftMostColumn(procPerRow)) then
-        call sideflowRightLeft(u, size(u, 1) - 2, size(u, 2) - 2, size(u, 3), procPerRow, 1)
-        call sideflowLeftRight(u, size(u, 1) - 2, size(u, 2) - 2, size(u, 3), procPerRow, 2)
-    else if (isRightMostColumn(procPerRow)) then
-        call sideflowRightLeft(u, size(u, 1) - 2, size(u, 2) - 2, size(u, 3), procPerRow, jp+1)
-        call sideflowLeftRight(u, size(u, 1) - 2, size(u, 2) - 2, size(u, 3), procPerRow, jp+2)
-    end if
-    if (isLeftMostColumn(procPerRow)) then
-        call sideflowRightLeft(v, size(v, 1) - 2, size(v, 2) - 2, size(v, 3), procPerRow, 1)
-        call sideflowLeftRight(v, size(v, 1) - 2, size(v, 2) - 2, size(v, 3), procPerRow, 2)
-    else if (isRightMostColumn(procPerRow)) then
-        call sideflowRightLeft(v, size(v, 1) - 2, size(v, 2) - 2, size(v, 3), procPerRow, jp+1)
-        call sideflowLeftRight(v, size(v, 1) - 2, size(v, 2) - 2, size(v, 3), procPerRow, jp+2)
-    end if
-    if (isLeftMostColumn(procPerRow)) then
-        call sideflowRightLeft(w, size(w, 1) - 2, size(w, 2) - 2, size(w, 3), procPerRow, 1)
-        call sideflowLeftRight(w, size(w, 1) - 2, size(w, 2) - 2, size(w, 3), procPerRow, 2)
-    else if (isRightMostColumn(procPerRow)) then
-        call sideflowRightLeft(w, size(w, 1) - 2, size(w, 2) - 2, size(w, 3), procPerRow, jp+1)
-        call sideflowLeftRight(w, size(w, 1) - 2, size(w, 2) - 2, size(w, 3), procPerRow, jp+2)
-    end if
+    call sideflowRightLeft(u, size(u, 1) - 2, size(u, 2) - 2, size(u, 3), procPerRow, jp+1, 1)
+    call sideflowLeftRight(u, size(u, 1) - 2, size(u, 2) - 2, size(u, 3), procPerRow, 2, jp+2)
+    call sideflowRightLeft(v, size(v, 1) - 2, size(v, 2) - 2, size(v, 3), procPerRow, jp+1, 1)
+    call sideflowLeftRight(v, size(v, 1) - 2, size(v, 2) - 2, size(v, 3), procPerRow, 2, jp+2)
+    call sideflowRightLeft(w, size(w, 1) - 2, size(w, 2) - 2, size(w, 3), procPerRow, jp+1, 1)
+    call sideflowLeftRight(w, size(w, 1) - 2, size(w, 2) - 2, size(w, 3), procPerRow, 2, jp+2)
 #endif
 ! -------top and underground condition
     do j = 0,jm+1

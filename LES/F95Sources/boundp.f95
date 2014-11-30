@@ -84,13 +84,8 @@ subroutine boundp1(km,jm,p,im)
         end do
     end do
 #else
-    if (isLeftMostColumn(procPerRow)) then
-        call sideflowRightLeft(p, size(p, 1) - 2, size(p, 2) - 2, size(p, 3), procPerRow, 1)
-        call sideflowLeftRight(p, size(p, 1) - 2, size(p, 2) - 2, size(p, 3), procPerRow, 2)
-    else if (isRightMostColumn(procPerRow)) then
-        call sideflowRightLeft(p, size(p, 1) - 2, size(p, 2) - 2, size(p, 3), procPerRow, jp+1)
-        call sideflowLeftRight(p, size(p, 1) - 2, size(p, 2) - 2, size(p, 3), procPerRow, jp+2)
-    end if
+    call sideflowRightLeft(p, size(p, 1) - 2, size(p, 2) - 2, size(p, 3), procPerRow, jp+1, 1)
+    call sideflowLeftRight(p, size(p, 1) - 2, size(p, 2) - 2, size(p, 3), procPerRow, 2, jp+2)
 #endif
 #ifdef MPI
 ! --halo exchanges
