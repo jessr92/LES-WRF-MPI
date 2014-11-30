@@ -434,21 +434,32 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow, procPerCol)
     implicit none
     integer, intent(in) :: ip, jp, ipmax, jpmax, procPerRow, procPerCol
     real(kind=4), dimension(-1:ipmax+1,-1:jpmax+1) , intent(InOut) :: zbm
-    integer :: startRow, startCol, endRow, endCol, i, arraySize
+    integer :: startRow, startCol, i, r, c
+    real(kind=4), dimension(ip, jp) :: sendBuffer, recvBuffer
     if (isMaster()) then
         ! Send appropriate 2D section to the other ranks
         do i = 1, mpi_size - 1
             startRow = topLeftRowValue(i, procPerRow, ip)
-            endRow = startRow + ip
             startCol = topLeftColValue(i, procPerCol, jp)
-            endCol = startCol + jp
-            arraySize = (endRow - startRow) * (endCol - startCol)
-            call MPI_Send(zbm(startRow:endRow, startCol:endCol), arraySize, &
-                          MPI_REAL, i, zbmTag, communicator, ierror)
+            do r=1, ip
+                do c=1, jp
+                    sendBuffer(r, c) = zbm(startRow + r, startCol + c)
+                end do
+            end do
+            call MPI_Send(sendBuffer, (ip*jp), MPI_REAL, i, zbmTag, &
+                          communicator, ierror)
+            call checkMPIError()
         end do
     else
         ! Receive appropriate 2D section from master
-        call MPI_Recv(zbm, (ip*jp), MPI_REAL, 0, zbmTag, communicator, status, ierror)
+        call MPI_Recv(recvBuffer, (ip*jp), MPI_REAL, 0, zbmTag, communicator, &
+                      status, ierror)
+        call checkMPIError()
+        do r=1, ip
+            do c=1, jp
+                zbm(r, c) = recvBuffer(r, c)
+            end do
+        end do
     end if
 end subroutine distributeZBM
 
