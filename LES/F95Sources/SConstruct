@@ -38,6 +38,7 @@ WITH_MPI=''
 FAST_MPI=''
 PROC_PER_ROW=''
 PROC_PER_COL=''
+USE_NETCDF_OUTPUT=''
 with_mpi = getOpt('mpi','Use MPI','0')
 if with_mpi == '1':
     procPerRow= getOpt('procPerRow', 'Processes Per Row', '2')
@@ -45,6 +46,7 @@ if with_mpi == '1':
     PROC_PER_ROW = '-DPROC_PER_ROW=' + procPerRow
     PROC_PER_COL = '-DPROC_PER_COL=' + procPerCol
     WITH_MPI = '-DMPI'
+    #USE_NETCDF_OUTPUT='-DUSE_NETCDF_OUTPUT'
     envF['F95']='mpifort'
     envF['LINK']=envF['F95']
 
@@ -58,7 +60,7 @@ IFBF='-DIFBF=1'
 IANIME='-DIANIME=0'
 IADAM='-DIADAM=0'
 
-FFLAGS  = [WITH_MPI, FAST_MPI, PROC_PER_ROW, PROC_PER_COL, WITH_OCL, NO_FILE_IO, ICAL, IFBF,IANIME, IADAM] 
+FFLAGS  = [USE_NETCDF_OUTPUT, WITH_MPI, FAST_MPI, PROC_PER_ROW, PROC_PER_COL, WITH_OCL, NO_FILE_IO, ICAL, IFBF,IANIME, IADAM] 
 
 if with_ocl == '0':
     FFLAGS += ['-cpp','-Ofast', '-m64', '-Wall','-ffree-form', '-fconvert=big-endian', VERBOSE,TIMINGS]
@@ -73,6 +75,9 @@ fsources = []
 
 if with_mpi == '1':
     fsources += ['./fortran_helper.f95', './mpi_helper.f95']
+
+if USE_NETCDF_OUTPUT != '':
+    fsources += ['./module_LES_write_netcdf.f95']
 
 fsources+= ['./anime.f95','./aveflow.f95','./bondFG.f95','./bondv1.f95','./boundp.f95','./boundsm.f95','./vel2.f95','./velFG.f95','./feedbf.f95','./feedbfm.f95','./les.f95','./grid.f95','./ifdata.f95','./init.f95','./main.f95','./set.f95','./timdata.f95','./common_sn.f95','./params_common_sn.f95']
 

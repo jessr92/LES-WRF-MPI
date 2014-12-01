@@ -19,14 +19,29 @@ module module_LES_write_netcdf
   integer, parameter :: NDIMS = 4
   integer, parameter :: NTIMESTEPS=20 ! FIXME: should be taken from global macro
   ! For p only: 0:ip+2,0:jp+2,0:kp+1
+#ifdef MPI
+    integer, parameter :: NLVLS_P_UV = kp+2
+    integer, parameter :: NLATS_P_UVW = (jp*procPerCol)+3
+    integer, parameter :: NLONS_P = (ip*procPerRow)+3
+#else
   integer, parameter :: NLVLS_P_UV = kp+2, NLATS_P_UVW = jp+3, NLONS_P = ip+3
+#endif
   ! For u,v
+#ifdef MPI
+    integer, parameter :: NLONS_UVW = (ip*procPerRow)+2
+#else
   integer, parameter :: NLONS_UVW = ip+2
+#endif
   ! For w
-  integer, parameter :: NLVLS_W = kp+3
+  integer, parameter :: NLVLS_W = kp+3 ! GR: fine as is for MPI since depth (kp) isn't split up
   ! For usum/vsum/wsum
+#ifdef MPI
+  integer, parameter :: NLVLS_UVWSUM = kp+1
+  integer, parameter :: NLATS_UVWSUM = (jp*procPerCol)+1
+  integer, parameter :: NLONS_UVWSUM = (ip*procPerRow)+1
+#else
   integer, parameter :: NLVLS_UVWSUM = kp+1, NLATS_UVWSUM = jp+1, NLONS_UVWSUM = ip+1
-
+#endif
   integer :: start(NDIMS), count(NDIMS)
   integer :: count_p(NDIMS), count_u(NDIMS),count_v(NDIMS),count_w(NDIMS), count_uvwsum(NDIMS)
 
@@ -102,10 +117,12 @@ module module_LES_write_netcdf
     end if
   end subroutine check  
 
-  subroutine init_netcdf_file()       
+subroutine init_netcdf_file()       
       ! Loop indices
       integer :: lat, lon,t
-  
+#ifdef MPI
+    if (isMaster()) then
+#endif
      ! Create the file.
 print *,'nf90_create()'
       call check( nf90_create( FILE_NAME, NF90_CLOBBER,  ncid) )
@@ -318,71 +335,98 @@ print*,'Create count*/start'
 
 
 !      print *, 'ncid init: ',ncid,'pres_varid: ',pres_varid
-    
-  end subroutine init_netcdf_file
+#ifdef MPI
+    end if
+#endif
+end subroutine init_netcdf_file
 
-  subroutine write_to_netcdf_file(p,u,v,w,usum,vsum,wsum,n)
-        real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1), intent(InOut)  :: p
-        real(kind=4), dimension(0:ip+1,-1:jp+1,0:kp+1) , intent(In) :: u
-        real(kind=4), dimension(0:ip+1,-1:jp+1,0:kp+1) , intent(In) :: v
-        real(kind=4), dimension(0:ip+1,-1:jp+1,-1:kp+1) , intent(In) :: w
-        real(kind=4), dimension(0:ip,0:jp,0:kp) , intent(In) :: usum
-        real(kind=4), dimension(0:ip,0:jp,0:kp) , intent(In) :: vsum
-        real(kind=4), dimension(0:ip,0:jp,0:kp) , intent(In) :: wsum
-        integer, intent(In) :: n
+subroutine write_to_netcdf_file(p,u,v,w,usum,vsum,wsum,n)
+    real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1), intent(InOut)  :: p
+    real(kind=4), dimension(0:ip+1,-1:jp+1,0:kp+1) , intent(In) :: u
+    real(kind=4), dimension(0:ip+1,-1:jp+1,0:kp+1) , intent(In) :: v
+    real(kind=4), dimension(0:ip+1,-1:jp+1,-1:kp+1) , intent(In) :: w
+    real(kind=4), dimension(0:ip,0:jp,0:kp) , intent(In) :: usum
+    real(kind=4), dimension(0:ip,0:jp,0:kp) , intent(In) :: vsum
+    real(kind=4), dimension(0:ip,0:jp,0:kp) , intent(In) :: wsum
+    integer, intent(In) :: n
+#ifdef MPI
+    real(kind=4), dimension(0:(ip*procPerRow)+2,0:(jp*procPerCol)+2,0:kp+1), intent(InOut)  :: pTot
+    real(kind=4), dimension(0:(ip*procPerRow)+1,-1:(jp*procPerCol)+1,0:kp+1) , intent(In) :: uTot
+    real(kind=4), dimension(0:(ip*procPerRow)+1,-1:(jp*procPerCol)+1,0:kp+1) , intent(In) :: vTot
+    real(kind=4), dimension(0:(ip*procPerRow)+1,-1:(jp*procPerCol)+1,-1:kp+1) , intent(In) :: wTot
+    real(kind=4), dimension(0:(ip*procPerRow),0:(jp*procPerCol),0:kp) , intent(In) :: usumTot
+    real(kind=4), dimension(0:(ip*procPerRow),0:(jp*procPerCol),0:kp) , intent(In) :: vsumTot
+    real(kind=4), dimension(0:(ip*procPerRow),0:(jp*procPerCol),0:kp) , intent(In) :: wsumTot
+    if (isMaster()) then
+        ! Grab p, u, v, w, usum, vsum, wsum from the other processes
+    else
+        ! Send p, u, v, w, usum, vsum, wsum to the master process
+    end if
+#endif
+#ifdef MPI
+    if (isMaster()) then
+        ! Write varTot rather than var to the netCDF files
+#endif
+        ! The start and count arrays will tell the netCDF library where to
+        ! write our data.
 
- ! The start and count arrays will tell the netCDF library where to
-  ! write our data.
+        ! Write the pretend data. This will write our surface pressure and
+        ! surface velerature data. The arrays only hold one timestep worth
+        ! of data. We will just rewrite the same data for each timestep. In
+        ! a real :: application, the data would change between timesteps.
+        start(4) = n
+        print *, 'ncid: ',ncid,'pres_varid: ',pres_varid
 
-  ! Write the pretend data. This will write our surface pressure and
-  ! surface velerature data. The arrays only hold one timestep worth
-  ! of data. We will just rewrite the same data for each timestep. In
-  ! a real :: application, the data would change between timesteps.
-     start(4) = n
-     print *, 'ncid: ',ncid,'pres_varid: ',pres_varid
+        call check( nf90_put_var(ncid, pres_varid, p,  start, count) )
 
-     call check( nf90_put_var(ncid, pres_varid, p,  start, count) )
+        call check( nf90_put_var(ncid_p, pres_varid, p,  start, count_p) )
 
-     call check( nf90_put_var(ncid_p, pres_varid, p,  start, count_p) )
+        print *, 'ncid_u: ',ncid_u,'vel_x_varid_u: ',vel_x_varid_u
+        call check( nf90_put_var(ncid_u, vel_x_varid_u, u, start, count_u) )
+        call check( nf90_put_var(ncid_v, vel_y_varid_v, v, start, count_v) )
+        call check( nf90_put_var(ncid_w, vel_z_varid_w, w, start, count_w) )
 
-     print *, 'ncid_u: ',ncid_u,'vel_x_varid_u: ',vel_x_varid_u
-     call check( nf90_put_var(ncid_u, vel_x_varid_u, u, start, count_u) )
-     call check( nf90_put_var(ncid_v, vel_y_varid_v, v, start, count_v) )
-     call check( nf90_put_var(ncid_w, vel_z_varid_w, w, start, count_w) )
+        call check( nf90_put_var(ncid_uvwsum, velsum_x_varid_uvwsum, usum, start, count_uvwsum) )
+        call check( nf90_put_var(ncid_uvwsum, velsum_y_varid_uvwsum, vsum, start, count_uvwsum) )
+        call check( nf90_put_var(ncid_uvwsum, velsum_z_varid_uvwsum, wsum, start, count_uvwsum) )
+#ifdef MPI
+    end if
+#endif
+end subroutine write_to_netcdf_file
 
-     call check( nf90_put_var(ncid_uvwsum, velsum_x_varid_uvwsum, usum, start, count_uvwsum) )
-     call check( nf90_put_var(ncid_uvwsum, velsum_y_varid_uvwsum, vsum, start, count_uvwsum) )
-     call check( nf90_put_var(ncid_uvwsum, velsum_z_varid_uvwsum, wsum, start, count_uvwsum) )
-
-    end subroutine write_to_netcdf_file
-
-    subroutine close_netcdf_file()
+subroutine close_netcdf_file()
+#ifdef MPI
+    if (isMaster()) then
+#endif    
   ! Close the file. This causes netCDF to flush all buffers and make
   ! sure your data are really written to disk.
-  call check( nf90_close(ncid) )
+        call check( nf90_close(ncid) )
 #ifdef VERBOSE   
-  print *,"*** SUCCESS writing file ", FILE_NAME
+        print *,"*** SUCCESS writing file ", FILE_NAME
 #endif
-  call check( nf90_close(ncid_p) )
+        call check( nf90_close(ncid_p) )
 #ifdef VERBOSE
-  print *,"*** SUCCESS writing file ", FILE_NAME_p
+        print *,"*** SUCCESS writing file ", FILE_NAME_p
 #endif
-  call check( nf90_close(ncid_u) )
+        call check( nf90_close(ncid_u) )
 #ifdef VERBOSE
-  print *,"*** SUCCESS writing file ", FILE_NAME_U
+        print *,"*** SUCCESS writing file ", FILE_NAME_U
 #endif
-  call check( nf90_close(ncid_v) )
+        call check( nf90_close(ncid_v) )
 #ifdef VERBOSE
-  print *,"*** SUCCESS writing file ", FILE_NAME_V
+        print *,"*** SUCCESS writing file ", FILE_NAME_V
 #endif
-  call check( nf90_close(ncid_W) )
+        call check( nf90_close(ncid_W) )
 #ifdef VERBOSE
-  print *,"*** SUCCESS writing file ", FILE_NAME_W
+        print *,"*** SUCCESS writing file ", FILE_NAME_W
 #endif
-  call check( nf90_close(ncid_uvwsum) )
+        call check( nf90_close(ncid_uvwsum) )
 #ifdef VERBOSE
-  print *,"*** SUCCESS writing file ", FILE_NAME_UVWSUM
-#endif    
-    end subroutine close_netcdf_file
+        print *,"*** SUCCESS writing file ", FILE_NAME_UVWSUM
+#endif
+#ifdef MPI
+    end if
+#endif
+end subroutine close_netcdf_file
 
 end module module_LES_write_netcdf
