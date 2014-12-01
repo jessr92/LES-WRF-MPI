@@ -1,4 +1,8 @@
-include /home/mpi-user/LES-WRF-MPI/oasis3-mct/util/make_dir/make.inc
+ifeq "$(shell hostname)" "togian.dcs.gla.ac.uk"
+    include /scratch1/1002536r/LES-WRF-MPI/oasis3-mct/util/make_dir/make.inc
+else
+    include /home/mpi-user/LES-WRF-MPI/oasis3-mct/util/make_dir/make.inc
+endif
 LIBPSMILE = $(ARCHDIR)/lib/libpsmile.${CHAN}.a $(ARCHDIR)/lib/libmct.a $(ARCHDIR)/lib/libmpeu.a $(ARCHDIR)/lib/libscrip.a
 
 F90FLAGS += -W -Wall -O2 -fopenmp
