@@ -44,6 +44,7 @@ subroutine bondfg(km,jm,f,im,g,h)
 ! --halo exchanges
     call exchangeRealHalos(f, procPerRow, 1, 1, 1, 1)
     call exchangeRealHalos(g, procPerRow, 1, 1, 1, 1)
+    call exchangeRealHalos(h, procPerRow, 1, 1, 1, 1)
 #endif
 end subroutine bondFG                                    
 
