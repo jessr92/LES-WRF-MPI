@@ -83,31 +83,44 @@ integer function topLeftColValue(process, procPerRow, colCount)
     topLeftColValue = modulo(process, procPerRow) * colCount
 end function topLeftColValue
 
-subroutine calculateCorners(array, rowCount, colCount, procPerRow)
+subroutine calculateCorners(array, procPerRow, leftThickness, rightThickness, &
+                            topThickness, bottomThickness)
     implicit none
-    integer, intent(in) :: rowCount, colCount, procPerRow
-    integer, dimension(rowCount + 2, colCount + 2), intent(inout) :: array
+    integer, intent(in) :: procPerRow, leftThickness, rightThickness, &
+                           topThickness, bottomThickness
+    integer, dimension(:,:), intent(inout) :: array
+    integer :: r, c
     if (.not. isTopRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
         ! There is a top left corner to specify
-        array(1,1) = (array(2, 1) + array(1, 2) - array(2,2)) / 2
+        do r=topThickness,1,-1
+            do c=leftThickness,1,-1
+                array(r, c) = (array(r+1, c) + array(r, c+1) - array(r+1, c+1)) / 2
+            end do
+        end do
     end if
     if (.not. isTopRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
         ! There is a top right corner to specify
-        array(1, colCount + 2) = (array(2, colCount + 2) + &
-                                 array(1, colCount + 1) - &
-                                 array(2, colCount + 1)) / 2
+        do r=topThickness,1,-1
+            do c=size(array,2)-rightThickness+1,size(array,2)
+                array(r, c) = (array(r+1, c) + array(r, c-1) - array(r+1, c-1)) / 2
+            end do
+        end do
     end if
     if (.not. isBottomRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
         ! There is a bottom left corner to specify
-        array(rowCount + 2, 1) = (array(rowCount + 1, 1) + &
-                                 array(rowCount + 2, 2) - &
-                                 array(rowCount + 1, 2)) / 2
+        do r=size(array,1)-bottomThickness+1,size(array,1)
+            do c=leftThickness,1,-1
+                array(r, c) = (array(r-1, c) + array(r, c+1) - array(r-1, c+1)) / 2
+            end do
+        end do
     end if
     if (.not. isBottomRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
         ! There is a bottom right corner to specify
-        array(rowCount + 2, colCount + 2) = (array(rowCount + 2, colCount + 1) + &
-                                           array(rowCount + 1, colCount + 2) - &
-                                           array(rowCount + 1, colCount + 1)) / 2
+        do r=size(array,1)-bottomThickness+1,size(array,1)
+            do c=size(array,2)-rightThickness+1,size(array,2)
+                array(r, c) = (array(r, c-1) + array(r-1, c) - array(r-1, c-1)) / 2
+            end do
+       end do
     end if
 end subroutine calculateCorners
 
@@ -254,7 +267,8 @@ subroutine exchangeIntegerHalos(array, procPerRow, leftThickness, &
         end do
     end if    
     do i=1, depthSize
-        !call calculateCorners(array(:,:,i), rowCount, colCount, procPerRow)
+        call calculateCorners(array(:,:,i), procPerRow, leftThickness, &
+                              rightThickness, topThickness, bottomThickness)
         call MPI_Barrier(communicator, ierror)
         call checkMPIError()
         call sleep(rank+1)
