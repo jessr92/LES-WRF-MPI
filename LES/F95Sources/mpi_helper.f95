@@ -111,54 +111,69 @@ subroutine calculateCorners(array, rowCount, colCount, procPerRow)
     end if
 end subroutine calculateCorners
 
-subroutine exchangeIntegerHalos(array, procPerRow)
+subroutine exchangeIntegerHalos(array, procPerRow, leftThickness, &
+                                rightThickness, topThickness, &
+                                bottomThickness)
     implicit none
     integer, dimension(:,:,:), intent(inout) :: array
-    integer, intent(in) :: procPerRow
+    integer, intent(in) :: procPerRow, leftThickness, rightThickness, topThickness, bottomThickness
     integer :: i, commWith, r, c, d, rowCount, colCount, depthSize, requests(8)
-    integer, dimension(:,:), allocatable :: leftRecv, leftSend, rightSend, rightRecv
-    integer, dimension(:,:), allocatable :: topRecv, topSend, bottomSend, bottomRecv
-    rowCount = size(array, 1) - 2
-    colCount = size(array, 2) - 2
+    integer, dimension(:,:,:), allocatable :: leftRecv, leftSend, rightSend, rightRecv
+    integer, dimension(:,:,:), allocatable :: topRecv, topSend, bottomSend, bottomRecv
+    rowCount = size(array, 1) - topThickness - bottomThickness
+    colCount = size(array, 2) - leftThickness - rightThickness
     depthSize = size(array, 3)
-    allocate(leftRecv(rowCount, depthSize))
-    allocate(leftSend(rowCount, depthSize))
-    allocate(rightSend(rowCount, depthSize))
-    allocate(rightRecv(rowCount, depthSize))
-    allocate(topRecv(colCount, depthSize))
-    allocate(topSend(colCount, depthSize))
-    allocate(bottomSend(colCount, depthSize))
-    allocate(bottomRecv(colCount, depthSize))
+    allocate(leftRecv(rowCount, rightThickness, depthSize))
+    allocate(rightSend(rowCount, leftThickness, depthSize))
+    allocate(rightRecv(rowCount, leftThickness, depthSize))
+    allocate(leftSend(rowCount, rightThickness, depthSize))
+    allocate(topRecv(bottomThickness, colCount, depthSize))
+    allocate(bottomSend(topThickness, colCount, depthSize))
+    allocate(bottomRecv(topThickness, colCount, depthSize))
+    allocate(topSend(bottomThickness, colCount, depthSize))
+    do i=1, depthSize
+        !call calculateCorners(array(:,:,i), rowCount, colCount, procPerRow)
+        call MPI_Barrier(communicator, ierror)
+        call checkMPIError()
+    !    call sleep(rank+1)
+    !    call outputArray(array(:,:,i))
+    end do
     do i=1,8
         requests(i)= -1
     end do
     if (.not. isTopRow(procPerRow)) then
         ! Top edge to send, bottom edge to receive
         commWith = rank - procPerRow
-        do c=1, colCount
-            do d=1, depthSize
-                topSend(c, d) = array(2, c+1, d)
+        do r=1, bottomThickness
+            do c=1, colCount
+                do d=1, depthSize
+                    topSend(r, c, d) = array(r + topThickness, c+leftThickness, d)
+                end do
             end do
         end do
-        call MPI_ISend(topSend, colCount*depthSize, MPI_INT, commWith, topTag, &
+        call MPI_ISend(topSend, bottomThickness*colCount*depthSize, MPI_INT, commWith, topTag, &
                       communicator, requests(1), ierror)
         call checkMPIError()
-        call MPI_IRecv(bottomRecv, colCount*depthSize, MPI_INT, commWith, bottomTag, &
+        call MPI_IRecv(bottomRecv, topThickness*colCount*depthSize, MPI_INT, commWith, bottomTag, &
                       communicator, requests(2), ierror)
         call checkMPIError()
     end if
     if (.not. isBottomRow(procPerRow)) then
         ! Bottom edge to send, top edge to receive
         commWith = rank + procPerRow
-        do c=1, colCount
-            do d=1, depthSize
-                bottomSend(c, d) = array(rowCount+1, c+1, d)
+        do r=1, topThickness
+            do c=1, colCount
+                do d=1, depthSize
+                    bottomSend(r, c, d) = array(size(array, 1) - bottomThickness - topThickness + r, &
+                                          c+leftThickness, &
+                                          d)
+                end do
             end do
         end do
-        call MPI_IRecv(topRecv, colCount*depthSize, MPI_INT, commWith, topTag, &
+        call MPI_IRecv(topRecv, bottomThickness*colCount*depthSize, MPI_INT, commWith, topTag, &
                       communicator, requests(3), ierror)
         call checkMPIError()
-        call MPI_ISend(bottomSend, colCount*depthSize, MPI_INT, commWith, bottomTag, &
+        call MPI_ISend(bottomSend, topThickness*colCount*depthSize, MPI_INT, commWith, bottomTag, &
                       communicator, requests(4), ierror)
         call checkMPIError()
     end if
@@ -166,14 +181,16 @@ subroutine exchangeIntegerHalos(array, procPerRow)
         ! Left edge to send, right edge to receive
         commWith = rank - 1
         do r=1, rowCount
-            do d=1, depthSize
-                leftSend(r, d) = array(r+1, 2, d)
+            do c=1, rightThickness
+                do d=1, depthSize
+                    leftSend(r, c, d) = array(r+topThickness, c + leftThickness, d)
+                end do
             end do
         end do
-        call MPI_ISend(leftSend, rowCount*depthSize, MPI_INT, commWith, leftTag, &
+        call MPI_ISend(leftSend, rightThickness*rowCount*depthSize, MPI_INT, commWith, leftTag, &
                       communicator, requests(5), ierror)
         call checkMPIError()
-        call MPI_IRecv(rightRecv, rowCount*depthSize, MPI_INT, commWith, rightTag, &
+        call MPI_IRecv(rightRecv, leftThickness*rowCount*depthSize, MPI_INT, commWith, rightTag, &
                       communicator, requests(6), ierror)
         call checkMPIError()
     end if
@@ -181,14 +198,18 @@ subroutine exchangeIntegerHalos(array, procPerRow)
         ! Right edge to send, left edge to receive
         commWith = rank + 1
         do r=1, rowCount
-            do d=1, depthSize
-                rightSend(r, d) = array(r+1, colCount+1, d)
+            do c=1, leftThickness
+                do d=1, depthSize
+                    rightSend(r, c, d) = array(r+topThickness, &
+                                               size(array, 2) - rightThickness - leftThickness + c,&
+                                               d)
+                end do
             end do
         end do
-        call MPI_IRecv(leftRecv, rowCount*depthSize, MPI_INT, commWith, leftTag, &
+        call MPI_IRecv(leftRecv, rightThickness*rowCount*depthSize, MPI_INT, commWith, leftTag, &
                       communicator, requests(7), ierror)
         call checkMPIError()
-        call MPI_ISend(rightSend, rowCount*depthSize, MPI_INT, commWith, rightTag, &
+        call MPI_ISend(rightSend, leftThickness*rowCount*depthSize, MPI_INT, commWith, rightTag, &
                       communicator, requests(8), ierror)
         call checkMPIError()
     end if
@@ -201,38 +222,46 @@ subroutine exchangeIntegerHalos(array, procPerRow)
     if (.not. isTopRow(procPerRow)) then
         ! Top edge to send, bottom edge to receive
         commWith = rank - procPerRow
-        do c=1, colCount
-            do d=1, depthSize
-                array(1, c+1, d) = bottomRecv(c, d)
+        do r=1, topThickness
+            do c=1, colCount
+                do d=1, depthSize
+                    array(r, c+leftThickness, d) = bottomRecv(r, c, d)
+                end do
             end do
         end do
     end if
     if (.not. isBottomRow(procPerRow)) then
         ! Bottom edge to send, top edge to receive
-        do c=1, colCount
-            do d=1, depthSize
-                array(rowCount+2, c+1, d) = topRecv(c, d)
+        do r=1, bottomThickness
+            do c=1, colCount
+                do d=1, depthSize
+                    array(size(array, 1) - bottomThickness + r, c+leftThickness, d) = topRecv(r, c, d)
+                end do
             end do
         end do
     end if
     if (.not. isLeftmostColumn(procPerRow)) then
         ! Left edge to send, right edge to receive
         do r=1, rowCount
-            do d=1, depthSize
-                array(r+1, 1, d) = rightRecv(r, d)
+            do c=1, leftThickness
+                do d=1, depthSize
+                    array(r+topThickness, c, d) = rightRecv(r, c, d)
+                end do
             end do
         end do
     end if
     if (.not. isRightmostColumn(procPerRow)) then
         ! Right edge to send, left edge to receive
         do r=1, rowCount
-            do d=1, depthSize
-                array(r+1, colCount+2, d) = leftRecv(r, d)
+            do c=1, rightThickness
+                do d=1, depthSize
+                    array(r+topThickness, size(array, 2) - rightThickness + c, d) = leftRecv(r, c, d)
+                end do
             end do
         end do
     end if    
     do i=1, depthSize
-        call calculateCorners(array(:,:,i), rowCount, colCount, procPerRow)
+        !call calculateCorners(array(:,:,i), rowCount, colCount, procPerRow)
         call MPI_Barrier(communicator, ierror)
         call checkMPIError()
         call sleep(rank+1)
