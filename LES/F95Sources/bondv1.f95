@@ -178,9 +178,9 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
 ! =================================
 #ifdef MPI
 ! --halo exchanges
-    call exchangeRealHalos(u, procPerRow)
-    call exchangeRealHalos(v, procPerRow)
-    call exchangeRealHalos(w, procPerRow)
+    call exchangeRealHalos(u, procPerRow, 1, 1, 2, 1)
+    call exchangeRealHalos(v, procPerRow, 1, 1, 2, 1)
+    call exchangeRealHalos(w, procPerRow, 1, 1, 2, 1)
 #endif
 #ifdef WV_DEBUG
     print *,'F95 UVWSUM after bondv1:',sum(u)+sum(v)+sum(w)
