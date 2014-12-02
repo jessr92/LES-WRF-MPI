@@ -84,8 +84,8 @@ subroutine boundp1(km,jm,p,im)
         end do
     end do
 #else
-    call sideflowRightLeft(p, size(p, 1) - 2, size(p, 2) - 2, size(p, 3), procPerRow, jp+1, 1)
-    call sideflowLeftRight(p, size(p, 1) - 2, size(p, 2) - 2, size(p, 3), procPerRow, 2, jp+2)
+    call sideflowRightLeft(p, procPerRow, jp+1, 1)
+    call sideflowLeftRight(p, procPerRow, 2, jp+2)
 #endif
 #ifdef MPI
 ! --halo exchanges

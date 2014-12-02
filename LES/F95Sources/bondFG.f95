@@ -31,7 +31,7 @@ subroutine bondfg(km,jm,f,im,g,h)
         end do
     end do
 #else
-    call sideflowRightLeft(g, size(g, 1) - 2, size(g, 2) - 2, size(g, 3), procPerRow, jp+1, 1)
+    call sideflowRightLeft(g, procPerRow, jp+1, 1)
 #endif
 ! --ground and top condition
     do j = 1,jm
