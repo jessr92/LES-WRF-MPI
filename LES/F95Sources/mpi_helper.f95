@@ -131,13 +131,6 @@ subroutine exchangeIntegerHalos(array, procPerRow, leftThickness, &
     allocate(bottomSend(topThickness, colCount, depthSize))
     allocate(bottomRecv(topThickness, colCount, depthSize))
     allocate(topSend(bottomThickness, colCount, depthSize))
-    do i=1, depthSize
-        !call calculateCorners(array(:,:,i), rowCount, colCount, procPerRow)
-        call MPI_Barrier(communicator, ierror)
-        call checkMPIError()
-    !    call sleep(rank+1)
-    !    call outputArray(array(:,:,i))
-    end do
     do i=1,8
         requests(i)= -1
     end do
