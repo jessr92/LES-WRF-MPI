@@ -111,13 +111,24 @@ subroutine calculateCorners(array, rowCount, colCount, procPerRow)
     end if
 end subroutine calculateCorners
 
-subroutine exchangeAll2DHalos3DArray(array, rowCount, colCount, depthSize, procPerRow)
+subroutine exchangeIntegerHalos(array, procPerRow)
     implicit none
-    integer, intent(in) :: rowCount, colCount, depthSize, procPerRow
-    integer, dimension(rowCount + 2, colCount + 2, depthSize), intent(inout) :: array
-    integer :: i, commWith, r, c, d, requests(8)
-    integer, dimension(rowCount, depthSize) :: leftRecv, leftSend, rightSend, rightRecv
-    integer, dimension(colCount, depthSize) :: topRecv, topSend, bottomSend, bottomRecv
+    integer, dimension(:,:,:), intent(inout) :: array
+    integer, intent(in) :: procPerRow
+    integer :: i, commWith, r, c, d, rowCount, colCount, depthSize, requests(8)
+    integer, dimension(:,:), allocatable :: leftRecv, leftSend, rightSend, rightRecv
+    integer, dimension(:,:), allocatable :: topRecv, topSend, bottomSend, bottomRecv
+    rowCount = size(array, 1) - 2
+    colCount = size(array, 2) - 2
+    depthSize = size(array, 3)
+    allocate(leftRecv(rowCount, depthSize))
+    allocate(leftSend(rowCount, depthSize))
+    allocate(rightSend(rowCount, depthSize))
+    allocate(rightRecv(rowCount, depthSize))
+    allocate(topRecv(colCount, depthSize))
+    allocate(topSend(colCount, depthSize))
+    allocate(bottomSend(colCount, depthSize))
+    allocate(bottomRecv(colCount, depthSize))
     do i=1,8
         requests(i)= -1
     end do
@@ -227,7 +238,15 @@ subroutine exchangeAll2DHalos3DArray(array, rowCount, colCount, depthSize, procP
         call sleep(rank+1)
         call outputArray(array(:,:,i))
     end do
-end subroutine exchangeAll2DHalos3DArray
+    deallocate(leftRecv)
+    deallocate(leftSend)
+    deallocate(rightSend)
+    deallocate(rightRecv)
+    deallocate(topRecv)
+    deallocate(topSend)
+    deallocate(bottomSend)
+    deallocate(bottomRecv)
+end subroutine exchangeIntegerHalos
 
 subroutine calculateCornersReal(array, rowCount, colCount, procPerRow)
     implicit none
@@ -257,13 +276,24 @@ subroutine calculateCornersReal(array, rowCount, colCount, procPerRow)
     end if
 end subroutine calculateCornersReal
 
-subroutine exchangeRealHalos(array, rowCount, colCount, depthSize, procPerRow)
+subroutine exchangeRealHalos(array, procPerRow)
     implicit none
-    integer, intent(in) :: rowCount, colCount, depthSize, procPerRow
-    real(kind=4), dimension(rowCount + 2, colCount + 2, depthSize), intent(inout) :: array
-    integer :: i, commWith, r, c, d, requests(8)
-    real(kind=4), dimension(rowCount, depthSize) :: leftRecv, leftSend, rightSend, rightRecv
-    real(kind=4), dimension(colCount, depthSize) :: topRecv, topSend, bottomSend, bottomRecv
+    real(kind=4), dimension(:,:,:), intent(inout) :: array
+    integer, intent(in) :: procPerRow
+    integer :: i, commWith, r, c, d, rowCount, colCount, depthSize, requests(8)
+    real(kind=4), dimension(:,:), allocatable :: leftRecv, leftSend, rightSend, rightRecv
+    real(kind=4), dimension(:,:), allocatable :: topRecv, topSend, bottomSend, bottomRecv
+    rowCount = size(array, 1) - 2
+    colCount = size(array, 2) - 2
+    depthSize = size(array, 3)
+    allocate(leftRecv(rowCount, depthSize))
+    allocate(leftSend(rowCount, depthSize))
+    allocate(rightSend(rowCount, depthSize))
+    allocate(rightRecv(rowCount, depthSize))
+    allocate(topRecv(colCount, depthSize))
+    allocate(topSend(colCount, depthSize))
+    allocate(bottomSend(colCount, depthSize))
+    allocate(bottomRecv(colCount, depthSize))
     do i=1,8
         requests(i)= -1
     end do

@@ -42,8 +42,8 @@ subroutine bondfg(km,jm,f,im,g,h)
     end do
 #ifdef MPI
 ! --halo exchanges
-    call exchangeRealHalos(f, size(f, 1) - 2, size(f, 2) - 2, size(f, 3), procPerRow)
-    call exchangeRealHalos(g, size(g, 1) - 2, size(g, 2) - 2, size(g, 3), procPerRow)
+    call exchangeRealHalos(f, procPerRow)
+    call exchangeRealHalos(g, procPerRow)
 #endif
 end subroutine bondFG                                    
 

@@ -64,7 +64,7 @@ subroutine boundsm(km,jm,sm,im)
     end do
 #ifdef MPI
 ! --halo exchanges
-    call exchangeRealHalos(sm, size(sm, 1) - 2, size(sm, 2) - 2, size(sm, 3), procPerRow)
+    call exchangeRealHalos(sm, procPerRow)
 #endif
 end subroutine boundsm
 

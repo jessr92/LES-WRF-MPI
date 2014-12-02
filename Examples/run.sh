@@ -24,6 +24,6 @@ mpiexec -n 4 $(pwd)/mpi_pi
 echo '**********'
 echo 'Running MPI Halo Exchange 3D Example'
 echo '*********'
-mpiexec -n 9 $(pwd)/haloExchange3DExample
+mpiexec -n 12 $(pwd)/haloExchange3DExample
 echo '*********'
 
