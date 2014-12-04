@@ -151,12 +151,30 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
                       communicator, requests(8), ierror)
         call checkMPIError()
     end if
-    do i=1,8
-        if (.not. (requests(i) .eq. MPI_REQUEST_NULL)) then
-            call MPI_Wait(requests(i), status, ierror)
-            call checkMPIError()
-        end if
-    end do
+    if (neighbours(topNeighbour) .ne. -1) then
+        call MPI_Wait(requests(1), status, ierror)
+        call checkMPIError()
+        call MPI_Wait(requests(2), status, ierror)
+        call checkMPIError()
+    end if
+    if (neighbours(bottomNeighbour) .ne. -1) then
+        call MPI_Wait(requests(3), status, ierror)
+        call checkMPIError()
+        call MPI_Wait(requests(4), status, ierror)
+        call checkMPIError()
+    end if
+    if (neighbours(leftNeighbour) .ne. -1) then
+        call MPI_Wait(requests(5), status, ierror)
+        call checkMPIError()
+        call MPI_Wait(requests(6), status, ierror)
+        call checkMPIError()
+    end if
+    if (neighbours(rightNeighbour) .ne. -1) then
+        call MPI_Wait(requests(7), status, ierror)
+        call checkMPIError()
+        call MPI_Wait(requests(8), status, ierror)
+        call checkMPIError()
+    end if
     if (.not. isTopRow(procPerRow)) then
         ! Top edge to send, bottom edge to receive
         commWith = rank - procPerRow
