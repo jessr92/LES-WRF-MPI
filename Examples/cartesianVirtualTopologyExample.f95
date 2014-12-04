@@ -2,9 +2,12 @@ program cartesianVirtualTopologyExample
 use mpi_helper
 implicit none
 integer, parameter :: procPerRow = 3, procPerCol = 4, dimensions = 2
-integer :: dimensionSizes(dimensions), periodicDimensions(dimensions)
-integer :: coordinates(dimensions), neighbours(2*dimensions), reorder
-data dimensionSizes /procPerCol,procPerRow/, periodicDimensions /0,0/, reorder /0/
+integer :: dimensionSizes(dimensions)
+logical :: periodicDimensions(dimensions)
+integer :: coordinates(dimensions), neighbours(2*dimensions)
+logical :: reorder
+data dimensionSizes /procPerCol,procPerRow/, periodicDimensions /.false.,.false./, &
+reorder /.false./
 call main()
 
 contains
