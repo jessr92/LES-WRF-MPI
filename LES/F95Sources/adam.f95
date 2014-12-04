@@ -20,6 +20,7 @@ contains
 ! 
 !
 #ifndef NO_IO
+#ifndef MPI
       if (mod(n,1000) == 0.or.n == nmax) then
        open(unit=21,file=data21,form='unformatted',status='unknown')
        write(21) (((fold(i,j,k),i=1,im),j=1,jm),k=1,km)
@@ -28,6 +29,7 @@ contains
        write(21) (((fghold(i,j,k),i=1,im),j=1,jm),k=1,km)
        close(unit=21)
       end if
+#endif
 #endif
       do k = 1,km
       do j = 1,jm

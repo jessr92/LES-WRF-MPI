@@ -157,6 +157,7 @@ contains
         end do
 ! 
 #ifndef NO_IO
+#ifndef MPI
         open(unit=10,file=data10,form='unformatted',status='unknown')
           write(10) n,time
           write(10) (((aveu(i,j,k),i=1,im),j=1,jm),k=1,km)
@@ -171,7 +172,8 @@ contains
           write(11) (((avevv(i,j,k),i=1,im),j=1,jm),k=1,km)
           write(11) (((uwfx(i,j,k),i=1,im),j=1,jm),k=1,km)
         close(unit=11)
-#endif      
+#endif
+#endif
       endif
 ! 
 
