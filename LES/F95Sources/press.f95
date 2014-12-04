@@ -44,7 +44,7 @@ subroutine press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn
     integer, parameter  :: nmaxp = 50 ! WV was 50
     real, parameter  :: omega = 1.
 
-    !call bondfg(km,jm,f,im,g,h)
+    call bondfg(km,jm,f,im,g,h)
 
     do k = 1,km
         do j = 1,jm
@@ -95,9 +95,9 @@ subroutine press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn
                     end do
                 end do
             end do
-            !call boundp1(km,jm,p,im)
+            call boundp1(km,jm,p,im)
         end do
-        !call boundp2(jm,im,p,km)
+        call boundp2(jm,im,p,km)
 #ifndef NO_IO
 #ifdef VERBOSE
 ! --check
@@ -107,12 +107,15 @@ subroutine press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn
 #endif      
 #endif
 !
+#ifndef MPI
         if (sor < pjuge) then
             goto 510 !Break
         end if
+#endif
     end do
+#ifndef MPI
     510 continue
-
+#endif
 #ifdef MPI
     call MPI_Barrier(communicator, ierror)
 #endif
@@ -138,9 +141,9 @@ subroutine press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn
     end do
 !
     !print *, "F95: P_SUM_ADJ=",sum(p)
-    !call boundp1(km,jm,p,im)
+    call boundp1(km,jm,p,im)
     !print *, "F95: P_SUM_1=",sum(p)
-    !call boundp2(jm,im,p,km)
+    call boundp2(jm,im,p,km)
     !print *, "F95: P_SUM_BOUND=",sum(p)
 ! 
 #ifndef NO_IO
