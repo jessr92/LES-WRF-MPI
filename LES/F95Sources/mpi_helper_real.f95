@@ -73,7 +73,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
     allocate(bottomRecv(topThickness, colCount, depthSize))
     allocate(topSend(bottomThickness, colCount, depthSize))
     do i=1,8
-        requests(i)= -1
+        requests(i)= MPI_REQUEST_NULL
     end do
     ! Top edge to send, bottom edge to receive
     commWith = neighbours(topNeighbour)
@@ -152,7 +152,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
         call checkMPIError()
     end if
     do i=1,8
-        if (.not. requests(i) .eq. -1) then
+        if (.not. (requests(i) .eq. MPI_REQUEST_NULL)) then
             call MPI_Wait(requests(i), status, ierror)
             call checkMPIError()
         end if
