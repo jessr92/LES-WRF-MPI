@@ -25,7 +25,7 @@ subroutine boundp2(jm,im,p,km)
 #ifdef MPI
 #ifndef FAST_MPI
 ! --halo exchanges
-    call exchangeRealHalos(p, procPerRow, 1, 2, 1, 2)
+    call exchangeRealHalos(p, procPerRow, neighbours, 1, 2, 1, 2)
 #endif
 #endif
 end subroutine boundp2
@@ -89,7 +89,7 @@ subroutine boundp1(km,jm,p,im)
 #endif
 #ifdef MPI
 ! --halo exchanges
-    call exchangeRealHalos(p, procPerRow, 1, 2, 1, 2)
+    call exchangeRealHalos(p, procPerRow, neighbours, 1, 2, 1, 2)
 #endif
 end subroutine boundp1
 

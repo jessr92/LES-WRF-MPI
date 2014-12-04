@@ -4,8 +4,6 @@ implicit none
 
 contains
 
-
-
 subroutine calculateCornersReal(array, procPerRow, leftThickness, rightThickness, &
                             topThickness, bottomThickness)
     implicit none
@@ -47,15 +45,22 @@ subroutine calculateCornersReal(array, procPerRow, leftThickness, rightThickness
     end if
 end subroutine calculateCornersReal
 
-subroutine exchangeRealHalos(array, procPerRow, leftThickness, &
+subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
                                 rightThickness, topThickness, &
                                 bottomThickness)
     implicit none
     real(kind=4), dimension(:,:,:), intent(inout) :: array
+    integer, dimension(:), intent(in) :: neighbours
     integer, intent(in) :: procPerRow, leftThickness, rightThickness, topThickness, bottomThickness
     integer :: i, commWith, r, c, d, rowCount, colCount, depthSize, requests(8)
     real(kind=4), dimension(:,:,:), allocatable :: leftRecv, leftSend, rightSend, rightRecv
     real(kind=4), dimension(:,:,:), allocatable :: topRecv, topSend, bottomSend, bottomRecv
+    call MPI_Barrier(communicator, ierror)
+    if (size(neighbours, 1) .lt. 4) then
+        print*, "Error: cannot have a 4-way halo exchange with less than 4 neighbours"
+        call finalise_mpi()
+        return
+    end if
     rowCount = size(array, 1) - topThickness - bottomThickness
     colCount = size(array, 2) - leftThickness - rightThickness
     depthSize = size(array, 3)
@@ -70,9 +75,10 @@ subroutine exchangeRealHalos(array, procPerRow, leftThickness, &
     do i=1,8
         requests(i)= -1
     end do
-    if (.not. isTopRow(procPerRow)) then
-        ! Top edge to send, bottom edge to receive
-        commWith = rank - procPerRow
+    ! Top edge to send, bottom edge to receive
+    commWith = neighbours(topNeighbour)
+    if (commWith .ne. -1) then
+        !print*, 'rank ', rank, ' communicating with top neighbour ', commWith
         do r=1, bottomThickness
             do c=1, colCount
                 do d=1, depthSize
@@ -81,15 +87,16 @@ subroutine exchangeRealHalos(array, procPerRow, leftThickness, &
             end do
         end do
         call MPI_ISend(topSend, bottomThickness*colCount*depthSize, MPI_REAL, commWith, topTag, &
-                      communicator, requests(1), ierror)
+                      cartTopComm, requests(1), ierror)
         call checkMPIError()
         call MPI_IRecv(bottomRecv, topThickness*colCount*depthSize, MPI_REAL, commWith, bottomTag, &
                       communicator, requests(2), ierror)
         call checkMPIError()
     end if
-    if (.not. isBottomRow(procPerRow)) then
-        ! Bottom edge to send, top edge to receive
-        commWith = rank + procPerRow
+    ! Bottom edge to send, top edge to receive
+    commWith = neighbours(bottomNeighbour)
+    if (commWith .ne. -1) then
+        !print*, 'rank ', rank, ' communicating with bottom neighbour ', commWith
         do r=1, topThickness
             do c=1, colCount
                 do d=1, depthSize
@@ -100,15 +107,16 @@ subroutine exchangeRealHalos(array, procPerRow, leftThickness, &
             end do
         end do
         call MPI_IRecv(topRecv, bottomThickness*colCount*depthSize, MPI_REAL, commWith, topTag, &
-                      communicator, requests(3), ierror)
+                      cartTopComm, requests(3), ierror)
         call checkMPIError()
         call MPI_ISend(bottomSend, topThickness*colCount*depthSize, MPI_REAL, commWith, bottomTag, &
                       communicator, requests(4), ierror)
         call checkMPIError()
     end if
-    if (.not. isLeftmostColumn(procPerRow)) then
-        ! Left edge to send, right edge to receive
-        commWith = rank - 1
+    ! Left edge to send, right edge to receive
+    commWith = neighbours(leftNeighbour)
+    if (commWith .ne. -1) then
+        !print*, 'rank ', rank, ' communicating with left neighbour ', commWith
         do r=1, rowCount
             do c=1, rightThickness
                 do d=1, depthSize
@@ -123,9 +131,10 @@ subroutine exchangeRealHalos(array, procPerRow, leftThickness, &
                       communicator, requests(6), ierror)
         call checkMPIError()
     end if
-    if (.not. isRightmostColumn(procPerRow)) then
-        ! Right edge to send, left edge to receive
-        commWith = rank + 1
+    ! Right edge to send, left edge to receive
+    commWith = neighbours(rightNeighbour)
+    if (commWith .ne. -1) then
+        !print*, 'rank ', rank, ' communicating with right neighbour ', commWith
         do r=1, rowCount
             do c=1, leftThickness
                 do d=1, depthSize
@@ -201,6 +210,7 @@ subroutine exchangeRealHalos(array, procPerRow, leftThickness, &
     deallocate(topSend)
     deallocate(bottomSend)
     deallocate(bottomRecv)
+    call MPI_Barrier(communicator, ierror)
 end subroutine exchangeRealHalos
 
 subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv)
@@ -209,12 +219,13 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv)
     real(kind=4), dimension(:,:,:), intent(inout) :: array
     real(kind=4), dimension(:,:), allocatable :: leftRecv, rightSend
     integer :: r, d, commWith, rowCount, depthSize
+    call MPI_Barrier(communicator, ierror)
     rowCount = size(array, 1) - 2
     depthSize = size(array, 3)
     if (isLeftmostColumn(procPerRow)) then
         allocate(leftRecv(rowCount, depthSize))
         commWith = rank + procPerRow - 1
-        call MPI_Recv(leftRecv, rowCount*depthSize, MPI_Real, commWith, rightSideTag, &
+        call MPI_Recv(leftRecv, rowCount*depthSize, MPI_REAL, commWith, rightSideTag, &
                       communicator, status, ierror)
         call checkMPIError()
         do r=1, rowCount
@@ -231,11 +242,12 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv)
                 rightSend(r, d) = array(r+1, colToSend, d)
             end do
         end do
-        call MPI_Send(rightSend, rowCount*depthSize, MPI_Real, commWith, rightSideTag, &
+        call MPI_Send(rightSend, rowCount*depthSize, MPI_REAL, commWith, rightSideTag, &
                       communicator, ierror)
         call checkMPIError()
         deallocate(rightSend)
     end if
+    call MPI_Barrier(communicator, ierror)
 end subroutine sideflowRightLeft
 
 subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv)
@@ -244,6 +256,7 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv)
     real(kind=4), dimension(:,:,:), intent(inout) :: array
     real(kind=4), dimension(:,:), allocatable :: leftSend, rightRecv
     integer :: r, d, commWith, rowCount, depthSize
+    call MPI_Barrier(communicator, ierror)
     rowCount = size(array, 1) - 2
     depthSize = size(array, 3)
     if (isLeftmostColumn(procPerRow)) then
@@ -254,14 +267,14 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv)
                 leftSend(r, d) = array(r+1, colToSend, d)
             end do
         end do
-        call MPI_Send(leftSend, rowCount*depthSize, MPI_Real, commWith, leftSideTag, &
+        call MPI_Send(leftSend, rowCount*depthSize, MPI_REAL, commWith, leftSideTag, &
                       communicator, ierror)
         call checkMPIError()
         deallocate(leftSend)
     else if (isRightmostColumn(procPerRow)) then
         allocate(rightRecv(rowCount, depthSize))
         commWith = rank - procPerRow + 1
-        call MPI_Recv(rightRecv, rowCount*depthSize, MPI_Real, commWith, leftSideTag, &
+        call MPI_Recv(rightRecv, rowCount*depthSize, MPI_REAL, commWith, leftSideTag, &
                       communicator, status, ierror)
         call checkMPIError()
         do r=1, rowCount
@@ -271,6 +284,7 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv)
         end do
         deallocate(rightRecv)
     end if
+    call MPI_Barrier(communicator, ierror)
 end subroutine sideflowLeftRight
 
 subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow, procPerCol)
@@ -279,6 +293,7 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow, procPerCol)
     real(kind=4), dimension(-1:ipmax+1,-1:jpmax+1) , intent(InOut) :: zbm
     integer :: startRow, startCol, i, r, c
     real(kind=4), dimension(ip, jp) :: sendBuffer, recvBuffer
+    call MPI_Barrier(communicator, ierror)
     if (isMaster()) then
         ! Send appropriate 2D section to the other ranks
         do i = 1, mpi_size - 1
@@ -304,6 +319,7 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow, procPerCol)
             end do
         end do
     end if
+    call MPI_Barrier(communicator, ierror)
 end subroutine distributeZBM
 
 end module
