@@ -23,10 +23,8 @@ subroutine boundp2(jm,im,p,km)
         end do
     end do
 #ifdef MPI
-#ifndef FAST_MPI
 ! --halo exchanges
     call exchangeRealHalos(p, procPerRow, neighbours, 1, 2, 1, 2)
-#endif
 #endif
 end subroutine boundp2
 
@@ -37,7 +35,7 @@ subroutine boundp1(km,jm,p,im)
     integer, intent(In) :: jm
     integer, intent(In) :: km
     real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1) , intent(InOut) :: p
-#if (PROC_PER_ROW==1) || (defined(MPI) && defined(FAST_MPI)) || !defined(MPI)
+#if (PROC_PER_ROW==1) || !defined(MPI)
     integer :: i, j, k
 #else
     integer :: j, k
@@ -45,38 +43,28 @@ subroutine boundp1(km,jm,p,im)
 ! 
 ! --computational boundary(neumann condition)
 #ifdef MPI
-#ifndef FAST_MPI
     if (isTopRow(procPerRow) .or. isBottomRow(procPerRow)) then
-#endif
 #endif
         do k = 0,km+1
             do j = 0,jm+1
 #ifdef MPI
-#ifndef FAST_MPI
                 if (isTopRow(procPerRow)) then
-#endif
 #endif
                     p(   0,j,k) = p(1 ,j,k)
 #ifdef MPI
-#ifndef FAST_MPI
                 else
-#endif
 #endif
                     p(im+1,j,k) = p(im,j,k)
 #ifdef MPI
-#ifndef FAST_MPI
                 end if
-#endif
 #endif
             end do
         end do
 #ifdef MPI
-#ifndef FAST_MPI
     end if
 #endif
-#endif
 ! --side flow exchanges
-#if (PROC_PER_ROW==1) || (defined(MPI) && defined(FAST_MPI)) || !defined(MPI)
+#if (PROC_PER_ROW==1) || !defined(MPI)
     do k = 0,km+1
         do i = 0,im+1
             p(i,   0,k) = p(i,jm,k) ! right to left
