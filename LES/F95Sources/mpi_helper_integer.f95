@@ -45,15 +45,21 @@ subroutine calculateCorners(array, procPerRow, leftThickness, rightThickness, &
     end if
 end subroutine calculateCorners
 
-subroutine exchangeIntegerHalos(array, procPerRow, leftThickness, &
+subroutine exchangeIntegerHalos(array, procPerRow, neighbours, leftThickness, &
                                 rightThickness, topThickness, &
                                 bottomThickness)
     implicit none
     integer, dimension(:,:,:), intent(inout) :: array
+    integer, dimension(:), intent(in) :: neighbours
     integer, intent(in) :: procPerRow, leftThickness, rightThickness, topThickness, bottomThickness
     integer :: i, commWith, r, c, d, rowCount, colCount, depthSize, requests(8)
     integer, dimension(:,:,:), allocatable :: leftRecv, leftSend, rightSend, rightRecv
     integer, dimension(:,:,:), allocatable :: topRecv, topSend, bottomSend, bottomRecv
+    if (size(neighbours, 1) .lt. 4) then
+        print*, "Error: cannot have a 4-way halo exchange with less than 4 neighbours"
+        call finalise_mpi()
+        return
+    end if
     rowCount = size(array, 1) - topThickness - bottomThickness
     colCount = size(array, 2) - leftThickness - rightThickness
     depthSize = size(array, 3)
@@ -68,9 +74,10 @@ subroutine exchangeIntegerHalos(array, procPerRow, leftThickness, &
     do i=1,8
         requests(i)= -1
     end do
-    if (.not. isTopRow(procPerRow)) then
-        ! Top edge to send, bottom edge to receive
-        commWith = rank - procPerRow
+    ! Top edge to send, bottom edge to receive
+    commWith = neighbours(topNeighbour)
+    if (commWith .ne. -1) then
+        !print*, 'rank ', rank, ' communicating with top neighbour ', commWith
         do r=1, bottomThickness
             do c=1, colCount
                 do d=1, depthSize
@@ -85,9 +92,10 @@ subroutine exchangeIntegerHalos(array, procPerRow, leftThickness, &
                       communicator, requests(2), ierror)
         call checkMPIError()
     end if
-    if (.not. isBottomRow(procPerRow)) then
-        ! Bottom edge to send, top edge to receive
-        commWith = rank + procPerRow
+    ! Bottom edge to send, top edge to receive
+    commWith = neighbours(bottomNeighbour)
+    if (commWith .ne. -1) then
+        !print*, 'rank ', rank, ' communicating with bottom neighbour ', commWith
         do r=1, topThickness
             do c=1, colCount
                 do d=1, depthSize
@@ -104,9 +112,10 @@ subroutine exchangeIntegerHalos(array, procPerRow, leftThickness, &
                       communicator, requests(4), ierror)
         call checkMPIError()
     end if
-    if (.not. isLeftmostColumn(procPerRow)) then
-        ! Left edge to send, right edge to receive
-        commWith = rank - 1
+    ! Left edge to send, right edge to receive
+    commWith = neighbours(leftNeighbour)
+    if (commWith .ne. -1) then
+        !print*, 'rank ', rank, ' communicating with left neighbour ', commWith
         do r=1, rowCount
             do c=1, rightThickness
                 do d=1, depthSize
@@ -121,9 +130,10 @@ subroutine exchangeIntegerHalos(array, procPerRow, leftThickness, &
                       communicator, requests(6), ierror)
         call checkMPIError()
     end if
-    if (.not. isRightmostColumn(procPerRow)) then
-        ! Right edge to send, left edge to receive
-        commWith = rank + 1
+    ! Right edge to send, left edge to receive
+    commWith = neighbours(rightNeighbour)
+    if (commWith .ne. -1) then
+        !print*, 'rank ', rank, ' communicating with right neighbour ', commWith
         do r=1, rowCount
             do c=1, leftThickness
                 do d=1, depthSize

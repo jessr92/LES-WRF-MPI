@@ -20,9 +20,9 @@ subroutine main
     call setupCartesianVirtualTopology(dimensions, dimensionSizes, periodicDimensions, coordinates, neighbours)
     call MPI_Barrier(communicator, ierror)
     call sleep(rank)
-    print*, rank, ' ', cartRank, ' row ', coordinates(1), ' col ', coordinates(2)
-    print*, rank, ' left ', neighbours(leftNeighbour), ' right ', neighbours(rightNeighbour)
-    print*, rank, ' top ', neighbours(topNeighbour), ' bottom ', neighbours(bottomNeighbour)
+    print*, 'rank ', rank, ' ', cartRank, ' row ', coordinates(1), ' col ', coordinates(2)
+    print*, 'rank ', rank, ' left neighbour ', neighbours(leftNeighbour), ' right neighbour ', neighbours(rightNeighbour)
+    print*, 'rank ', rank, ' top neighbour ', neighbours(topNeighbour), ' bottom neighbour ', neighbours(bottomNeighbour)
     call finalise_mpi()
 end subroutine main
 
