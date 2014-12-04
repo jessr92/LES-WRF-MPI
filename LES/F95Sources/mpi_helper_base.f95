@@ -41,13 +41,13 @@ subroutine checkMPIError()
     end if
 end subroutine checkMPIError
 
-subroutine setupCartesianVirtualTopology(dimensions, dimensionSizes, periodicDimensions, coordinates, neighbours)
+subroutine setupCartesianVirtualTopology(dimensions, dimensionSizes, periodicDimensions, coordinates, neighbours, reorder)
     implicit none
     integer, intent(in) :: dimensions
-    integer, dimension(dimensions), intent(in) :: dimensionSizes, periodicDimensions
-    integer, dimension(dimensions), intent(out) :: coordinates
-    integer, dimension(2*dimensions), intent(out) :: neighbours
-    integer :: reorder = 0
+    integer, intent(in) :: dimensionSizes(dimensions), periodicDimensions(dimensions)
+    integer, intent(out) :: coordinates(dimensions)
+    integer, intent(out) :: neighbours(2*dimensions)
+    integer, intent(in) :: reorder
     call MPI_Cart_Create(communicator, dimensions, dimensionSizes, &
                          periodicDimensions, reorder, cartTopComm, ierror)
     call checkMPIError()

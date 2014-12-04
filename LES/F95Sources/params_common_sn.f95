@@ -2,10 +2,9 @@ module params_common_sn
 #ifdef MPI
     use mpi_helper
     integer, parameter :: procPerRow = PROC_PER_ROW, procPerCol = PROC_PER_COL, dimensions = 2
-    integer, dimension(dimensions), parameter :: dimensionSizes = (/procPerCol, procPerRow/)
-    integer, dimension(dimensions), parameter :: periodicDimensions = (/0, 0/)
-    integer, dimension(dimensions) :: coordinates
-    integer, dimension(2*dimensions) :: neighbours
+    integer :: dimensionSizes(dimensions), periodicDimensions(dimensions)
+    integer :: coordinates(dimensions), neighbours(2*dimensions), reorder
+    data dimensionSizes /procPerCol,procPerRow/, periodicDimensions /0,0/, reorder /0/
 #endif
     integer, parameter :: ipmax = 150, jpmax = 150
     !integer, parameter :: ipmax = 254, jpmax = 253

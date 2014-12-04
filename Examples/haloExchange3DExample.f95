@@ -3,10 +3,9 @@ use mpi_helper
 implicit none
 integer, parameter :: rows = 30, columns = 40, depthSize=2, dimensions = 2
 integer, parameter :: procPerRow = 3, procPerCol = 4
-integer, dimension(dimensions), parameter :: dimensionSizes = (/procPerCol, procPerRow/)
-integer, dimension(dimensions), parameter :: periodicDimensions = (/0, 0/)
-integer, dimension(dimensions) :: coordinates
-integer, dimension(2*dimensions) :: neighbours
+integer :: dimensionSizes(dimensions), periodicDimensions(dimensions)
+integer :: coordinates(dimensions), neighbours(2*dimensions), reorder
+data dimensionSizes /procPerCol,procPerRow/, periodicDimensions /0,0/, reorder /0/
 ! Ignoring the halo boundaries, actual sizes will be + 2
 integer, parameter :: rowSize = rows / procPerRow
 integer, parameter :: colSize = columns / procPerCol
@@ -29,7 +28,7 @@ subroutine main()
         call finalise_mpi()
         return
     endif
-    call setupCartesianVirtualTopology(dimensions, dimensionSizes, periodicDimensions, coordinates, neighbours)
+    call setupCartesianVirtualTopology(dimensions, dimensionSizes, periodicDimensions, coordinates, neighbours, reorder)
     allocate(processArray(rowSize + topThickness + bottomThickness, &
                           colSize + leftThickness + rightThickness, &
                           depthSize))

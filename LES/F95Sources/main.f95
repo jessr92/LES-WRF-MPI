@@ -161,7 +161,9 @@
           print*, 'Needed ', (procPerRow * procPerCol), ' processes, got ', mpi_size
           call MPI_Abort(communicator, 1, ierror)
       end if
-      call setupCartesianVirtualTopology(dimensions, dimensionSizes, periodicDimensions, coordinates, neighbours)
+      call setupCartesianVirtualTopology(dimensions, dimensionSizes, & 
+                                         periodicDimensions, coordinates, &
+                                         neighbours, reorder)
 #endif
       call set(data10,data11,data20,data21,data22,data23,data24,data25,data26,data27,data30,data31, &
       im,jm,km,ifbf,ianime,ical,n0,n1,nmax,dt,ro,vn,alpha,beta)

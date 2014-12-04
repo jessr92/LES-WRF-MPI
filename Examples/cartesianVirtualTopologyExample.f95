@@ -2,10 +2,9 @@ program cartesianVirtualTopologyExample
 use mpi_helper
 implicit none
 integer, parameter :: procPerRow = 3, procPerCol = 4, dimensions = 2
-integer, dimension(dimensions), parameter :: dimensionSizes = (/procPerCol, procPerRow/)
-integer, dimension(dimensions), parameter :: periodicDimensions = (/0, 0/)
-integer, dimension(dimensions) :: coordinates
-integer, dimension(2*dimensions) :: neighbours
+integer :: dimensionSizes(dimensions), periodicDimensions(dimensions)
+integer :: coordinates(dimensions), neighbours(2*dimensions), reorder
+data dimensionSizes /procPerCol,procPerRow/, periodicDimensions /0,0/, reorder /0/
 call main()
 
 contains
@@ -17,7 +16,7 @@ subroutine main
         call finalise_mpi()
         return
     end if
-    call setupCartesianVirtualTopology(dimensions, dimensionSizes, periodicDimensions, coordinates, neighbours)
+    call setupCartesianVirtualTopology(dimensions, dimensionSizes, periodicDimensions, coordinates, neighbours, reorder)
     call MPI_Barrier(communicator, ierror)
     call sleep(rank)
     print*, 'rank ', rank, ' ', cartRank, ' row ', coordinates(1), ' col ', coordinates(2)
