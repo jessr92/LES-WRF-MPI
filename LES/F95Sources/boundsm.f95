@@ -64,6 +64,7 @@ subroutine boundsm(km,jm,sm,im)
     end do
 #ifdef MPI
 ! --halo exchanges
+    !print*, 'Rank ', rank, ' sm'
     call exchangeRealHalos(sm, procPerRow, neighbours, 2, 1, 2, 1)
 #endif
 end subroutine boundsm

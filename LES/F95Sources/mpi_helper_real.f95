@@ -56,6 +56,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
     real(kind=4), dimension(:,:,:), allocatable :: leftRecv, leftSend, rightSend, rightRecv
     real(kind=4), dimension(:,:,:), allocatable :: topRecv, topSend, bottomSend, bottomRecv
     call MPI_Barrier(communicator, ierror)
+    !print*, 'Rank ', rank, ' is starting exchangeRealHalos'
     if (size(neighbours, 1) .lt. 4) then
         print*, "Error: cannot have a 4-way halo exchange with less than 4 neighbours"
         call finalise_mpi()
@@ -229,6 +230,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
     deallocate(bottomSend)
     deallocate(bottomRecv)
     call MPI_Barrier(communicator, ierror)
+    !print*, 'Rank ', rank, ' has finished exchangeRealHalos'
 end subroutine exchangeRealHalos
 
 subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv)
@@ -238,6 +240,7 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv)
     real(kind=4), dimension(:,:), allocatable :: leftRecv, rightSend
     integer :: r, d, commWith, rowCount, depthSize
     call MPI_Barrier(communicator, ierror)
+    !print*, 'Rank ', rank, ' is starting sideflowRightLeft'
     rowCount = size(array, 1) - 2
     depthSize = size(array, 3)
     if (isLeftmostColumn(procPerRow)) then
@@ -266,6 +269,7 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv)
         deallocate(rightSend)
     end if
     call MPI_Barrier(communicator, ierror)
+    !print*, 'Rank ', rank, ' has finished sideflowRightLeft'
 end subroutine sideflowRightLeft
 
 subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv)
@@ -275,6 +279,7 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv)
     real(kind=4), dimension(:,:), allocatable :: leftSend, rightRecv
     integer :: r, d, commWith, rowCount, depthSize
     call MPI_Barrier(communicator, ierror)
+    !print*, 'Rank ', rank, ' is starting sideflowLeftRight'
     rowCount = size(array, 1) - 2
     depthSize = size(array, 3)
     if (isLeftmostColumn(procPerRow)) then
@@ -303,6 +308,7 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv)
         deallocate(rightRecv)
     end if
     call MPI_Barrier(communicator, ierror)
+    !print*, 'Rank ', rank, ' has finished sideflowLeftRight'
 end subroutine sideflowLeftRight
 
 subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow, procPerCol)
@@ -312,6 +318,7 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow, procPerCol)
     integer :: startRow, startCol, i, r, c
     real(kind=4), dimension(ip, jp) :: sendBuffer, recvBuffer
     call MPI_Barrier(communicator, ierror)
+    !print*, 'Rank ', rank, ' is starting distributeZBM'
     if (isMaster()) then
         ! Send appropriate 2D section to the other ranks
         do i = 1, mpi_size - 1
@@ -338,6 +345,7 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow, procPerCol)
         end do
     end if
     call MPI_Barrier(communicator, ierror)
+    !print*, 'Rank ', rank, ' has finished distributeZBM'
 end subroutine distributeZBM
 
 end module

@@ -45,7 +45,7 @@ contains
       real, parameter  :: omega = 1.
 !      
 
-      call bondfg(km,jm,f,im,g,h)
+    !  call bondfg(km,jm,f,im,g,h)
 ! 
       do k = 1,km
       do j = 1,jm
@@ -94,10 +94,10 @@ contains
       end do
       end do
       end do
-        call boundp1(km,jm,p,im)
+      !  call boundp1(km,jm,p,im)
 
       end do
-        call boundp2(jm,im,p,km)
+     !   call boundp2(jm,im,p,km)
 #ifndef NO_IO
 #ifdef VERBOSE
 ! --check
@@ -110,6 +110,10 @@ contains
         if (sor < pjuge) goto 510                         !Break
       end do
   510 continue
+
+#ifdef MPI
+    call MPI_Barrier(communicator, ierror)
+#endif
 
       pav = 0.0
       pco = 0.0
@@ -131,11 +135,11 @@ contains
       end do
       end do
 ! 
-!      print *, "F95: P_SUM_ADJ=",sum(p)
-      call boundp1(km,jm,p,im)
-      ! print *, "F95: P_SUM_1=",sum(p)
-      call boundp2(jm,im,p,km)
-!      print *, "F95: P_SUM_BOUND=",sum(p)
+      !print *, "F95: P_SUM_ADJ=",sum(p)
+      !call boundp1(km,jm,p,im)
+      !print *, "F95: P_SUM_1=",sum(p)
+      !call boundp2(jm,im,p,km)
+      !print *, "F95: P_SUM_BOUND=",sum(p)
 
 ! 
 #ifndef NO_IO
@@ -193,7 +197,9 @@ contains
       end if
 
 ! 
-      return
+#ifdef MPI
+    call MPI_Barrier(communicator, ierror)
+#endif
       end subroutine press
 
 

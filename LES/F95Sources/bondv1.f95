@@ -178,8 +178,11 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
 ! =================================
 #ifdef MPI
 ! --halo exchanges
+    !print*, 'Rank ', rank, ' u'
     call exchangeRealHalos(u, procPerRow, neighbours, 1, 1, 2, 1)
+    !print*, 'Rank ', rank, ' v'
     call exchangeRealHalos(v, procPerRow, neighbours, 1, 1, 2, 1)
+    !print*, 'Rank ', rank, ' w'
     call exchangeRealHalos(w, procPerRow, neighbours, 1, 1, 2, 1)
 #endif
 #ifdef WV_DEBUG
