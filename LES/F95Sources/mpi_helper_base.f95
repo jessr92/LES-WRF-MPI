@@ -47,8 +47,9 @@ subroutine setupCartesianVirtualTopology(dimensions, dimensionSizes, periodicDim
     integer, dimension(dimensions), intent(in) :: dimensionSizes, periodicDimensions
     integer, dimension(dimensions), intent(out) :: coordinates
     integer, dimension(2*dimensions), intent(out) :: neighbours
+    integer :: reorder = 0
     call MPI_Cart_Create(communicator, dimensions, dimensionSizes, &
-                         periodicDimensions, 0, cartTopComm, ierror)
+                         periodicDimensions, reorder, cartTopComm, ierror)
     call checkMPIError()
     call MPI_Comm_Rank(cartTopComm, cartRank, ierror)
     call checkMPIError()
@@ -99,7 +100,6 @@ integer function topLeftColValue(process, procPerRow, colCount)
     integer, intent(in) :: process, procPerRow, colCount
     topLeftColValue = modulo(process, procPerRow) * colCount
 end function topLeftColValue
-
 
 end module
 

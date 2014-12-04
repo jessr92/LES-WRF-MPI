@@ -196,7 +196,7 @@ subroutine exchangeIntegerHalos(array, procPerRow, neighbours, leftThickness, &
                 end do
             end do
         end do
-    end if    
+    end if
     do i=1, depthSize
         call calculateCorners(array(:,:,i), procPerRow, leftThickness, &
                               rightThickness, topThickness, bottomThickness)
