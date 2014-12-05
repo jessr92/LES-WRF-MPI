@@ -15,7 +15,7 @@ contains
 subroutine main
     implicit none
     call initialise_mpi()
-    if (.not. (mpi_size .eq. (procperRow * procPerCol))) then
+    if (.not. (mpi_size .eq. (procPerRow * procPerCol))) then
         call finalise_mpi()
         return
     end if
