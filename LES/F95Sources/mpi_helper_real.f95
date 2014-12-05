@@ -311,9 +311,9 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv)
     !print*, 'Rank ', rank, ' has finished sideflowLeftRight'
 end subroutine sideflowLeftRight
 
-subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow, procPerCol)
+subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
     implicit none
-    integer, intent(in) :: ip, jp, ipmax, jpmax, procPerRow, procPerCol
+    integer, intent(in) :: ip, jp, ipmax, jpmax, procPerRow
     real(kind=4), dimension(-1:ipmax+1,-1:jpmax+1) , intent(InOut) :: zbm
     integer :: startRow, startCol, i, r, c
     real(kind=4), dimension(ip, jp) :: sendBuffer, recvBuffer
@@ -323,7 +323,7 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow, procPerCol)
         ! Send appropriate 2D section to the other ranks
         do i = 1, mpi_size - 1
             startRow = topLeftRowValue(i, procPerRow, ip)
-            startCol = topLeftColValue(i, procPerCol, jp)
+            startCol = topLeftColValue(i, procPerRow, jp)
             do r=1, ip
                 do c=1, jp
                     sendBuffer(r, c) = zbm(startRow + r, startCol + c)

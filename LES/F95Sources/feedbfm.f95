@@ -43,7 +43,7 @@ subroutine feedbfm(km,jm,im,amask1,bmask1,cmask1,dmask1,zbm,z2,dzn)
         close(70)
 #ifdef MPI
     end if
-    call distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow, procPerCol)
+    call distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
 #endif
 
 ! -----------------------------------------------------------------------
