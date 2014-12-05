@@ -2,16 +2,15 @@ program haloExchangeExample
 use mpi_helper
 implicit none
 integer, parameter :: rows = 30, columns = 40, depthSize=2, dimensions = 2
-integer, parameter :: procPerRow = 3, procPerCol = 4
+integer, parameter :: procPerCol = 3, procPerRow = 4
 integer :: dimensionSizes(dimensions)
 logical :: periodicDimensions(dimensions)
 integer :: coordinates(dimensions), neighbours(2*dimensions)
 logical :: reorder
 data dimensionSizes /procPerCol,procPerRow/, periodicDimensions /.false.,.false./, &
 reorder /.false./
-! Ignoring the halo boundaries, actual sizes will be + 2
-integer, parameter :: rowSize = rows / procPerRow
-integer, parameter :: colSize = columns / procPerCol
+integer, parameter :: rowCount = rows / procPerCol
+integer, parameter :: colCount = columns / procPerRow
 
 integer :: leftThickness, rightThickness, topThickness, bottomThickness
 
@@ -32,8 +31,8 @@ subroutine main()
         return
     endif
     call setupCartesianVirtualTopology(dimensions, dimensionSizes, periodicDimensions, coordinates, neighbours, reorder)
-    allocate(processArray(rowSize + topThickness + bottomThickness, &
-                          colSize + leftThickness + rightThickness, &
+    allocate(processArray(rowCount + topThickness + bottomThickness, &
+                          colCount + leftThickness + rightThickness, &
                           depthSize))
     call initArray(processArray)
     call exchangeIntegerHalos(processArray, procPerRow, neighbours, leftThickness, rightThickness, topThickness, bottomThickness)
