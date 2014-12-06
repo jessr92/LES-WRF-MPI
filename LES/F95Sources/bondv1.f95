@@ -56,13 +56,9 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
     if (isTopRow(procPerRow)) then
         startI = 2
     else
-        startI = 0
+        startI = 1
     end if
-    if (isBottomRow(procPerRow)) then
-        endI = ip
-    else
-        endI = ip + 1
-    end if
+    endI = ip
 #else
     startI = 2
     endI = im
