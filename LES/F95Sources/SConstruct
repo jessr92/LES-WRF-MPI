@@ -59,13 +59,18 @@ estimate_corners = getOpt('estimate_corners', 'Estimate Corners', '0')
 if estimate_corners == '1':
     ESTIMATE_CORNERS='-DESTIMATE_CORNERS'
 
+GR_DEBUG=''
+gr_debug = getOpt('gr_debug', 'GR Debug', '0')
+if gr_debug == '1':
+    GR_DEBUG='-DGR_DEBUG'
+
 NO_FILE_IO='-DNO_FILE_IO'
 ICAL = '-DICAL=0'
 IFBF='-DIFBF=1'
 IANIME='-DIANIME=0'
 IADAM='-DIADAM=0'
 
-FFLAGS  = [USE_NETCDF_OUTPUT, WITH_MPI, FAST_MPI, ESTIMATE_CORNERS, PROC_PER_ROW, PROC_PER_COL, WITH_OCL, NO_FILE_IO, ICAL, IFBF,IANIME, IADAM] 
+FFLAGS  = [USE_NETCDF_OUTPUT, WITH_MPI, FAST_MPI, ESTIMATE_CORNERS, GR_DEBUG, PROC_PER_ROW, PROC_PER_COL, WITH_OCL, NO_FILE_IO, ICAL, IFBF,IANIME, IADAM] 
 
 if with_ocl == '0':
     FFLAGS += ['-cpp','-Ofast', '-m64', '-Wall','-ffree-form', '-fconvert=big-endian', VERBOSE,TIMINGS]

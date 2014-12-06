@@ -165,9 +165,12 @@
                                          periodicDimensions, coordinates, &
                                          neighbours, reorder)
 #ifdef GR_DEBUG
-    print*, 'rank ', rank, ' ', cartRank, ' row ', coordinates(1), ' col ', coordinates(2)
-    print*, 'rank ', rank, ' left neighbour ', neighbours(leftNeighbour), ' right neighbour ', neighbours(rightNeighbour)
-    print*, 'rank ', rank, ' top neighbour ', neighbours(topNeighbour), ' bottom neighbour ', neighbours(bottomNeighbour)
+    print*, 'GR: rank ', rank, ' ', cartRank, ' row ', coordinates(1), &
+            ' col ', coordinates(2)
+    print*, 'GR: rank ', rank, ' left neighbour ', neighbours(leftNeighbour), &
+            ' right neighbour ', neighbours(rightNeighbour)
+    print*, 'GR: rank ', rank, ' top neighbour ', neighbours(topNeighbour),  &
+            ' bottom neighbour ', neighbours(bottomNeighbour)
 #endif 
 #endif
       call set(data10,data11,data20,data21,data22,data23,data24,data25,data26,data27,data30,data31, &

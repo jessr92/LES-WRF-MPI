@@ -318,12 +318,18 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
     integer :: startRow, startCol, i, r, c
     real(kind=4), dimension(ip, jp) :: sendBuffer, recvBuffer
     call MPI_Barrier(communicator, ierror)
-    !print*, 'Rank ', rank, ' is starting distributeZBM'
+#ifdef GR_DEBUG
+    print*, 'GR: rank ', rank, ' is starting distributeZBM'
+#endif
     if (isMaster()) then
         ! Send appropriate 2D section to the other ranks
         do i = 1, mpi_size - 1
             startRow = topLeftRowValue(i, procPerRow, ip)
             startCol = topLeftColValue(i, procPerRow, jp)
+#ifdef GR_DEBUG
+            print*, 'GR: Sending (', (startRow+1), '-', (startRow+ip), ',', &
+                     (startCol+1), '-', (startCol+jp), ') to rank ', i
+#endif
             do r=1, ip
                 do c=1, jp
                     sendBuffer(r, c) = zbm(startRow + r, startCol + c)
@@ -345,7 +351,9 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
         end do
     end if
     call MPI_Barrier(communicator, ierror)
-    !print*, 'Rank ', rank, ' has finished distributeZBM'
+#ifdef GR_DEBUG
+    print*, 'GR: rank ', rank, ' has finished distributeZBM'
+#endif
 end subroutine distributeZBM
 
 end module
