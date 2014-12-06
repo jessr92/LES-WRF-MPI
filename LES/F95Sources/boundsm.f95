@@ -67,7 +67,9 @@ subroutine boundsm(km,jm,sm,im)
     !print*, 'Rank ', rank, ' sm'
     call exchangeRealHalos(sm, procPerRow, neighbours, 2, 1, 2, 1)
 #else
+#ifdef ESTIMATE_CORNERS
     call calculateCornersNonMPI(sm, 2, 1, 2, 1)
+#endif
 #endif
 end subroutine boundsm
 

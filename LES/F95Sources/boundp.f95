@@ -27,7 +27,9 @@ subroutine boundp2(jm,im,p,km)
     !print*, 'Rank ', rank, ' p - boundp2'
     call exchangeRealHalos(p, procPerRow, neighbours, 1, 2, 1, 2)
 #else
+#ifdef ESTIMATE_CORNERS
     call calculateCornersNonMPI(p, 1, 2, 1, 2)
+#endif
 #endif
 end subroutine boundp2
 
@@ -83,7 +85,9 @@ subroutine boundp1(km,jm,p,im)
     !print*, 'Rank ', rank, ' p - boundp1'
     call exchangeRealHalos(p, procPerRow, neighbours, 1, 2, 1, 2)
 #else
+#ifdef ESTIMATE_CORNERS
     call calculateCornersNonMPI(p, 1, 2, 1, 2)
+#endif
 #endif
 end subroutine boundp1
 
