@@ -178,12 +178,13 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
 ! =================================
 #ifdef MPI
 ! --halo exchanges
-    !print*, 'Rank ', rank, ' u'
     call exchangeRealHalos(u, procPerRow, neighbours, 1, 1, 2, 1)
-    !print*, 'Rank ', rank, ' v'
     call exchangeRealHalos(v, procPerRow, neighbours, 1, 1, 2, 1)
-    !print*, 'Rank ', rank, ' w'
     call exchangeRealHalos(w, procPerRow, neighbours, 1, 1, 2, 1)
+#else
+    call calculateCornersNonMPI(u, 1, 1, 2, 1)
+    call calculateCornersNonMPI(v, 1, 1, 2, 1)
+    call calculateCornersNonMPI(w, 1, 1, 2, 1)
 #endif
 #ifdef WV_DEBUG
     print *,'F95 UVWSUM after bondv1:',sum(u)+sum(v)+sum(w)

@@ -42,12 +42,13 @@ subroutine bondfg(km,jm,f,im,g,h)
     end do
 #ifdef MPI
 ! --halo exchanges
-    !print*, 'Rank ', rank, ' f'
     call exchangeRealHalos(f, procPerRow, neighbours, 1, 1, 1, 1)
-    !print*, 'Rank ', rank, ' g'
     call exchangeRealHalos(g, procPerRow, neighbours, 1, 1, 1, 1)
-    !print*, 'Rank ', rank, ' h'
     call exchangeRealHalos(h, procPerRow, neighbours, 1, 1, 1, 1)
+#else
+    call calculateCornersNonMPI(f, 1, 1, 1, 1)
+    call calculateCornersNonMPI(g, 1, 1, 1, 1)
+    call calculateCornersNonMPI(h, 1, 1, 1, 1)
 #endif
 end subroutine bondFG                                    
 

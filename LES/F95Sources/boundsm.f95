@@ -66,6 +66,8 @@ subroutine boundsm(km,jm,sm,im)
 ! --halo exchanges
     !print*, 'Rank ', rank, ' sm'
     call exchangeRealHalos(sm, procPerRow, neighbours, 2, 1, 2, 1)
+#else
+    call calculateCornersNonMPI(sm, 2, 1, 2, 1)
 #endif
 end subroutine boundsm
 
