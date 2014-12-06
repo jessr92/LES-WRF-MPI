@@ -64,13 +64,18 @@ gr_debug = getOpt('gr_debug', 'GR Debug', '0')
 if gr_debug == '1':
     GR_DEBUG='-DGR_DEBUG'
 
+WV_DEBUG=''
+wv_debug = getOpt('wv_debug', 'WV Debug', '0')
+if wv_debug =='1':
+    WV_DEBUG='-DWV_DEBUG'
+
 NO_FILE_IO='-DNO_FILE_IO'
 ICAL = '-DICAL=0'
 IFBF='-DIFBF=1'
 IANIME='-DIANIME=0'
 IADAM='-DIADAM=0'
 
-FFLAGS  = [USE_NETCDF_OUTPUT, WITH_MPI, FAST_MPI, ESTIMATE_CORNERS, GR_DEBUG, PROC_PER_ROW, PROC_PER_COL, WITH_OCL, NO_FILE_IO, ICAL, IFBF,IANIME, IADAM] 
+FFLAGS  = [USE_NETCDF_OUTPUT, WITH_MPI, FAST_MPI, ESTIMATE_CORNERS, GR_DEBUG, WV_DEBUG, PROC_PER_ROW, PROC_PER_COL, WITH_OCL, NO_FILE_IO, ICAL, IFBF,IANIME, IADAM] 
 
 if with_ocl == '0':
     FFLAGS += ['-cpp','-Ofast', '-m64', '-Wall','-ffree-form', '-fconvert=big-endian', VERBOSE,TIMINGS]
