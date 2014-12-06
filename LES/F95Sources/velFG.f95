@@ -106,14 +106,14 @@ contains
 !                                          
 ! =======================================
 #ifdef WV_DEBUG
-!    print *, 'F95 FGHSUM after velfg:',sum(f)+sum(g)+sum(h)
-!    print *, 'F95 FSUM after velfg:',sum(f)
-!    print *, 'F95 GSUM after velfg:',sum(g)
-!    print *, 'F95 HSUM after velfg:',sum(h)
-!    print *, 'F95 UVWSUM after velfg:', sum(u)+sum(v)+sum(w)
-!    print *, 'F95 USUM after velfg:', sum(u)
-!    print *, 'F95 VSUM after velfg:', sum(v)
-!    print *, 'F95 WSUM after velfg:', sum(w)
+    print *, 'F95 FGHSUM after velfg:',sum(f)+sum(g)+sum(h)
+    print *, 'F95 FSUM after velfg:',sum(f)
+    print *, 'F95 GSUM after velfg:',sum(g)
+    print *, 'F95 HSUM after velfg:',sum(h)
+    print *, 'F95 UVWSUM after velfg:', sum(u)+sum(v)+sum(w)
+    print *, 'F95 USUM after velfg:', sum(u)
+    print *, 'F95 VSUM after velfg:', sum(v)
+    print *, 'F95 WSUM after velfg:', sum(w)
 #endif
       return
       end subroutine velFG
