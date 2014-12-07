@@ -1,7 +1,7 @@
 program cartesianVirtualTopologyExample
 use mpi_helper
 implicit none
-integer, parameter :: procPerRow = 3, procPerCol = 4, dimensions = 2
+integer, parameter :: procPerRow = 4, procPerCol = 3, dimensions = 2
 integer :: dimensionSizes(dimensions)
 logical :: periodicDimensions(dimensions)
 integer :: coordinates(dimensions), neighbours(2*dimensions)
