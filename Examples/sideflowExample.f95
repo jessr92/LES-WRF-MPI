@@ -1,4 +1,4 @@
-program haloExchangeExample
+program sideflowExample
 use mpi_helper
 implicit none
 integer, parameter :: rows = 30, columns = 40, depthSize=2, dimensions = 2
@@ -21,7 +21,6 @@ contains
 subroutine main()
     implicit none
     integer, dimension(:,:,:), allocatable :: processArray
-    integer :: i
     leftThickness = 3
     rightThickness = 2
     topThickness = 2
@@ -36,13 +35,7 @@ subroutine main()
                           colCount + leftThickness + rightThickness, &
                           depthSize))
     call initArray(processArray)
-    call exchangeIntegerHalos(processArray, procPerRow, neighbours, leftThickness, rightThickness, topThickness, bottomThickness)
-    do i=1, depthSize
-        call MPI_Barrier(communicator, ierror)
-        call checkMPIError()
-        call sleep(rank+1)
-        call outputArray(processArray(:,:,i))
-    end do
+    ! Sideflow
     deallocate(processArray)
     call finalise_mpi()
 end subroutine main
@@ -67,5 +60,5 @@ subroutine initArray(processArray)
     end do
 end subroutine initArray
 
-end program haloExchangeExample
+end program sideflowExample
 

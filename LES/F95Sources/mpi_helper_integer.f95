@@ -200,10 +200,6 @@ subroutine exchangeIntegerHalos(array, procPerRow, neighbours, leftThickness, &
     do i=1, depthSize
         call calculateCorners(array(:,:,i), procPerRow, leftThickness, &
                               rightThickness, topThickness, bottomThickness)
-        call MPI_Barrier(communicator, ierror)
-        call checkMPIError()
-        call sleep(rank+1)
-        call outputArray(array(:,:,i))
     end do
     deallocate(leftRecv)
     deallocate(leftSend)
