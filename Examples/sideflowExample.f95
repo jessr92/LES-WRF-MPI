@@ -13,6 +13,8 @@ integer, parameter :: rowCount = rows / procPerCol
 integer, parameter :: colCount = columns / procPerRow
 
 integer :: leftThickness, rightThickness, topThickness, bottomThickness
+integer :: colToSendRightLeft, colToRecvRightLeft
+integer :: colToSendLeftRight, colToRecvLeftRight
 
 call main()
 
@@ -21,6 +23,7 @@ contains
 subroutine main()
     implicit none
     integer, dimension(:,:,:), allocatable :: processArray
+    integer :: i
     leftThickness = 3
     rightThickness = 2
     topThickness = 2
@@ -35,7 +38,18 @@ subroutine main()
                           colCount + leftThickness + rightThickness, &
                           depthSize))
     call initArray(processArray)
-    ! Sideflow
+    colToSendRightLeft = size(processArray, 2) - rightThickness
+    colToRecvRightLeft = leftThickness
+    colToSendLeftRight = leftThickness+1
+    colToRecvLeftRight = size(processArray, 2) - rightThickness + 1
+    call sideflowRightLeftInteger(processArray, procPerRow, colToSendRightLeft, colToRecvRightLeft, topThickness, bottomThickness)
+    call sideflowLeftRightInteger(processArray, procPerRow, colToSendLeftRight, colToRecvLeftRight, topThickness, bottomThickness)
+    do i=1, depthSize
+        call MPI_Barrier(communicator, ierror)
+        call checkMPIError()
+        call sleep(rank+1)
+        call outputArray(processArray(:,:,i))
+    end do
     deallocate(processArray)
     call finalise_mpi()
 end subroutine main

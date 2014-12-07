@@ -22,13 +22,13 @@ echo 'Running MPI PI Example'
 echo '**********'
 mpiexec -n 4 $(pwd)/mpi_pi
 echo '**********'
-echo 'Running MPI Halo Exchange 3D Example'
-echo '*********'
-mpiexec -n 12 $(pwd)/haloExchange3DExample
-echo '*********'
 echo 'Running MPI Sideflow Example'
 echo '*********'
 mpiexec -n 12 $(pwd)/sideflowExample
+echo '*********'
+echo 'Running MPI Halo Exchange 3D Example'
+echo '*********'
+mpiexec -n 12 $(pwd)/haloExchange3DExample
 echo '*********'
 echo 'Running MPI Cartesian Virtual Topology Example'
 echo '*********'
