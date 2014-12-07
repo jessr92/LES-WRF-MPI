@@ -4,6 +4,76 @@ implicit none
 
 contains
 
+subroutine sideflowRightLeftInteger(array, procPerRow, colToSend, colToRecv)
+    implicit none
+    integer, intent(in) :: procPerRow, colToSend, colToRecv
+    integer(kind=4), dimension(:,:,:), intent(inout) :: array
+    integer(kind=4), dimension(:,:), allocatable :: leftRecv, rightSend
+    integer :: r, d, commWith, rowCount, depthSize
+    rowCount = size(array, 1) - 2
+    depthSize = size(array, 3)
+    if (isLeftmostColumn(procPerRow)) then
+        allocate(leftRecv(rowCount, depthSize))
+        commWith = rank + procPerRow - 1
+        call MPI_Recv(leftRecv, rowCount*depthSize, MPI_INT, commWith, rightSideTag, &
+                      communicator, status, ierror)
+        call checkMPIError()
+        do r=1, rowCount
+            do d=1, depthSize
+                array(r+1, colToRecv, d) = leftRecv(r, d)
+            end do
+        end do
+        deallocate(leftRecv)
+    else if (isRightmostColumn(procPerRow)) then
+        allocate(rightSend(rowCount, depthSize))
+        commWith = rank - procPerRow + 1
+        do r=1, rowCount
+            do d=1, depthSize
+                rightSend(r, d) = array(r+1, colToSend, d)
+            end do
+        end do
+        call MPI_Send(rightSend, rowCount*depthSize, MPI_INT, commWith, rightSideTag, &
+                      communicator, ierror)
+        call checkMPIError()
+        deallocate(rightSend)
+    end if
+end subroutine sideflowRightLeftInteger
+
+subroutine sideflowLeftRightInteger(array, procPerRow, colToSend, colToRecv)
+    implicit none
+    integer, intent(in) :: procPerRow, colToSend, colToRecv
+    integer(kind=4), dimension(:,:,:), intent(inout) :: array
+    integer(kind=4), dimension(:,:), allocatable :: leftSend, rightRecv
+    integer :: r, d, commWith, rowCount, depthSize
+    rowCount = size(array, 1) - 2
+    depthSize = size(array, 3)
+    if (isLeftmostColumn(procPerRow)) then
+        allocate(leftSend(rowCount, depthSize))
+        commWith = rank + procPerRow - 1
+        do r=1, rowCount
+            do d=1, depthSize
+                leftSend(r, d) = array(r+1, colToSend, d)
+            end do
+        end do
+        call MPI_Send(leftSend, rowCount*depthSize, MPI_INT, commWith, leftSideTag, &
+                      communicator, ierror)
+        call checkMPIError()
+        deallocate(leftSend)
+    else if (isRightmostColumn(procPerRow)) then
+        allocate(rightRecv(rowCount, depthSize))
+        commWith = rank - procPerRow + 1
+        call MPI_Recv(rightRecv, rowCount*depthSize, MPI_INT, commWith, leftSideTag, &
+                      communicator, status, ierror)
+        call checkMPIError()
+        do r=1, rowCount
+            do d=1, depthSize
+                array(r+1, colToRecv, d) = rightRecv(r, d)
+            end do
+        end do
+        deallocate(rightRecv)
+    end if
+end subroutine sideflowLeftRightInteger
+
 subroutine calculateCorners(array, procPerRow, leftThickness, rightThickness, &
                             topThickness, bottomThickness)
     implicit none
