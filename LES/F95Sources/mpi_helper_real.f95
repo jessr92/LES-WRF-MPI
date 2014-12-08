@@ -57,7 +57,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
     real(kind=4), dimension(:,:,:), allocatable :: topRecv, topSend, bottomSend, bottomRecv
     call MPI_Barrier(communicator, ierror)
 #ifdef GR_DEBUG
-    print*, 'GR: rank ', rank, ' is starting exchangeRealHalos'
+    !print*, 'GR: rank ', rank, ' is starting exchangeRealHalos'
 #endif
     if (size(neighbours, 1) .lt. 4) then
         print*, "Error: cannot have a 4-way halo exchange with less than 4 neighbours"
@@ -241,7 +241,7 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, topThickne
     real(kind=4), dimension(:,:), allocatable :: leftRecv, rightSend
     integer :: r, d, commWith, rowCount, depthSize
 #ifdef GR_DEBUG
-    print*, 'GR: rank ', rank, ' is starting sideflowRightLeft'
+    !print*, 'GR: rank ', rank, ' is starting sideflowRightLeft'
 #endif
     rowCount = size(array, 1) - topThickness - bottomThickness
     depthSize = size(array, 3)
@@ -279,7 +279,7 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, topThickne
     real(kind=4), dimension(:,:), allocatable :: leftSend, rightRecv
     integer :: r, d, commWith, rowCount, depthSize
 #ifdef GR_DEBUG
-    print*, 'GR: rank ', rank, ' is starting sideflowLeftRight'
+    !print*, 'GR: rank ', rank, ' is starting sideflowLeftRight'
 #endif
     rowCount = size(array, 1) - topThickness - bottomThickness
     depthSize = size(array, 3)
@@ -318,7 +318,7 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
     real(kind=4), dimension(ip, jp) :: sendBuffer, recvBuffer
     call MPI_Barrier(communicator, ierror)
 #ifdef GR_DEBUG
-    print*, 'GR: rank ', rank, ' is starting distributeZBM'
+    !print*, 'GR: rank ', rank, ' is starting distributeZBM'
 #endif
     if (isMaster()) then
         ! Send appropriate 2D section to the other ranks
