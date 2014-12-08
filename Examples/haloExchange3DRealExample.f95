@@ -62,6 +62,12 @@ subroutine initArray(processArray)
         do col = leftThickness + 1, size(processArray, 2) - rightThickness
             do depth = 1, size(processArray, 3)
                 processArray(row, col, depth) = rank
+                if (col < rightThickness + leftThickness + 1 .or. &
+                    col > size(processArray, 2) - rightThickness - leftThickness .or. &
+                    row < topThickness + bottomThickness + 1 .or. &
+                    row > size(processArray, 1) - bottomThickness - topThickness) then
+                    processArray(row, col, depth) = processArray(row, col, depth) + 0.5
+                end if
             end do
         end do
     end do
