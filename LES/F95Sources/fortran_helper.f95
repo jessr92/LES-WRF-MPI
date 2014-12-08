@@ -26,7 +26,11 @@ subroutine outputArrayReal(array)
     integer :: col, row
     do row = 1, size(array, 1)
         do col = 1, size(array,2)
-            write(*,"(F5.2)",advance="no") array(row,col)
+            if (array(row, col) .ne. -1.0) then
+                write(*,"(F6.2)",advance="no") array(row,col)
+            else
+                write(*,"(A6)", advance="no") '-'
+            end if
         end do
         write (*,*)
     end do
