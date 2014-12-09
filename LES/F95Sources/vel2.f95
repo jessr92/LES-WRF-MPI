@@ -125,6 +125,9 @@ contains
       end do
       end do
 ! ====================================
+#ifdef MPI
+    if (isBottomRow(procPerRow)) then
+#endif
       do k = 1,km
       do j = 1,jm
         nou1(im+1,j,k) = nou1(im,j,k)
@@ -132,6 +135,9 @@ contains
         cov1(im+1,j,k) = cov1(im,j,k)
       end do
       end do
+#ifdef MPI
+    end if
+#endif
 #if !defined(MPI) || (PROC_PER_ROW==1)
       do k = 1,km
       do i = 1,im
@@ -151,6 +157,9 @@ contains
     call sideflowLeftRight(diu2, procPerRow, 2, jp+2, 1, 2)
     call sideflowLeftRight(cov2, procPerRow, 2, jp+2, 1, 2)
 #endif
+#ifdef MPI
+    if (isBottomRow(procPerRow)) then
+#endif
       do k = 1,km
       do j = 1,jm
         nou4(im+1,j,k) = nou4(im,j,k)
@@ -158,6 +167,9 @@ contains
         cov4(im+1,j,k) = cov4(im,j,k)
       end do
       end do
+#ifdef MPI
+    end if
+#endif
 #if !defined(MPI) || (PROC_PER_ROW==1)
       do k = 1,km
       do i = 1,im
@@ -177,6 +189,9 @@ contains
     call sideflowLeftRight(diu5, procPerRow, 3, jp+3, 1, 2)
     call sideflowLeftRight(cov5, procPerRow, 3, jp+3, 1, 2)
 #endif
+#ifdef MPI
+    if (isBottomRow(procPerRow)) then
+#endif
       do k = 1,km-1
       do j = 1,jm
         nou7(im+1,j,k) = nou7(im,j,k)
@@ -184,6 +199,9 @@ contains
         cov7(im+1,j,k) = cov7(im,j,k)
       end do
       end do
+#ifdef MPI
+    end if
+#endif
 #if !defined(MPI) || (PROC_PER_ROW==1)
       do k = 1,km-1
       do i = 1,im
@@ -204,12 +222,18 @@ contains
     call sideflowLeftRight(cov8, procPerRow, 2, jp+2, 1, 2)
 #endif
 ! --les
+#ifdef MPI
+    if (isBottomRow(procPerRow)) then
+#endif
       do k = 1,km+1
       do j = 1,jm+1
         diu2(im+1,j,k) = diu2(im,j,k)
         diu3(im+1,j,k) = diu3(im,j,k)
       end do
       end do
+#ifdef MPI
+    end if
+#endif
 #if !defined(MPI) || (PROC_PER_ROW==1)
       do k = 1,km+1
       do i = 1,im+1
@@ -225,9 +249,8 @@ contains
 #ifdef WV_DEBUG
     print *, 'F95 DIU SUMS:',sum(diu1),sum(diu2),sum(diu3),sum(diu4),sum(diu5),sum(diu6),sum(diu7),sum(diu8),sum(diu9)
 #endif
-! 
-      return
-      end subroutine vel2
+
+end subroutine vel2
 
 end module module_vel2
 
