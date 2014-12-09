@@ -62,6 +62,9 @@ contains
       end do
       end do
 ! 
+#ifdef GR_DEBUG
+    print*, 'GR: SUM(nou1) = ', sum(nou1)
+#endif
       do k = 1,km
       do j = 1,jm
       do i = 1,im
@@ -129,6 +132,7 @@ contains
         cov1(im+1,j,k) = cov1(im,j,k)
       end do
       end do
+#if !defined(MPI) || (PROC_PER_ROW==1)
       do k = 1,km
       do i = 1,im
         nou2(i,0,k) = nou2(i,jm,k)
@@ -139,6 +143,14 @@ contains
         cov2(i,jm+1,k) = cov2(i,1,k)
       end do
       end do
+#else
+    call sideflowRightLeft(nou2, procPerRow, jp+1, 1, 1, 2)
+    call sideflowRightLeft(diu2, procPerRow, jp+1, 1, 1, 2)
+    call sideflowRightLeft(cov2, procPerRow, jp+1, 1, 1, 2)
+    call sideflowLeftRight(nou2, procPerRow, 2, jp+2, 1, 2)
+    call sideflowLeftRight(diu2, procPerRow, 2, jp+2, 1, 2)
+    call sideflowLeftRight(cov2, procPerRow, 2, jp+2, 1, 2)
+#endif
       do k = 1,km
       do j = 1,jm
         nou4(im+1,j,k) = nou4(im,j,k)
@@ -146,6 +158,7 @@ contains
         cov4(im+1,j,k) = cov4(im,j,k)
       end do
       end do
+#if !defined(MPI) || (PROC_PER_ROW==1)
       do k = 1,km
       do i = 1,im
         nou5(i,0,k) = nou5(i,jm,k)
@@ -156,6 +169,14 @@ contains
         cov5(i,jm+1,k) = cov5(i,1,k)
       end do
       end do
+#else
+    call sideflowRightLeft(nou5, procPerRow, jp+3, 2, 1, 2)
+    call sideflowRightLeft(diu5, procPerRow, jp+3, 2, 1, 2)
+    call sideflowRightLeft(cov5, procPerRow, jp+3, 2, 1, 2)
+    call sideflowLeftRight(nou5, procPerRow, 3, jp+3, 1, 2)
+    call sideflowLeftRight(diu5, procPerRow, 3, jp+3, 1, 2)
+    call sideflowLeftRight(cov5, procPerRow, 3, jp+3, 1, 2)
+#endif
       do k = 1,km-1
       do j = 1,jm
         nou7(im+1,j,k) = nou7(im,j,k)
@@ -163,6 +184,7 @@ contains
         cov7(im+1,j,k) = cov7(im,j,k)
       end do
       end do
+#if !defined(MPI) || (PROC_PER_ROW==1)
       do k = 1,km-1
       do i = 1,im
         nou8(i,0,k) = nou8(i,jm,k)
@@ -173,6 +195,14 @@ contains
         cov8(i,jm+1,k) = cov8(i,1,k)
       end do
       end do
+#else
+    call sideflowRightLeft(nou8, procPerRow, jp+1, 1, 1, 2)
+    call sideflowRightLeft(diu8, procPerRow, jp+1, 1, 1, 2)
+    call sideflowRightLeft(cov8, procPerRow, jp+1, 1, 1, 2)
+    call sideflowLeftRight(nou8, procPerRow, 2, jp+2, 1, 2)
+    call sideflowLeftRight(diu8, procPerRow, 2, jp+2, 1, 2)
+    call sideflowLeftRight(cov8, procPerRow, 2, jp+2, 1, 2)
+#endif
 ! --les
       do k = 1,km+1
       do j = 1,jm+1
@@ -180,21 +210,24 @@ contains
         diu3(im+1,j,k) = diu3(im,j,k)
       end do
       end do
+#if !defined(MPI) || (PROC_PER_ROW==1)
       do k = 1,km+1
       do i = 1,im+1
         diu4(i,0,k) = diu4(i,jm,k)
         diu6(i,0,k) = diu6(i,jm,k)
       end do
       end do
+#else
+    call sideflowRightLeft(diu4, procPerRow, jp+1, 1, 1, 2)
+    call sideflowRightLeft(diu6, procPerRow, jp+1, 1, 1, 2)
+#endif
+
 #ifdef WV_DEBUG
     print *, 'F95 DIU SUMS:',sum(diu1),sum(diu2),sum(diu3),sum(diu4),sum(diu5),sum(diu6),sum(diu7),sum(diu8),sum(diu9)
 #endif
 ! 
       return
       end subroutine vel2
-
-
-
 
 end module module_vel2
 
