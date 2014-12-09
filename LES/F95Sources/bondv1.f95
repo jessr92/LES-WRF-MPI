@@ -92,8 +92,8 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
         end do
     end do
 #ifdef MPI
-    call MPI_AllReduce(MPI_IN_PLACE, aaa, 1, MPI_REAL, MPI_MAX, communicator, ierror)
-    call MPI_AllReduce(MPI_IN_PLACE, bbb, 1, MPI_REAL, MPI_MIN, communicator, ierror)
+    call getGlobalMaxOf(aaa)
+    call getGlobalMinOf(bbb)
 #endif
     uout = (aaa+bbb)/2.
 #ifdef WV_DEBUG

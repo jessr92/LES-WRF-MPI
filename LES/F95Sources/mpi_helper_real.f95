@@ -11,6 +11,20 @@ subroutine getGlobalSumOf(value)
     call checkMPIError()
 end subroutine getGlobalSumOf
 
+subroutine getGlobalMaxOf(value)
+    implicit none
+    real(kind=4), intent(inout) :: value
+    call MPI_AllReduce(MPI_IN_PLACE, value, 1, MPI_REAL, MPI_MAX, communicator, ierror)
+    call checkMPIError()
+end subroutine getGlobalMaxOf
+
+subroutine getGlobalMinOf(value)
+    implicit none
+    real(kind=4), intent(inout) :: value
+    call MPI_AllReduce(MPI_IN_PLACE, value, 1, MPI_REAL, MPI_MIN, communicator, ierror)
+    call checkMPIError()
+end subroutine getGlobalMinOf
+
 subroutine calculateCornersReal(array, procPerRow, leftThickness, rightThickness, &
                             topThickness, bottomThickness)
     implicit none
