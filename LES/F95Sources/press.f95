@@ -74,6 +74,9 @@ subroutine press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn
     call getGlobalSumOf(rhsav)
     call getGlobalSumOf(area)
 #endif
+#if GR_DEBUG
+    print*, 'GR: rhsav ', rhsav, ' area ', area
+#endif
     rhsav = rhsav/area
     do k = 1,km
         do j = 1,jm
@@ -136,6 +139,10 @@ subroutine press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn
     call getGlobalSumOf(pav)
     call getGlobalSumOf(pco)
 #endif
+#if GR_DEBUG
+    print*, 'GR: pav ', pav, ' pco ', pco
+#endif
+
     pav = pav/pco
     do k = 1,km
         do j = 1,jm

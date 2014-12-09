@@ -14,7 +14,7 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
     real(kind=4), dimension(0:ip+1,-1:jp+1,-1:kp+1) , intent(InOut) :: w
     real(kind=4), dimension(kp+2) , intent(In) :: z2
     real(kind=4) :: u_val
-    integer :: i, j, k, startI, endI
+    integer :: i, j, k
     real(kind=4) :: aaa, bbb, uout
 ! 
 ! 
@@ -52,21 +52,10 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
 
 #if ICAL == 0
     !if(ical == 0.and.n == 1) then
-#ifdef MPI
-    if (isTopRow(procPerRow)) then
-        startI = 2
-    else
-        startI = 1
-    end if
-    endI = ip
-#else
-    startI = 2
-    endI = im
-#endif
     if(n == 1) then
         do k = 1,km
             do j = 1,jm
-                do i = startI, endI
+                do i = 2, im
                     u(i,j,k) = u(1,j,k)
                     v(i,j,k) = v(1,j,k)
                     w(i,j,k) = w(1,j,k)
@@ -95,6 +84,10 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
     call getGlobalMaxOf(aaa)
     call getGlobalMinOf(bbb)
 #endif
+#if GR_DEBUG
+    print*, 'GR: aaa ', aaa, ' bbb ', bbb
+#endif
+
     uout = (aaa+bbb)/2.
 #ifdef WV_DEBUG
     print *, 'F95: UOUT: ',uout
