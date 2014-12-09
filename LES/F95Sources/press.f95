@@ -71,8 +71,8 @@ subroutine press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn
         end do
     end do
 #ifdef MPI
-    call MPI_AllReduce(MPI_IN_PLACE, rhsav, 1, MPI_REAL, MPI_SUM, communicator, ierror)
-    call MPI_AllReduce(MPI_IN_PLACE, area, 1, MPI_REAL, MPI_SUM, communicator, ierror)
+    call getGlobalSumOf(rhsav)
+    call getGlobalSumOf(area)
 #endif
     rhsav = rhsav/area
     do k = 1,km
@@ -120,9 +120,6 @@ subroutine press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn
 #ifndef MPI
     510 continue
 #endif
-#ifdef MPI
-    call MPI_Barrier(communicator, ierror)
-#endif
 
     pav = 0.0
     pco = 0.0
@@ -136,8 +133,8 @@ subroutine press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn
     end do
 ! 
 #ifdef MPI
-    call MPI_AllReduce(MPI_IN_PLACE, pav, 1, MPI_REAL, MPI_SUM, communicator, ierror)
-    call MPI_AllReduce(MPI_IN_PLACE, pco, 1, MPI_REAL, MPI_SUM, communicator, ierror)
+    call getGlobalSumOf(pav)
+    call getGlobalSumOf(pco)
 #endif
     pav = pav/pco
     do k = 1,km
@@ -210,9 +207,6 @@ subroutine press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn
 #endif
     end if
 !
-#ifdef MPI
-    call MPI_Barrier(communicator, ierror)
-#endif
 end subroutine press
 
 end module module_press

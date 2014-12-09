@@ -4,6 +4,13 @@ implicit none
 
 contains
 
+subroutine getGlobalSumOf(value)
+    implicit none
+    real(kind=4), intent(inout) :: value
+    call MPI_AllReduce(MPI_IN_PLACE, value, 1, MPI_REAL, MPI_SUM, communicator, ierror)
+    call checkMPIError()
+end subroutine getGlobalSumOf
+
 subroutine calculateCornersReal(array, procPerRow, leftThickness, rightThickness, &
                             topThickness, bottomThickness)
     implicit none
