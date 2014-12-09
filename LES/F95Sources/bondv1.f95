@@ -83,42 +83,39 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
 ! ------------- outflow condition ------------
 !      advective condition
 ! 
-#ifdef MPI
-    if (isBottomRow(procPerRow)) then
-#endif
-        aaa = 0.0
-        bbb = 0.0
-        do k = 1,km
-            do j = 1,jm
-                aaa = amax1(aaa,u(im,j,k))
-                bbb = amin1(bbb,u(im,j,k))
-            end do
+    aaa = 0.0
+    bbb = 0.0
+    do k = 1,km
+        do j = 1,jm
+            aaa = amax1(aaa,u(im,j,k))
+            bbb = amin1(bbb,u(im,j,k))
         end do
-        uout = (aaa+bbb)/2.
+    end do
+#ifdef MPI
+    call MPI_AllReduce(MPI_IN_PLACE, aaa, 1, MPI_REAL, MPI_MAX, communicator, ierror)
+    call MPI_AllReduce(MPI_IN_PLACE, bbb, 1, MPI_REAL, MPI_MIN, communicator, ierror)
+#endif
+    uout = (aaa+bbb)/2.
 #ifdef WV_DEBUG
-        print *, 'F95: UOUT: ',uout
+    print *, 'F95: UOUT: ',uout
 #endif
-
-        do k = 1,km
-            do j = 1,jm
-                u(im,j,k) = u(im,j,k)-dt*uout *(u(im,j,k)-u(im-1,j,k))/dxs(im)
-            end do
+    do k = 1,km
+        do j = 1,jm
+            u(im,j,k) = u(im,j,k)-dt*uout *(u(im,j,k)-u(im-1,j,k))/dxs(im)
         end do
+    end do
 
-        do k = 1,km
-            do j = 1,jm
-                v(im+1,j,k) = v(im+1,j,k)-dt*uout *(v(im+1,j,k)-v(im,j,k))/dxs(im)
-            end do
+    do k = 1,km
+        do j = 1,jm
+            v(im+1,j,k) = v(im+1,j,k)-dt*uout *(v(im+1,j,k)-v(im,j,k))/dxs(im)
         end do
+    end do
 
-        do k = 1,km
-            do j = 1,jm
-                w(im+1,j,k) = w(im+1,j,k)-dt*uout *(w(im+1,j,k)-w(im,j,k))/dxs(im)
-            end do
+    do k = 1,km
+        do j = 1,jm
+            w(im+1,j,k) = w(im+1,j,k)-dt*uout *(w(im+1,j,k)-w(im,j,k))/dxs(im)
         end do
-#ifdef MPI
-    end if
-#endif
+    end do
 #if !defined(MPI) || (PROC_PER_ROW==1)
 ! --side flow condition; periodic
     do k = 0,km+1

@@ -70,6 +70,10 @@ subroutine press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn
             end do
         end do
     end do
+#ifdef MPI
+    call MPI_AllReduce(MPI_IN_PLACE, rhsav, 1, MPI_REAL, MPI_SUM, communicator, ierror)
+    call MPI_AllReduce(MPI_IN_PLACE, area, 1, MPI_REAL, MPI_SUM, communicator, ierror)
+#endif
     rhsav = rhsav/area
     do k = 1,km
         do j = 1,jm
@@ -131,6 +135,10 @@ subroutine press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn
         end do
     end do
 ! 
+#ifdef MPI
+    call MPI_AllReduce(MPI_IN_PLACE, pav, 1, MPI_REAL, MPI_SUM, communicator, ierror)
+    call MPI_AllReduce(MPI_IN_PLACE, pco, 1, MPI_REAL, MPI_SUM, communicator, ierror)
+#endif
     pav = pav/pco
     do k = 1,km
         do j = 1,jm
