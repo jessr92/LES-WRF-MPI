@@ -61,10 +61,19 @@ contains
       end do
       end do
       end do
-! 
+
 #ifdef GR_DEBUG
     print*, 'GR: SUM(nou1) = ', sum(nou1)
+    print*, 'GR: SUM(diu1) = ', sum(diu1)
+    print*, 'GR: SUM(nou5) = ', sum(nou5)
+    print*, 'GR: SUM(diu5) = ', sum(diu5)
+    print*, 'GR: SUM(nou9) = ', sum(nou9)
+    print*, 'GR: SUM(diu9) = ', sum(diu9)
+    print*, 'GR: SUM(cov1) = ', sum(cov1)
+    print*, 'GR: SUM(cov5) = ', sum(cov5)
+    print*, 'GR: SUM(cov9) = ', sum(cov9)
 #endif
+
       do k = 1,km
       do j = 1,jm
       do i = 1,im
