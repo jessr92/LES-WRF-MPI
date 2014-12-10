@@ -273,17 +273,18 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
     call MPI_Barrier(communicator, ierror)
 end subroutine exchangeRealHalos
 
-subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, topThickness, bottomThickness)
+subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, &
+                             topThickness, bottomThickness, ignoreFirstK, ignoreLastK)
     implicit none
     integer, intent(in) :: procPerRow, colToSend, colToRecv, topThickness, bottomThickness
     real(kind=4), dimension(:,:,:), intent(inout) :: array
     real(kind=4), dimension(:,:), allocatable :: leftRecv, rightSend
-    integer :: r, d, commWith, rowCount, depthSize
+    integer :: r, d, commWith, rowCount, depthSize, ignoreFirstK, ignoreLastK
 #ifdef GR_DEBUG
     !print*, 'GR: rank ', rank, ' is starting sideflowRightLeft'
 #endif
     rowCount = size(array, 1) - topThickness - bottomThickness
-    depthSize = size(array, 3)
+    depthSize = size(array, 3) - ignoreFirstK - ignoreLastK
     if (isLeftmostColumn(procPerRow)) then
         allocate(leftRecv(rowCount, depthSize))
         commWith = rank + procPerRow - 1
@@ -291,8 +292,8 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, topThickne
                       communicator, status, ierror)
         call checkMPIError()
         do r=1, rowCount
-            do d=1, depthSize
-                array(r+topThickness, colToRecv, d) = leftRecv(r, d)
+            do d=1+ignoreFirstK, size(array,3) - ignoreLastK
+                array(r+topThickness, colToRecv, d) = leftRecv(r, d-ignoreFirstK)
             end do
         end do
         deallocate(leftRecv)
@@ -300,8 +301,8 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, topThickne
         allocate(rightSend(rowCount, depthSize))
         commWith = rank - procPerRow + 1
         do r=1, rowCount
-            do d=1, depthSize
-                rightSend(r, d) = array(r+topThickness, colToSend, d)
+            do d=1+ignoreFirstK, size(array,3) - ignoreLastK
+                rightSend(r, d-ignoreFirstK) = array(r+topThickness, colToSend, d)
             end do
         end do
         call MPI_Send(rightSend, rowCount*depthSize, MPI_REAL, commWith, rightSideTag, &
@@ -311,23 +312,24 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, topThickne
     end if
 end subroutine sideflowRightLeft
 
-subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, topThickness, bottomThickness)
+subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, &
+                             topThickness, bottomThickness, ignoreFirstK, ignoreLastK)
     implicit none
     integer, intent(in) :: procPerRow, colToSend, colToRecv, topThickness, bottomThickness
     real(kind=4), dimension(:,:,:), intent(inout) :: array
     real(kind=4), dimension(:,:), allocatable :: leftSend, rightRecv
-    integer :: r, d, commWith, rowCount, depthSize
+    integer :: r, d, commWith, rowCount, depthSize, ignoreFirstK, ignoreLastK
 #ifdef GR_DEBUG
     !print*, 'GR: rank ', rank, ' is starting sideflowLeftRight'
 #endif
     rowCount = size(array, 1) - topThickness - bottomThickness
-    depthSize = size(array, 3)
+    depthSize = size(array, 3) - ignoreFirstK - ignoreLastK
     if (isLeftmostColumn(procPerRow)) then
         allocate(leftSend(rowCount, depthSize))
         commWith = rank + procPerRow - 1
         do r=1, rowCount
-            do d=1, depthSize
-                leftSend(r, d) = array(r+topThickness, colToSend, d)
+            do d=1+ignoreFirstK, size(array,3) - ignoreLastK
+                leftSend(r, d-ignoreFirstK) = array(r+topThickness, colToSend, d)
             end do
         end do
         call MPI_Send(leftSend, rowCount*depthSize, MPI_REAL, commWith, leftSideTag, &
@@ -341,8 +343,8 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, topThickne
                       communicator, status, ierror)
         call checkMPIError()
         do r=1, rowCount
-            do d=1, depthSize
-                array(r+topThickness, colToRecv, d) = rightRecv(r, d)
+            do d=1+ignoreFirstK, size(array,3) - ignoreLastK
+                array(r+topThickness, colToRecv, d) = rightRecv(r, d-ignoreFirstK)
             end do
         end do
         deallocate(rightRecv)
