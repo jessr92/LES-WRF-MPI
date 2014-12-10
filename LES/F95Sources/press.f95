@@ -151,13 +151,19 @@ subroutine press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn
             end do
         end do
     end do
-!
-    !print *, "F95: P_SUM_ADJ=",sum(p)
+
+#ifdef WV_DEBUG
+    print *, "F95: P_SUM_ADJ=",sum(p)
+#endif
     call boundp1(km,jm,p,im)
-    !print *, "F95: P_SUM_1=",sum(p)
+#ifdef WV_DEBUG    
+    print *, "F95: P_SUM_1=",sum(p)
+#endif
     call boundp2(jm,im,p,km)
-    !print *, "F95: P_SUM_BOUND=",sum(p)
-! 
+#ifdef WV_DEBUG    
+    print *, "F95: P_SUM_BOUND=",sum(p)
+#endif
+
 #ifndef NO_IO
 #ifdef VERBOSE
     if (mod(n-1,20) == 0) then
