@@ -115,10 +115,9 @@ subroutine press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn
 #endif
         call getGlobalSumOf(sor)
         if (sor < pjuge) then
-            goto 510 !Break
+            exit
         end if
     end do
-    510 continue
 
     pav = 0.0
     pco = 0.0
