@@ -25,6 +25,8 @@ contains
 
       dxl(0) = 0.
       do i = 1,ip
+       ! GR: MPI-ify dxl? The leftmost value of rank 1 would need the rightmost
+       ! value of rank 0 for this to work correctly for instance?
        dxl(i) = dxl(i-1)+dx1(i)
       end do
 ! --dy set; spanwise direction
@@ -35,6 +37,8 @@ contains
       end do
       dyl(0) = 0. 
       do j = 1,jp
+       ! GR: MPI-ify dyl? The leftmost value of rank 1 would need the rightmost
+       ! value of rank 0 for this to work correctly for instance?
        dyl(j) = dyl(j-1)+dy1(j)
       end do
 ! --dz set; vertical direction
@@ -68,6 +72,8 @@ contains
         dzs(k) = dzn(k+1)/2.+dzn(k)/2.
       end do
       do i = 0,ip+1
+        ! GR: dxs is defined from 0:ip but ip+1 is written to
+        ! GR: dx1 is defined from -1 to ip+1 but ip+2 is read from
         dxs(i) = dx1(i)/2.+dx1(i+1)/2.
       end do
 ! WV: so the access to the undefine dy1(jp+2) seems to be what causes corruption of dy1(0)
