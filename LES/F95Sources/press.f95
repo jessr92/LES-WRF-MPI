@@ -108,12 +108,11 @@ subroutine press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn
 #ifndef NO_IO
 #ifdef VERBOSE
 ! --check
-!      if ((mod(n-1,10) == 0).and.(mod(l,20) == 0)) then
-!        print *, 'time step, iteration step, conv =',n,l,sor
-!      end if
+        if ((mod(n-1,10) == 0).and.(mod(l,20) == 0)) then
+            print *, 'time step, iteration step, conv =',n,l,sor
+        end if
 #endif      
 #endif
-!
         call getGlobalSumOf(sor)
         if (sor < pjuge) then
             goto 510 !Break
