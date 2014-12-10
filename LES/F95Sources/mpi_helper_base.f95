@@ -72,11 +72,23 @@ logical function isTopRow(procPerRow)
     isTopRow = rank .lt. procPerRow
 end function isTopRow
 
+logical function isTopRowNeighbours(neighbours)
+    implicit none
+    integer, dimension(:), intent(in) :: neighbours
+    isTopRowNeighbours = neighbours(topNeighbour) .eq. -1
+end function isTopRowNeighbours
+
 logical function isBottomRow(procPerRow)
     implicit none
     integer, intent(in) :: procPerRow
     isBottomRow = rank .gt. (mpi_size - procPerRow - 1)
 end function isBottomRow
+
+logical function isBottomRowNeighbours(neighbours)
+    implicit none
+    integer, dimension(:), intent(in) :: neighbours
+    isBottomRowNeighbours = neighbours(bottomNeighbour) .eq. -1
+end function isBottomRowNeighbours
 
 logical function isLeftmostColumn(procPerRow)
     implicit none
@@ -84,11 +96,23 @@ logical function isLeftmostColumn(procPerRow)
     isLeftmostColumn = modulo(rank, procPerRow) .eq. 0
 end function isLeftmostColumn
 
+logical function isLeftmostColumnNeighbours(neighbours)
+    implicit none
+    integer, dimension(:), intent(in) :: neighbours
+    isLeftmostColumnNeighbours = neighbours(leftNeighbour) .eq. -1
+end function isLeftmostColumnNeighbours
+
 logical function isRightmostColumn(procPerRow)
     implicit none
     integer, intent(in) :: procPerRow
     isRightmostColumn = modulo(rank, procPerRow) .eq. (procPerRow - 1)
 end function isRightmostColumn
+
+logical function isRightmostColumnNeighbours(neighbours)
+    implicit none
+    integer, dimension(:), intent(in) :: neighbours
+    isRightmostColumnNeighbours = neighbours(rightNeighbour) .eq. -1
+end function isRightmostColumnNeighbours
 
 integer function topLeftRowValue(process, procPerRow, rowCount)
     implicit none
