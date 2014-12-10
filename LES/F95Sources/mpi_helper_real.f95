@@ -8,11 +8,11 @@ subroutine getGlobalSumOf(value)
     implicit none
     real(kind=4), intent(inout) :: value
 #ifdef GR_DEBUG
-    print*, 'Rank: ', rank, ' before sum: ', value
+    !print*, 'Rank: ', rank, ' before sum: ', value
 #endif 
     call MPI_AllReduce(MPI_IN_PLACE, value, 1, MPI_REAL, MPI_SUM, communicator, ierror)
 #ifdef GR_DEBUG
-    print*, 'Rank: ', rank, ' after sum: ', value
+    !print*, 'Rank: ', rank, ' after sum: ', value
 #endif 
     call checkMPIError()
 end subroutine getGlobalSumOf
@@ -21,11 +21,11 @@ subroutine getGlobalMaxOf(value)
     implicit none
     real(kind=4), intent(inout) :: value
 #ifdef GR_DEBUG
-    print*, 'Rank: ', rank, ' before max: ', value
+    !print*, 'Rank: ', rank, ' before max: ', value
 #endif 
     call MPI_AllReduce(MPI_IN_PLACE, value, 1, MPI_REAL, MPI_MAX, communicator, ierror)
 #ifdef GR_DEBUG
-    print*, 'Rank: ', rank, ' after max: ', value
+    !print*, 'Rank: ', rank, ' after max: ', value
 #endif 
     call checkMPIError()
 end subroutine getGlobalMaxOf
@@ -34,11 +34,11 @@ subroutine getGlobalMinOf(value)
     implicit none
     real(kind=4), intent(inout) :: value
 #ifdef GR_DEBUG
-    print*, 'Rank: ', rank, ' before min: ', value
+    !print*, 'Rank: ', rank, ' before min: ', value
 #endif 
     call MPI_AllReduce(MPI_IN_PLACE, value, 1, MPI_REAL, MPI_MIN, communicator, ierror)
 #ifdef GR_DEBUG
-    print*, 'Rank: ', rank, ' after min: ', value
+    !print*, 'Rank: ', rank, ' after min: ', value
 #endif 
     call checkMPIError()
 end subroutine getGlobalMinOf
