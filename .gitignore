@@ -41,6 +41,8 @@ les_main_ocl
 les_main_ocl_mpi
 les_main
 les_main_mpi
+les_main_debug
+les_main_mpi_debug
 *.a
 *.dat
 *.dblite
