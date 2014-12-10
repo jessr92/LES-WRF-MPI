@@ -68,7 +68,7 @@ subroutine boundp1(km,jm,p,im)
     end if
 #endif
 ! --side flow exchanges
-#if (PROC_PER_ROW==1) || !defined(MPI)
+#if !defined(MPI) || (PROC_PER_ROW==1)
     do k = 0,km+1
         do i = 0,im+1
             p(i,   0,k) = p(i,jm,k) ! right to left
