@@ -71,9 +71,10 @@ contains
       do k = 0,kp
         dzs(k) = dzn(k+1)/2.+dzn(k)/2.
       end do
-      do i = 0,ip+1
-        ! GR: dxs is defined from 0:ip but ip+1 is written to
-        ! GR: dx1 is defined from -1 to ip+1 but ip+2 is read from
+! GR: dxs is defined from 0:ip but ip+1 is written to
+! GR: dx1 is defined from -1 to ip+1 but ip+2 is read from
+      !do i = 0,ip+1
+      do i=0, ip
         dxs(i) = dx1(i)/2.+dx1(i+1)/2.
       end do
 ! WV: so the access to the undefine dy1(jp+2) seems to be what causes corruption of dy1(0)
