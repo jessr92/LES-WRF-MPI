@@ -114,15 +114,12 @@ subroutine press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn
 #endif      
 #endif
 !
-#ifndef MPI
+        call getGlobalSumOf(sor)
         if (sor < pjuge) then
             goto 510 !Break
         end if
-#endif
     end do
-#ifndef MPI
     510 continue
-#endif
 
     pav = 0.0
     pco = 0.0
