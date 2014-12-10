@@ -1,5 +1,6 @@
 #!/bin/sh
 
+rm les_main*
 scons ocl=0 mpi=0 verbose=1 gr_debug=1 wv_debug=1
 mv les_main les_main_debug
 
