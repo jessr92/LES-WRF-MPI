@@ -3,6 +3,19 @@ implicit none
 
 contains
 
+subroutine zero3DReal4Array(array)
+    implicit none
+    real(kind=4), dimension(:,:,:), intent(inout) :: array
+    integer :: i, j, k
+    do i=1, size(array,1)
+        do j=1, size(array,2)
+            do k=1, size(array,3)
+                array(i,j,k) = 0.0
+            end do
+        end do
+    end do
+end subroutine zero3DReal4Array
+
 subroutine outputArray(array)
     implicit none
     integer, dimension(:,:), intent(in) :: array
