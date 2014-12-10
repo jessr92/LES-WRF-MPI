@@ -137,8 +137,8 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
     call sideflowLeftRight(u, procPerRow, 3, jp+3, 2, 1, 0, 0)
     call sideflowRightLeft(v, procPerRow, jp+2, 2, 2, 1, 0, 0)
     call sideflowLeftRight(v, procPerRow, 3, jp+3, 2, 1, 0, 0)
-    call sideflowRightLeft(w, procPerRow, jp+2, 2, 2, 1, 0, 0)
-    call sideflowLeftRight(w, procPerRow, 3, jp+3, 2, 1, 0, 0)
+    call sideflowRightLeft(w, procPerRow, jp+2, 2, 2, 1, 1, 0)
+    call sideflowLeftRight(w, procPerRow, 3, jp+3, 2, 1, 1, 0)
 #endif
 ! -------top and underground condition
     do j = 0,jm+1
