@@ -407,16 +407,21 @@ subroutine distribute1DRealRowWiseArray(arrayToBeSent, receivingArray, leftBound
     receivingSize = size(receivingArray, 1)
     if (isMaster()) then
         allocate(sendBuffer(receivingSize))
+#ifdef VERBOSE
         print*, ' Rank ', rank, ' needs to row wise send ', receivingSize, &
                 ' values out of ', totalSize, ' values to each process with a ', &
                 ' left boundary of ', leftBoundary, ' and a right boundary of ', &
                 rightBoundary
+#endif
         ! Master needs to memory copy its required portion
         receivingArray = arrayToBeSent(1:receivingSize+1)
         do i=1, mpi_size-1
             ! MPI_Send
             startI = 1 + ((i / procPerRow) * (receivingSize - leftBoundary - rightBoundary))
             endI = startI + receivingSize - 1
+#ifdef VERBOSE
+            print*, ' Rank ', i, ' is getting values row wise, (', startI, ',', endI, ')'
+#endif
             do currentI=startI,endI
                 sendBuffer(currentI-startI+1) = arrayToBeSent(currentI)
             end do
@@ -444,16 +449,21 @@ subroutine distribute1DRealColumnWiseArray(arrayToBeSent, receivingArray, leftBo
     receivingSize = size(receivingArray, 1)
     if (isMaster()) then
         allocate(sendBuffer(receivingSize))
+#ifdef VERBOSE
         print*, ' Rank ', rank, ' needs to column wise send ', receivingSize, &
                 ' values out of ', totalSize, ' values to each process with a ', &
                 ' left boundary of ', leftBoundary, ' and a right boundary of ', &
                 rightBoundary
+#endif
         ! Master needs to memory copy its required portion
         receivingArray = arrayToBeSent(1:receivingSize+1)
         do i=1, mpi_size-1
             ! MPI_Send
             startI = 1 + (modulo(i, procPerRow) * (receivingSize - leftBoundary - rightBoundary))
             endI = startI + receivingSize - 1
+#ifdef VERBOSE
+            print*, ' Rank ', i, ' is getting values column wise, (', startI, ',', endI, ')'
+#endif
             do currentI=startI,endI
                 sendBuffer(currentI-startI+1) = arrayToBeSent(currentI)
             end do
