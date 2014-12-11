@@ -396,5 +396,79 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
 #endif
 end subroutine distributeZBM
 
+subroutine distribute1DRealRowWiseArray(arrayToBeSent, receivingArray, leftBoundary, rightBoundary, procPerRow)
+    implicit none
+    real(kind=4), dimension(:), intent(in) :: arrayToBeSent
+    real(kind=4), dimension(:), intent(out) :: receivingArray
+    real(kind=4), dimension(:), allocatable :: sendBuffer
+    integer, intent(in) :: leftBoundary, rightBoundary, procPerRow
+    integer :: totalSize, receivingSize, i, startI, endI, currentI
+    totalSize = size(arrayToBeSent, 1)
+    receivingSize = size(receivingArray, 1)
+    if (isMaster()) then
+        allocate(sendBuffer(receivingSize))
+        print*, ' Rank ', rank, ' needs to row wise send ', receivingSize, &
+                ' values out of ', totalSize, ' values to each process with a ', &
+                ' left boundary of ', leftBoundary, ' and a right boundary of ', &
+                rightBoundary
+        ! Master needs to memory copy its required portion
+        receivingArray = arrayToBeSent(1:receivingSize+1)
+        do i=1, mpi_size-1
+            ! MPI_Send
+            startI = 1 + ((i / procPerRow) * (receivingSize - leftBoundary - rightBoundary))
+            endI = startI + receivingSize - 1
+            do currentI=startI,endI
+                sendBuffer(currentI-startI+1) = arrayToBeSent(currentI)
+            end do
+            call MPI_Send(sendBuffer, receivingSize, MPI_Real, i, dxTag, communicator, &
+                          ierror)
+            call checkMPIError()
+        end do
+        deallocate(sendBuffer)
+    else
+        ! Receive receivingSize reals
+        call MPI_Recv(receivingArray, receivingSize, MPI_REAL, 0, dxTag, communicator, &
+                      status, ierror)
+        call checkMPIError()
+    end if
+end subroutine distribute1DRealRowWiseArray
+
+subroutine distribute1DRealColumnWiseArray(arrayToBeSent, receivingArray, leftBoundary, rightBoundary, procPerRow)
+    implicit none
+    real(kind=4), dimension(:), intent(in) :: arrayToBeSent
+    real(kind=4), dimension(:), intent(out) :: receivingArray
+    real(kind=4), dimension(:), allocatable :: sendBuffer
+    integer, intent(in) :: leftBoundary, rightBoundary, procPerRow
+    integer :: totalSize, receivingSize, i, startI, endI, currentI
+    totalSize = size(arrayToBeSent, 1)
+    receivingSize = size(receivingArray, 1)
+    if (isMaster()) then
+        allocate(sendBuffer(receivingSize))
+        print*, ' Rank ', rank, ' needs to column wise send ', receivingSize, &
+                ' values out of ', totalSize, ' values to each process with a ', &
+                ' left boundary of ', leftBoundary, ' and a right boundary of ', &
+                rightBoundary
+        ! Master needs to memory copy its required portion
+        receivingArray = arrayToBeSent(1:receivingSize+1)
+        do i=1, mpi_size-1
+            ! MPI_Send
+            startI = 1 + (modulo(i, procPerRow) * (receivingSize - leftBoundary - rightBoundary))
+            endI = startI + receivingSize - 1
+            do currentI=startI,endI
+                sendBuffer(currentI-startI+1) = arrayToBeSent(currentI)
+            end do
+            call MPI_Send(sendBuffer, receivingSize, MPI_Real, i, dyTag, communicator, &
+                          ierror)
+            call checkMPIError()
+        end do
+        deallocate(sendBuffer)
+    else
+        ! Receive receivingSize reals
+        call MPI_Recv(receivingArray, receivingSize, MPI_REAL, 0, dyTag, communicator, &
+                      status, ierror)
+        call checkMPIError()
+    end if
+end subroutine distribute1DRealColumnWiseArray
+
 end module
 

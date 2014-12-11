@@ -13,34 +13,76 @@ contains
         real(kind=4), dimension(-1:kp+2) , intent(Out) :: dzn
         real(kind=4), dimension(-1:kp+2) , intent(Out) :: dzs
         real(kind=4), dimension(kp+2) , intent(Out) :: z2
+#ifdef MPI
+        real(kind=4), dimension(-1:(ip*procPerCol)+1) :: dx1Tot
+        real(kind=4), dimension(0:(jp*procPerRow)+1) :: dy1Tot
+        real(kind=4), dimension(0:ip*procPerCol) :: dxlTot
+        real(kind=4), dimension(0:jp*procPerRow) :: dylTot
+#endif
 ! 
 ! WV: I think the use of run-time im,jp,kp is dangerous, unless they are identical to ip,jp,kp
 ! WV: So I changed it to be that way
 ! --dx set; streamwise direction
 ! WV: so -1 and ip+1 are not set!!! I changed it analogous to dy1
 !      do i = 0,ip
+#ifdef MPI
+    if (isMaster()) then
+        do i=-1,(ip*procPerCol)+1
+            dx1Tot(i) = 20.
+        end do
+    end if
+    call distribute1DRealRowWiseArray(dx1Tot,dx1, 2, 1, procPerRow)
+#else
       do i = -1,ip+1
        dx1(i) = 20.
       end do
+#endif
 
+#ifdef MPI
+    if (isMaster()) then
+        dxlTot(0) = 0.
+        do i = 1, ip*procPerCol
+            dxlTot(i) = dxlTot(i-1) + dx1Tot(i)
+        end do
+    end if
+    call distribute1DRealRowWiseArray(dxlTot,dxl, 1, 0, procPerRow)
+#else
       dxl(0) = 0.
       do i = 1,ip
-       ! GR: MPI-ify dxl? The leftmost value of rank 1 would need the rightmost
-       ! value of rank 0 for this to work correctly for instance?
        dxl(i) = dxl(i-1)+dx1(i)
       end do
+#endif
+
 ! --dy set; spanwise direction
 !WV: let's set the *whole* array to this value!
       !do j = 0,jp
+#ifdef MPI
+    if (isMaster()) then
+        do j=0,(jp*procPerRow)+1
+            dy1Tot(j) = 20.
+        end do
+    end if
+    call distribute1DRealColumnWiseArray(dy1Tot, dy1, 1, 1, procPerRow)
+#else
       do j = 0,jp+1
        dy1(j) = 20.
       end do
+#endif
+
+#ifdef MPI
+    if (isMaster()) then
+        dylTot(0) = 0.
+        do j=1,(jp*procPerRow)
+            dylTot(j) = dylTot(j-1) + dy1Tot(j)
+        end do
+    end if
+    call distribute1DRealColumnWiseArray(dylTot, dyl, 1, 0, procPerRow)
+#else
       dyl(0) = 0. 
       do j = 1,jp
-       ! GR: MPI-ify dyl? The leftmost value of rank 1 would need the rightmost
-       ! value of rank 0 for this to work correctly for instance?
        dyl(j) = dyl(j-1)+dy1(j)
       end do
+#endif
 ! --dz set; vertical direction
 !WV: also define the first and last point in the array!
       do k = 0,1
