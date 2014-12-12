@@ -16,6 +16,9 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
     real(kind=4) :: u_val
     integer :: i, j, k
     real(kind=4) :: aaa, bbb, uout
+#ifdef MPI
+    integer :: a
+#endif
 ! 
 ! 
 ! -------------------inflow-------------------
@@ -53,6 +56,23 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
 #if ICAL == 0
     !if(ical == 0.and.n == 1) then
     if(n == 1) then
+#ifdef MPI
+        ! GR: Actually make this distributed rather than this awful mess
+        do a=1, procPerCol
+            do k = 1,km
+                do j = 1,jm
+                    do i = 2, im
+                        u(i,j,k) = u(1,j,k)
+                        v(i,j,k) = v(1,j,k)
+                        w(i,j,k) = w(1,j,k)
+                    end do
+                end do
+            end do
+            call exchangeRealHalos(u, procPerRow, neighbours, 0, 0, 3, 0)
+            call exchangeRealHalos(v, procPerRow, neighbours, 0, 0, 3, 0)
+            call exchangeRealHalos(w, procPerRow, neighbours, 0, 0, 3, 0)
+        end do
+#endif
         do k = 1,km
             do j = 1,jm
                 do i = 2, im
