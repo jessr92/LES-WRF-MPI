@@ -68,9 +68,9 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
                     end do
                 end do
             end do
-            call exchangeRealHalos(u, procPerRow, neighbours, 0, 0, 3, 0)
-            call exchangeRealHalos(v, procPerRow, neighbours, 0, 0, 3, 0)
-            call exchangeRealHalos(w, procPerRow, neighbours, 0, 0, 3, 0)
+            call exchangeRealHalos(u, procPerRow, neighbours, 2, 1, 3, 0)
+            call exchangeRealHalos(v, procPerRow, neighbours, 2, 1, 3, 0)
+            call exchangeRealHalos(w, procPerRow, neighbours, 2, 1, 3, 0)
         end do
 #endif
         do k = 1,km
