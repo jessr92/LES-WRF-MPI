@@ -70,6 +70,12 @@ subroutine feedbfm(km,jm,im,amask1,bmask1,cmask1,dmask1,zbm,z2,dzn)
             end do
         end do
     end do
+#ifdef MPI
+    call exchangeRealHalos(amask1, procPerRow, neighbours, 1, 1, 1, 1)
+    call exchangeRealHalos(bmask1, procPerRow, neighbours, 2, 1, 1, 1)
+    call exchangeRealHalos(cmask1, procPerRow, neighbours, 1, 1, 2, 1)
+    call exchangeRealHalos(dmask1, procPerRow, neighbours, 1, 1, 1, 1)
+#endif
 ! 
 end subroutine feedbfm
 
