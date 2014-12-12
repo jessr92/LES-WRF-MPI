@@ -83,6 +83,12 @@ contains
       end do
       end do
       end do
+
+#ifdef GR_DEBUG
+    print*, 'GR: SUM(nou2) = ', sum(nou2)
+    print*, 'GR: SUM(diu2) = ', sum(diu2)
+    print*, 'GR: SUM(cov2) = ', sum(cov2)
+#endif
 ! 
       do k = 1,km+1
       do j = 1,jm
