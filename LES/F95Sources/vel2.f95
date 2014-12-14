@@ -197,9 +197,9 @@ contains
       end do
       end do
 #else
-    call sideflowRightLeft(nou5, procPerRow, jp+3, 2, 2, 2, 1, 2)
-    call sideflowRightLeft(diu5, procPerRow, jp+3, 2, 2, 2, 1, 2)
-    call sideflowRightLeft(cov5, procPerRow, jp+3, 2, 2, 2, 1, 2)
+    call sideflowRightLeft(nou5, procPerRow, jp+2, 2, 2, 2, 1, 2)
+    call sideflowRightLeft(diu5, procPerRow, jp+2, 2, 2, 2, 1, 2)
+    call sideflowRightLeft(cov5, procPerRow, jp+2, 2, 2, 2, 1, 2)
     call sideflowLeftRight(nou5, procPerRow, 3, jp+3, 2, 2, 1, 2)
     call sideflowLeftRight(diu5, procPerRow, 3, jp+3, 2, 2, 1, 2)
     call sideflowLeftRight(cov5, procPerRow, 3, jp+3, 2, 2, 1, 2)
