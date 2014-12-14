@@ -175,18 +175,18 @@ subroutine press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn
             write(6,*) 'Urbanflow=',k,'u=',u(im/2,jm/2,k),v(im/2,jm/2,k) ,w(im/2,jm/2,k)
         end do
 ! 
-    cflu = 0.
-    cflv = 0.
-    cflw = 0.
-    do k = 1,km
-        do j = 1,jm
-            do i = 1,im
-                cflu = amax1(cflu,abs(u(i,j,k)*dt/dx1(i)))
-                cflv = amax1(cflv,abs(v(i,j,k)*dt/dy1(j)))
-                cflw = amax1(cflw,abs(w(i,j,k)*dt/dzn(k)))
-            end do 
+        cflu = 0.
+        cflv = 0.
+        cflw = 0.
+        do k = 1,km
+            do j = 1,jm
+                do i = 1,im
+                    cflu = amax1(cflu,abs(u(i,j,k)*dt/dx1(i)))
+                    cflv = amax1(cflv,abs(v(i,j,k)*dt/dy1(j)))
+                    cflw = amax1(cflw,abs(w(i,j,k)*dt/dzn(k)))
+                end do 
+            end do
         end do
-    end do
     end if
 
     if (mod(n-1,20) == 0) then
@@ -200,19 +200,19 @@ subroutine press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn
                 'vel at centre: ', &
                 u(ip/2,jp/2,kp/2),v(ip/2,jp/2,kp/2),w(ip/2,jp/2,kp/2)
 #ifdef USE_NETCDF_OUTPUT
-    call write_to_netcdf_file(p,u,v,w,usum,vsum,wsum,nn)
+        call write_to_netcdf_file(p,u,v,w,usum,vsum,wsum,nn)
 #endif
 #ifndef NO_IO
 #ifndef MPI
-    open(unit=20,file=data20,form='unformatted',status='unknown')
-    write(20) (((u(i,j,k),i=1,im),j=1,jm),k=1,km)
-    write(20) (((v(i,j,k),i=1,im),j=1,jm),k=1,km)
-    write(20) (((w(i,j,k),i=1,im),j=1,jm),k=1,km)
-    write(20) (((p(i,j,k),i=1,im),j=1,jm),k=1,km)
-    write(20) (((usum(i,j,k),i=1,im),j=1,jm),k=1,km)
-    write(20) (((vsum(i,j,k),i=1,im),j=1,jm),k=1,km)
-    write(20) (((wsum(i,j,k),i=1,im),j=1,jm),k=1,km)
-    close(unit=20)
+        open(unit=20,file=data20,form='unformatted',status='unknown')
+        write(20) (((u(i,j,k),i=1,im),j=1,jm),k=1,km)
+        write(20) (((v(i,j,k),i=1,im),j=1,jm),k=1,km)
+        write(20) (((w(i,j,k),i=1,im),j=1,jm),k=1,km)
+        write(20) (((p(i,j,k),i=1,im),j=1,jm),k=1,km)
+        write(20) (((usum(i,j,k),i=1,im),j=1,jm),k=1,km)
+        write(20) (((vsum(i,j,k),i=1,im),j=1,jm),k=1,km)
+        write(20) (((wsum(i,j,k),i=1,im),j=1,jm),k=1,km)
+        close(unit=20)
 #endif
 #endif
     end if
