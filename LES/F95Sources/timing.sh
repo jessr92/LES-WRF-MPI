@@ -6,7 +6,7 @@ mkdir -p $TIMING_DIRECTORY
 HARDWARE_THREAD_COUNT=$(grep -c ^processor /proc/cpuinfo)
 # Execute original code
 scons ocl=0 mpi=0 D=TIMINGS
-les_main 2>&1 | tee $TIMING_DIRECTORY"/les_main.txt"
+./les_main 2>&1 | tee $TIMING_DIRECTORY"/les_main.txt"
 # Execute MPI code for all combinations that fit on the number of hardware threads
 for procPerRow in $(seq $HARDWARE_THREAD_COUNT)
 do
