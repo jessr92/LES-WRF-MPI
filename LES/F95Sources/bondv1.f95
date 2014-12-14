@@ -153,12 +153,12 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
     end do 
 #else
     ! call assumes column (jp) index from 1, not -1 hence values are +2 from original code
-    call sideflowRightLeft(u, procPerRow, jp+2, 2, 2, 1, 0, 0)
-    call sideflowLeftRight(u, procPerRow, 3, jp+3, 2, 1, 0, 0)
-    call sideflowRightLeft(v, procPerRow, jp+2, 2, 2, 1, 0, 0)
-    call sideflowLeftRight(v, procPerRow, 3, jp+3, 2, 1, 0, 0)
-    call sideflowRightLeft(w, procPerRow, jp+2, 2, 2, 1, 1, 0)
-    call sideflowLeftRight(w, procPerRow, 3, jp+3, 2, 1, 1, 0)
+    call sideflowRightLeft(u, procPerRow, jp+2, 2, 0, 0, 0, 0)
+    call sideflowLeftRight(u, procPerRow, 3, jp+3, 0, 0, 0, 0)
+    call sideflowRightLeft(v, procPerRow, jp+2, 2, 0, 0, 0, 0)
+    call sideflowLeftRight(v, procPerRow, 3, jp+3, 0, 0, 0, 0)
+    call sideflowRightLeft(w, procPerRow, jp+2, 2, 0, 0, 1, 0)
+    call sideflowLeftRight(w, procPerRow, 3, jp+3, 0, 0, 1, 0)
 #endif
 
 ! =================================
