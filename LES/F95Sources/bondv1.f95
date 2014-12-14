@@ -160,6 +160,21 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
     call sideflowRightLeft(w, procPerRow, jp+2, 2, 2, 1, 1, 0)
     call sideflowLeftRight(w, procPerRow, 3, jp+3, 2, 1, 1, 0)
 #endif
+
+! =================================
+#ifdef MPI
+! --halo exchanges
+    call exchangeRealHalos(u, procPerRow, neighbours, 1, 1, 2, 1)
+    call exchangeRealHalos(v, procPerRow, neighbours, 1, 1, 2, 1)
+    call exchangeRealHalos(w, procPerRow, neighbours, 1, 1, 2, 1)
+#else
+#ifdef ESTIMATE_CORNERS
+    call calculateCornersNonMPI(u, 1, 1, 2, 1)
+    call calculateCornersNonMPI(v, 1, 1, 2, 1)
+    call calculateCornersNonMPI(w, 1, 1, 2, 1)
+#endif
+#endif
+
 ! -------top and underground condition
     do j = 0,jm+1
         do i = 0,im+1
@@ -182,19 +197,6 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
         end do
     end do
 
-! =================================
-#ifdef MPI
-! --halo exchanges
-    call exchangeRealHalos(u, procPerRow, neighbours, 1, 1, 2, 1)
-    call exchangeRealHalos(v, procPerRow, neighbours, 1, 1, 2, 1)
-    call exchangeRealHalos(w, procPerRow, neighbours, 1, 1, 2, 1)
-#else
-#ifdef ESTIMATE_CORNERS
-    call calculateCornersNonMPI(u, 1, 1, 2, 1)
-    call calculateCornersNonMPI(v, 1, 1, 2, 1)
-    call calculateCornersNonMPI(w, 1, 1, 2, 1)
-#endif
-#endif
 #ifdef WV_DEBUG
     print *,'F95 UVWSUM after bondv1:',sum(u)+sum(v)+sum(w)
 #endif
