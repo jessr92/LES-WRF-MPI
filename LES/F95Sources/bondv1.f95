@@ -164,14 +164,14 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
 ! =================================
 #ifdef MPI
 ! --halo exchanges
-    call exchangeRealHalos(u, procPerRow, neighbours, 1, 1, 2, 1)
-    call exchangeRealHalos(v, procPerRow, neighbours, 1, 1, 2, 1)
-    call exchangeRealHalos(w, procPerRow, neighbours, 1, 1, 2, 1)
+    call exchangeRealHalos(u, procPerRow, neighbours, 2, 1, 1, 1)
+    call exchangeRealHalos(v, procPerRow, neighbours, 2, 1, 1, 1)
+    call exchangeRealHalos(w, procPerRow, neighbours, 2, 1, 1, 1)
 #else
 #ifdef ESTIMATE_CORNERS
-    call calculateCornersNonMPI(u, 1, 1, 2, 1)
-    call calculateCornersNonMPI(v, 1, 1, 2, 1)
-    call calculateCornersNonMPI(w, 1, 1, 2, 1)
+    call calculateCornersNonMPI(u, 2, 1, 1, 1)
+    call calculateCornersNonMPI(v, 2, 1, 1, 1)
+    call calculateCornersNonMPI(w, 2, 1, 1, 1)
 #endif
 #endif
 
