@@ -1,0 +1,161 @@
+  Rank            0  needs to row wise send          153  values out of          153  values to each process with a  left boundary of            2  and a right boundary of            1
+  Rank            0  needs to row wise send          151  values out of          151  values to each process with a  left boundary of            1  and a right boundary of            0
+  Rank            0  needs to column wise send          152  values out of          152  values to each process with a  left boundary of            1  and a right boundary of            1
+  Rank            0  needs to column wise send          151  values out of          151  values to each process with a  left boundary of            1  and a right boundary of            0
+ Computational Domain X,Y,Z=   3000.00000       3000.00000       982.845215    
+ Vertical grid size=           1   2.50000000    
+ Vertical grid size=           2   2.62500000    
+ Vertical grid size=           3   2.75624990    
+ Vertical grid size=           4   2.89406228    
+ Vertical grid size=           5   3.03876519    
+ Vertical grid size=           6   3.19070339    
+ Vertical grid size=           7   3.35023832    
+ Vertical grid size=           8   3.51775002    
+ Vertical grid size=           9   3.69363737    
+ Vertical grid size=          10   3.87831903    
+ Vertical grid size=          11   4.07223463    
+ Vertical grid size=          12   4.27584600    
+ Vertical grid size=          13   4.48963833    
+ Vertical grid size=          14   4.71411991    
+ Vertical grid size=          15   4.94982576    
+ Vertical grid size=          16   5.00000000    
+ Vertical grid size=          17   5.00000000    
+ Vertical grid size=          18   5.00000000    
+ Vertical grid size=          19   5.00000000    
+ Vertical grid size=          20   5.00000000    
+ Vertical grid size=          21   5.00000000    
+ Vertical grid size=          22   5.00000000    
+ Vertical grid size=          23   5.00000000    
+ Vertical grid size=          24   5.00000000    
+ Vertical grid size=          25   5.00000000    
+ Vertical grid size=          26   5.00000000    
+ Vertical grid size=          27   5.00000000    
+ Vertical grid size=          28   5.00000000    
+ Vertical grid size=          29   5.00000000    
+ Vertical grid size=          30   5.00000000    
+ Vertical grid size=          31   5.00000000    
+ Vertical grid size=          32   5.00000000    
+ Vertical grid size=          33   5.00000000    
+ Vertical grid size=          34   5.00000000    
+ Vertical grid size=          35   5.00000000    
+ Vertical grid size=          36   5.00000000    
+ Vertical grid size=          37   5.00000000    
+ Vertical grid size=          38   5.00000000    
+ Vertical grid size=          39   5.00000000    
+ Vertical grid size=          40   5.00000000    
+ Vertical grid size=          41   5.00000000    
+ Vertical grid size=          42   5.00000000    
+ Vertical grid size=          43   5.00000000    
+ Vertical grid size=          44   5.00000000    
+ Vertical grid size=          45   5.22949982    
+ Vertical grid size=          46   5.46953392    
+ Vertical grid size=          47   5.72058535    
+ Vertical grid size=          48   5.98316002    
+ Vertical grid size=          49   6.25778675    
+ Vertical grid size=          50   6.54501915    
+ Vertical grid size=          51   6.84543562    
+ Vertical grid size=          52   7.15964079    
+ Vertical grid size=          53   7.48826838    
+ Vertical grid size=          54   7.83197975    
+ Vertical grid size=          55   8.19146729    
+ Vertical grid size=          56   8.56745529    
+ Vertical grid size=          57   8.96070099    
+ Vertical grid size=          58   9.37199688    
+ Vertical grid size=          59   9.80217171    
+ Vertical grid size=          60   10.2520914    
+ Vertical grid size=          61   10.7226620    
+ Vertical grid size=          62   11.2148323    
+ Vertical grid size=          63   11.7295933    
+ Vertical grid size=          64   12.2679815    
+ Vertical grid size=          65   12.8310814    
+ Vertical grid size=          66   13.4200277    
+ Vertical grid size=          67   14.0360069    
+ Vertical grid size=          68   14.6802597    
+ Vertical grid size=          69   15.3540831    
+ Vertical grid size=          70   16.0588360    
+ Vertical grid size=          71   16.7959366    
+ Vertical grid size=          72   17.5668697    
+ Vertical grid size=          73   18.3731880    
+ Vertical grid size=          74   19.2165165    
+ Vertical grid size=          75   20.0985546    
+ Vertical grid size=          76   21.0210781    
+ Vertical grid size=          77   21.9859447    
+ Vertical grid size=          78   22.9951000    
+ Vertical grid size=          79   24.0505753    
+ Vertical grid size=          80   25.1544971    
+ Vertical grid size=          81   26.3090878    
+ Vertical grid size=          82   27.5166740    
+ Vertical grid size=          83   28.7796898    
+ Vertical grid size=          84   30.1006775    
+ Vertical grid size=          85   31.4822979    
+ Vertical grid size=          86   32.9273338    
+ Vertical grid size=          87   34.4386978    
+ Vertical grid size=          88   36.0194321    
+ Vertical grid size=          89   37.6727219    
+ Vertical grid size=          90   39.4018974    
+ MAIN: running reference LES code for        20000  time steps, domain =          150 x         150 x          90
+ run_LES_reference: time step =            1
+ time step, iteration step, conv =           1          20   59395.8516    
+ time step, iteration step, conv =           1          40   14584.4434    
+ =mac= time step, iteration step, conv =           1          51   9902.63281    
+ Inflow=           1 u=   1.81194901       0.00000000       0.00000000    
+ Inflow=          11 u=   2.87255812       0.00000000       0.00000000    
+ Inflow=          21 u=   3.39382267       0.00000000       0.00000000    
+ Inflow=          31 u=   3.71819496       0.00000000       0.00000000    
+ Inflow=          41 u=   3.95776987       0.00000000       0.00000000    
+ Inflow=          51 u=   4.17798758       0.00000000       0.00000000    
+ Inflow=          61 u=   4.44910574       0.00000000       0.00000000    
+ Inflow=          71 u=   4.77403212       0.00000000       0.00000000    
+ Inflow=          81 u=   4.99497271       0.00000000       0.00000000    
+ Urbanflow=           1 u=   1.81194901       0.00000000       0.00000000    
+ Urbanflow=          11 u=   2.87255812       0.00000000       0.00000000    
+ Urbanflow=          21 u=   3.39382267       0.00000000       0.00000000    
+ Urbanflow=          31 u=   3.71819496       0.00000000       0.00000000    
+ Urbanflow=          41 u=   3.95776987       0.00000000       0.00000000    
+ Urbanflow=          51 u=   4.17798758       0.00000000       0.00000000    
+ Urbanflow=          61 u=   4.44910574       0.00000000       0.00000000    
+ Urbanflow=          71 u=   4.77403212       0.00000000       0.00000000    
+ Urbanflow=          81 u=   4.99497271       0.00000000       0.00000000    
+ Check_CFL,u*dt/dx,v*dt/dy,w*dt/dz=   5.03369160E-02   0.00000000       0.00000000    
+Time for state  1 =  0.004 s
+Time for state  2 =  0.008 s
+Time for state  3 =  0.052 s
+Time for state  4 =  0.016 s
+Time for state  5 =  0.040 s
+Time for state  6 =  0.016 s
+Time for state  7 =  0.480 s
+ run_LES_reference: time step =            2
+Time for state  1 =  0.008 s
+Time for state  2 =  0.000 s
+Time for state  3 =  0.052 s
+Time for state  4 =  0.016 s
+Time for state  5 =  0.040 s
+Time for state  6 =  0.004 s
+Time for state  7 =  0.472 s
+ run_LES_reference: time step =            3
+Time for state  1 =  0.004 s
+Time for state  2 =  0.004 s
+Time for state  3 =  0.052 s
+Time for state  4 =  0.012 s
+Time for state  5 =  0.044 s
+Time for state  6 =  0.008 s
+Time for state  7 =  0.520 s
+ run_LES_reference: time step =            4
+Time for state  1 =  0.008 s
+Time for state  2 =  0.000 s
+Time for state  3 =  0.056 s
+Time for state  4 =  0.012 s
+Time for state  5 =  0.044 s
+Time for state  6 =  0.004 s
+Time for state  7 =  0.468 s
+ run_LES_reference: time step =            5
+Time for state  1 =  0.008 s
+Time for state  2 =  0.004 s
+Time for state  3 =  0.052 s
+Time for state  4 =  0.012 s
+Time for state  5 =  0.040 s
+Time for state  6 =  0.008 s
+Time for state  7 =  0.464 s
+ run_LES_reference: time step =            6
+[mpiexec@deb1-mpi-host] Sending Ctrl-C to processes as requested
+[mpiexec@deb1-mpi-host] Press Ctrl-C again to force abort
