@@ -165,12 +165,12 @@ contains
       end do
       end do
 #else
-    call sideflowRightLeft(nou2, procPerRow, jp+1, 1, 1, 2, 1, 0)
-    call sideflowRightLeft(diu2, procPerRow, jp+1, 1, 1, 2, 1, 0)
-    call sideflowRightLeft(cov2, procPerRow, jp+1, 1, 1, 2, 1, 0)
-    call sideflowLeftRight(nou2, procPerRow, 2, jp+2, 1, 2, 1, 0)
-    call sideflowLeftRight(diu2, procPerRow, 2, jp+2, 1, 2, 1, 0)
-    call sideflowLeftRight(cov2, procPerRow, 2, jp+2, 1, 2, 1, 0)
+    call sideflowRightLeft(nou2, procPerRow, jp+1, 1, 1, 2, 1, 2)
+    call sideflowRightLeft(diu2, procPerRow, jp+1, 1, 1, 2, 1, 2)
+    call sideflowRightLeft(cov2, procPerRow, jp+1, 1, 1, 2, 1, 2)
+    call sideflowLeftRight(nou2, procPerRow, 2, jp+2, 1, 2, 1, 2)
+    call sideflowLeftRight(diu2, procPerRow, 2, jp+2, 1, 2, 1, 2)
+    call sideflowLeftRight(cov2, procPerRow, 2, jp+2, 1, 2, 1, 2)
 #endif
 #ifdef MPI
     if (isBottomRow(procPerRow)) then
@@ -197,12 +197,12 @@ contains
       end do
       end do
 #else
-    call sideflowRightLeft(nou5, procPerRow, jp+3, 2, 1, 2, 1, 1)
-    call sideflowRightLeft(diu5, procPerRow, jp+3, 2, 1, 2, 1, 1)
-    call sideflowRightLeft(cov5, procPerRow, jp+3, 2, 1, 2, 1, 1)
-    call sideflowLeftRight(nou5, procPerRow, 3, jp+3, 1, 2, 1, 1)
-    call sideflowLeftRight(diu5, procPerRow, 3, jp+3, 1, 2, 1, 1)
-    call sideflowLeftRight(cov5, procPerRow, 3, jp+3, 1, 2, 1, 1)
+    call sideflowRightLeft(nou5, procPerRow, jp+3, 2, 2, 2, 1, 2)
+    call sideflowRightLeft(diu5, procPerRow, jp+3, 2, 2, 2, 1, 2)
+    call sideflowRightLeft(cov5, procPerRow, jp+3, 2, 2, 2, 1, 2)
+    call sideflowLeftRight(nou5, procPerRow, 3, jp+3, 2, 2, 1, 2)
+    call sideflowLeftRight(diu5, procPerRow, 3, jp+3, 2, 2, 1, 2)
+    call sideflowLeftRight(cov5, procPerRow, 3, jp+3, 2, 2, 1, 2)
 #endif
 #ifdef MPI
     if (isBottomRow(procPerRow)) then
@@ -229,12 +229,12 @@ contains
       end do
       end do
 #else
-    call sideflowRightLeft(nou8, procPerRow, jp+1, 1, 1, 2, 1, 2)
-    call sideflowRightLeft(diu8, procPerRow, jp+1, 1, 1, 2, 1, 2)
-    call sideflowRightLeft(cov8, procPerRow, jp+1, 1, 1, 2, 1, 2)
-    call sideflowLeftRight(nou8, procPerRow, 2, jp+2, 1, 2, 1, 2)
-    call sideflowLeftRight(diu8, procPerRow, 2, jp+2, 1, 2, 1, 2)
-    call sideflowLeftRight(cov8, procPerRow, 2, jp+2, 1, 2, 1, 2)
+    call sideflowRightLeft(nou8, procPerRow, jp+1, 1, 1, 2, 1, 3)
+    call sideflowRightLeft(diu8, procPerRow, jp+1, 1, 1, 2, 1, 3)
+    call sideflowRightLeft(cov8, procPerRow, jp+1, 1, 1, 2, 1, 3)
+    call sideflowLeftRight(nou8, procPerRow, 2, jp+2, 1, 2, 1, 3)
+    call sideflowLeftRight(diu8, procPerRow, 2, jp+2, 1, 2, 1, 3)
+    call sideflowLeftRight(cov8, procPerRow, 2, jp+2, 1, 2, 1, 3)
 #endif
 ! --les
 #ifdef MPI
@@ -257,8 +257,8 @@ contains
       end do
       end do
 #else
-    call sideflowRightLeft(diu4, procPerRow, jp+1, 1, 1, 2, 1, 1)
-    call sideflowRightLeft(diu6, procPerRow, jp+1, 1, 1, 2, 1, 1)
+    call sideflowRightLeft(diu4, procPerRow, jp+1, 1, 1, 1, 1, 1)
+    call sideflowRightLeft(diu6, procPerRow, jp+1, 1, 1, 1, 1, 1)
 #endif
 
 #ifdef WV_DEBUG
