@@ -261,6 +261,36 @@ contains
     call sideflowRightLeft(diu6, procPerRow, jp+1, 1, 1, 1, 1, 1)
 #endif
 
+#ifdef MPI
+    call exchangeRealHalos(nou1, procPerRow, neighbours, 1, 2, 2, 2)
+    call exchangeRealHalos(diu1, procPerRow, neighbours, 1, 2, 2, 2)
+    call exchangeRealHalos(cov1, procPerRow, neighbours, 1, 2, 2, 2)
+    call exchangeRealHalos(nou2, procPerRow, neighbours, 1, 2, 1, 2)
+    call exchangeRealHalos(diu2, procPerRow, neighbours, 1, 2, 1, 2)
+    call exchangeRealHalos(cov2, procPerRow, neighbours, 1, 2, 1, 2)
+    call exchangeRealHalos(nou3, procPerRow, neighbours, 1, 2, 1, 2)
+    call exchangeRealHalos(diu3, procPerRow, neighbours, 1, 2, 1, 2)
+    call exchangeRealHalos(cov3, procPerRow, neighbours, 1, 2, 1, 2)
+    call exchangeRealHalos(nou4, procPerRow, neighbours, 1, 2, 1, 2)
+    call exchangeRealHalos(diu4, procPerRow, neighbours, 1, 2, 1, 2)
+    call exchangeRealHalos(cov4, procPerRow, neighbours, 1, 2, 1, 2)
+    call exchangeRealHalos(nou5, procPerRow, neighbours, 1, 2, 2, 2)
+    call exchangeRealHalos(diu5, procPerRow, neighbours, 1, 2, 2, 2)
+    call exchangeRealHalos(cov5, procPerRow, neighbours, 1, 2, 2, 2)
+    call exchangeRealHalos(nou6, procPerRow, neighbours, 1, 2, 1, 2)
+    call exchangeRealHalos(diu6, procPerRow, neighbours, 1, 2, 1, 2)
+    call exchangeRealHalos(cov6, procPerRow, neighbours, 1, 2, 1, 2)
+    call exchangeRealHalos(nou7, procPerRow, neighbours, 1, 2, 1, 2)
+    call exchangeRealHalos(diu7, procPerRow, neighbours, 1, 2, 1, 2)
+    call exchangeRealHalos(cov7, procPerRow, neighbours, 1, 2, 1, 2)
+    call exchangeRealHalos(nou8, procPerRow, neighbours, 1, 2, 1, 2)
+    call exchangeRealHalos(diu8, procPerRow, neighbours, 1, 2, 1, 2)
+    call exchangeRealHalos(cov8, procPerRow, neighbours, 1, 2, 1, 2)
+    call exchangeRealHalos(nou9, procPerRow, neighbours, 1, 2, 1, 2)
+    call exchangeRealHalos(diu9, procPerRow, neighbours, 1, 2, 1, 2)
+    call exchangeRealHalos(cov9, procPerRow, neighbours, 1, 2, 1, 2)
+#endif
+
 #ifdef WV_DEBUG
     print *, 'F95 DIU SUMS:',sum(diu1),sum(diu2),sum(diu3),sum(diu4),sum(diu5),sum(diu6),sum(diu7),sum(diu8),sum(diu9)
 #endif
