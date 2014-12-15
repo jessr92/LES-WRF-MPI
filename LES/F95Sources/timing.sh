@@ -5,6 +5,8 @@ TIMING_DIRECTORY="timingRuns/"$HOSTNAME
 MAX_PER_DIMENSION=8
 mkdir -p $TIMING_DIRECTORY
 HARDWARE_THREAD_COUNT=$(grep -c ^processor /proc/cpuinfo)
+# Max per dimension needs to be at least enough such that NxN will use all
+# available hardware threads on the shared memory system
 if [ `expr $MAX_PER_DIMENSION \\* $MAX_PER_DIMENSION` -lt $HARDWARE_THREAD_COUNT ]; then
     MAX_PER_DIMENSION=$(echo "sqrt($HARDWARE_THREAD_COUNT)" | bc -l)
     MAX_PER_DIMENSION=$(echo $(( `echo $MAX_PER_DIMENSION|cut -f1 -d"."` + 1 )))
