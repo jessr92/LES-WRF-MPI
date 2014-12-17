@@ -350,13 +350,13 @@ subroutine write_to_netcdf_file(p,u,v,w,usum,vsum,wsum,n)
     real(kind=4), dimension(0:ip,0:jp,0:kp) , intent(In) :: wsum
     integer, intent(In) :: n
 #ifdef MPI
-    real(kind=4), dimension(0:(ip*procPerRow)+2,0:(jp*procPerCol)+2,0:kp+1), intent(InOut)  :: pTot
-    real(kind=4), dimension(0:(ip*procPerRow)+1,-1:(jp*procPerCol)+1,0:kp+1) , intent(In) :: uTot
-    real(kind=4), dimension(0:(ip*procPerRow)+1,-1:(jp*procPerCol)+1,0:kp+1) , intent(In) :: vTot
-    real(kind=4), dimension(0:(ip*procPerRow)+1,-1:(jp*procPerCol)+1,-1:kp+1) , intent(In) :: wTot
-    real(kind=4), dimension(0:(ip*procPerRow),0:(jp*procPerCol),0:kp) , intent(In) :: usumTot
-    real(kind=4), dimension(0:(ip*procPerRow),0:(jp*procPerCol),0:kp) , intent(In) :: vsumTot
-    real(kind=4), dimension(0:(ip*procPerRow),0:(jp*procPerCol),0:kp) , intent(In) :: wsumTot
+    real(kind=4), dimension(0:(ip*procPerRow)+2,0:(jp*procPerCol)+2,0:kp+1) :: pTot
+    real(kind=4), dimension(0:(ip*procPerRow)+1,-1:(jp*procPerCol)+1,0:kp+1) :: uTot
+    real(kind=4), dimension(0:(ip*procPerRow)+1,-1:(jp*procPerCol)+1,0:kp+1) :: vTot
+    real(kind=4), dimension(0:(ip*procPerRow)+1,-1:(jp*procPerCol)+1,-1:kp+1) :: wTot
+    real(kind=4), dimension(0:(ip*procPerRow),0:(jp*procPerCol),0:kp) :: usumTot
+    real(kind=4), dimension(0:(ip*procPerRow),0:(jp*procPerCol),0:kp) :: vsumTot
+    real(kind=4), dimension(0:(ip*procPerRow),0:(jp*procPerCol),0:kp) :: wsumTot
     if (isMaster()) then
         ! Grab p, u, v, w, usum, vsum, wsum from the other processes
     else
