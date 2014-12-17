@@ -17,7 +17,7 @@ if [ $MAX_DIMENSION_PROCESSES -gt $MAX_PER_DIMENSION ]; then
 fi
 # Execute original code
 scons ocl=0 mpi=0 D=TIMINGS
-./les_main 2>&1 | tee $TIMING_DIRECTORY"/les_main.txt"
+./les_main > $TIMING_DIRECTORY"/les_main.txt"
 # Execute MPI code for all combinations that fit on the number of hardware threads
 for procPerRow in $(seq $MAX_DIMENSION_PROCESSES)
 do
