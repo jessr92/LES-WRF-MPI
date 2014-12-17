@@ -47,12 +47,14 @@ if with_mpi == '1':
     PROC_PER_COL = '-DPROC_PER_COL=' + procPerCol
     WITH_MPI = '-DMPI'
     USE_NETCDF_OUTPUT='-DUSE_NETCDF_OUTPUT'
-    envF.Append(LIBS=['netcdff'])   
+    envF.Append(LIBS=['netcdff'])
     envF['F95']='mpifort'
     envF['LINK']=envF['F95']
 
 if os.uname()[1] == 'togian.dcs.gla.ac.uk' and with_mpi == '1':
     envF['F95'] = '/scratch1/1002536r/mpich_install/bin/mpifort'
+    envF.Append(LIBPATH=['/scratch1/1002536r/netcdf-fortran_install/lib'])
+    envF.Append(F95PATH=['/scratch1/1002536r/netcdf-fortran_install/include'])
     envF['LINK']=envF['F95']
 
 ESTIMATE_CORNERS=''
