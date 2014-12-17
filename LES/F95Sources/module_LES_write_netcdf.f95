@@ -368,7 +368,6 @@ subroutine write_to_netcdf_file(p,u,v,w,usum,vsum,wsum,n)
 #ifdef MPI
     if (isMaster()) then
         ! Write varTot rather than var to the netCDF files
-#endif
         ! The start and count arrays will tell the netCDF library where to
         ! write our data.
 
@@ -379,20 +378,42 @@ subroutine write_to_netcdf_file(p,u,v,w,usum,vsum,wsum,n)
         start(4) = n
         print *, 'ncid: ',ncid,'pres_varid: ',pres_varid
 
-        call check( nf90_put_var(ncid, pres_varid, p,  start, count) )
+        call check( nf90_put_var(ncid, pres_varid, pTot,  start, count) )
 
-        call check( nf90_put_var(ncid_p, pres_varid, p,  start, count_p) )
+        call check( nf90_put_var(ncid_p, pres_varid, pTot,  start, count_p) )
 
         print *, 'ncid_u: ',ncid_u,'vel_x_varid_u: ',vel_x_varid_u
-        call check( nf90_put_var(ncid_u, vel_x_varid_u, u, start, count_u) )
-        call check( nf90_put_var(ncid_v, vel_y_varid_v, v, start, count_v) )
-        call check( nf90_put_var(ncid_w, vel_z_varid_w, w, start, count_w) )
+        call check( nf90_put_var(ncid_u, vel_x_varid_u, uTot, start, count_u) )
+        call check( nf90_put_var(ncid_v, vel_y_varid_v, vTot, start, count_v) )
+        call check( nf90_put_var(ncid_w, vel_z_varid_w, wTot, start, count_w) )
 
-        call check( nf90_put_var(ncid_uvwsum, velsum_x_varid_uvwsum, usum, start, count_uvwsum) )
-        call check( nf90_put_var(ncid_uvwsum, velsum_y_varid_uvwsum, vsum, start, count_uvwsum) )
-        call check( nf90_put_var(ncid_uvwsum, velsum_z_varid_uvwsum, wsum, start, count_uvwsum) )
-#ifdef MPI
+        call check( nf90_put_var(ncid_uvwsum, velsum_x_varid_uvwsum, usumTot, start, count_uvwsum) )
+        call check( nf90_put_var(ncid_uvwsum, velsum_y_varid_uvwsum, vsumTot, start, count_uvwsum) )
+        call check( nf90_put_var(ncid_uvwsum, velsum_z_varid_uvwsum, wsumTot, start, count_uvwsum) )
     end if
+#else
+    ! The start and count arrays will tell the netCDF library where to
+    ! write our data.
+
+    ! Write the pretend data. This will write our surface pressure and
+    ! surface velerature data. The arrays only hold one timestep worth
+    ! of data. We will just rewrite the same data for each timestep. In
+    ! a real :: application, the data would change between timesteps.
+    start(4) = n
+    print *, 'ncid: ',ncid,'pres_varid: ',pres_varid
+
+    call check( nf90_put_var(ncid, pres_varid, p,  start, count) )
+
+    call check( nf90_put_var(ncid_p, pres_varid, p,  start, count_p) )
+
+    print *, 'ncid_u: ',ncid_u,'vel_x_varid_u: ',vel_x_varid_u
+    call check( nf90_put_var(ncid_u, vel_x_varid_u, u, start, count_u) )
+    call check( nf90_put_var(ncid_v, vel_y_varid_v, v, start, count_v) )
+    call check( nf90_put_var(ncid_w, vel_z_varid_w, w, start, count_w) )
+
+    call check( nf90_put_var(ncid_uvwsum, velsum_x_varid_uvwsum, usum, start, count_uvwsum) )
+    call check( nf90_put_var(ncid_uvwsum, velsum_y_varid_uvwsum, vsum, start, count_uvwsum) )
+    call check( nf90_put_var(ncid_uvwsum, velsum_z_varid_uvwsum, wsum, start, count_uvwsum) )
 #endif
 end subroutine write_to_netcdf_file
 

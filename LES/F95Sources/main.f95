@@ -173,6 +173,9 @@
             ' bottom neighbour ', neighbours(bottomNeighbour)
 #endif 
 #endif
+#ifdef USE_NETCDF_OUTPUT
+    call init_netcdf_file()
+#endif
       call set(data10,data11,data20,data21,data22,data23,data24,data25,data26,data27,data30,data31, &
       im,jm,km,ifbf,ianime,ical,n0,n1,nmax,dt,ro,vn,alpha,beta)
       call grid(dx1,dxl,dy1,dyl,z2,dzn,dzs,dxs,dys)
@@ -281,11 +284,14 @@
 #endif
 !
       end do
-
+#ifdef USE_NETCDF_OUTPUT
+    call close_netcdf_file()
+#endif
 #ifdef TIMINGS
     call cpu_time(timestamp(9))
     print *,"Total time:" ,timestamp(9)-timestamp(8),"s for ",nmax-n0,"iterations"
 #endif
+
 #ifdef MPI
 !
 ! GR: Finialise MPI
