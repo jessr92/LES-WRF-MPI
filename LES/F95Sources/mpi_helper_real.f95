@@ -492,14 +492,21 @@ subroutine collect3DReal4Array(array, arrayTot, leftBoundary, rightBoundary, &
     allocate(sendRecvBuffer(size(array, 1) - topBoundary, size(array, 2) - leftBoundary, size(array, 3)))
     bufferSize = (size(array, 1) - topBoundary) * (size(array, 2) - leftBoundary) * (size(array, 3))
     if (isMaster()) then
-        do i=1, mpi_size
+        do r=1, size(array, 1)
+            do c=1, size(array, 2)
+                do d=1, size(array, 3)
+                    arrayTot(r, c, d) = array(r, c, d)
+                end do
+            end do
+        end do
+        do i=1, mpi_size - 1
             startRow = topLeftRowValue(i, procPerRow, ip)
             startCol = topLeftColValue(i, procPerRow, jp)
             call MPI_Recv(sendRecvBuffer, bufferSize, MPI_Real, i, collect3DReal4Tag, &
                           communicator, status, ierror)
             call checkMPIError()
-            do r=startRow+1, startRow+1+ip-bottomBoundary
-                do c=startCol+1, startCol+1+jp-rightBoundary
+            do r=startRow+1, startRow+1+ip+bottomBoundary
+                do c=startCol+1, startCol+1+jp+rightBoundary
                     do d=1, size(array, 3)
                         arrayTot(r, c, d) = sendRecvBuffer(r-startRow, c-startCol, d)
                     end do
