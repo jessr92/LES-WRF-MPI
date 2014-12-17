@@ -4,6 +4,7 @@ HOSTNAME=$(hostname)
 TIMING_DIRECTORY="timingRuns/"$HOSTNAME
 MAX_PER_DIMENSION=8
 mkdir -p $TIMING_DIRECTORY
+mkdir -p $TIMING_DIRECTORY"/MPI_SharedMemory"
 HARDWARE_THREAD_COUNT=$(grep -c ^processor /proc/cpuinfo)
 # Max per dimension needs to be at least enough such that NxN will use all
 # available hardware threads on the shared memory system
@@ -25,7 +26,7 @@ do
     do
         PROCESSES=`expr $procPerCol \\* $procPerRow`
         if [ $PROCESSES -le $HARDWARE_THREAD_COUNT ]; then
-            OUTPUT_FILE=$TIMING_DIRECTORY"/les_main_mpi_row"$procPerRow"_col"$procPerCol".txt"
+            OUTPUT_FILE=$TIMING_DIRECTORY"MPI_SharedMemory/les_main_mpi_row"$procPerRow"_col"$procPerCol".txt"
             scons ocl=0 mpi=1 D=TIMINGS procPerRow=$procPerRow procPerCol=$procPerCol
             mpiexec -np $PROCESSES ./les_main_mpi > $OUTPUT_FILE
         fi
