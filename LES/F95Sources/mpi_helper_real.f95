@@ -480,7 +480,7 @@ subroutine distribute1DRealColumnWiseArray(arrayToBeSent, receivingArray, leftBo
     end if
 end subroutine distribute1DRealColumnWiseArray
 
-subroutine collect3DReal4Array(array, arrayTot, leftBoundary, rightBoundary, &
+subroutine collect3DReal4ArrayP(array, arrayTot, leftBoundary, rightBoundary, &
                                topBoundary, bottomBoundary, ip, jp, kp, procPerRow)
     implicit none
     real(kind=4), dimension(:,:,:), intent(in) :: array
@@ -526,6 +526,47 @@ subroutine collect3DReal4Array(array, arrayTot, leftBoundary, rightBoundary, &
         call checkMPIError()
     end if
     deallocate(sendRecvBuffer)
+end subroutine collect3DReal4ArrayP
+
+subroutine collect3DReal4Array(array, arrayTot, leftBoundary, rightBoundary, &
+                               topBoundary, bottomBoundary, ip, jp, kp, procPerRow)
+    implicit none
+    real(kind=4), dimension(:,:,:), intent(in) :: array
+    real(kind=4), dimension(:,:,:), intent(out) :: arrayTot
+    integer, intent(in) :: leftBoundary, rightBoundary, topBoundary, bottomBoundary
+    integer, intent(in) :: ip, jp, kp, procPerRow
+    integer :: i, startRow, startCol, r, c, d, bufferSize
+    real(kind=4), dimension(:,:,:), allocatable :: recvBuffer
+    bufferSize = size(array, 1) * size(array, 2) * size(array, 3)
+    if (isMaster()) then
+        allocate(recvBuffer(size(array, 1), size(array, 2), size(array, 3)))
+        do r=1, size(array, 1)
+            do c=1, size(array, 2)
+                do d=1, size(array, 3)
+                    arrayTot(r, c, d) = array(r, c, d)
+                end do
+            end do
+        end do
+        do i=1, mpi_size - 1
+            startRow = topLeftRowValue(i, procPerRow, ip)
+            startCol = topLeftColValue(i, procPerRow, jp)
+            call MPI_Recv(recvBuffer, bufferSize, MPI_Real, i, collect3DReal4Tag, &
+                          communicator, status, ierror)
+            call checkMPIError()
+            do r=startRow+1, startRow+1+size(array, 1)
+                do c=startCol+1, startCol+1+size(array, 2)
+                    do d=1, size(array, 3)
+                        arrayTot(r, c, d) = recvBuffer(r-startRow, c-startCol, d)
+                    end do
+                end do
+            end do
+        end do
+        deallocate(recvBuffer)
+    else
+        call MPI_Send(array, bufferSize, MPI_Real, 0, collect3DReal4Tag, &
+                      communicator, ierror)
+        call checkMPIError()
+    end if
 end subroutine collect3DReal4Array
 
 end module
