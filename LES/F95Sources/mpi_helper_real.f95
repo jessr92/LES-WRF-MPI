@@ -480,5 +480,19 @@ subroutine distribute1DRealColumnWiseArray(arrayToBeSent, receivingArray, leftBo
     end if
 end subroutine distribute1DRealColumnWiseArray
 
+subroutine collect3DReal4Array(array, arrayTot, leftBoundary, rightBoundary, &
+                               topBoundary, bottomBoundary, ip, jp, kp)
+    implicit none
+    real(kind=4), dimension(:,:,:), intent(in) :: array
+    real(kind=4), dimension(:,:,:), intent(out) :: arrayTot
+    integer, intent(in) :: leftBoundary, rightBoundary, topBoundary, bottomBoundary
+    integer, intent(in) :: ip, jp, kp
+    if (isMaster()) then
+    
+    else
+    
+    end if
+end subroutine collect3DReal4Array
+
 end module
 
