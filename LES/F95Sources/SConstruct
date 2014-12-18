@@ -49,9 +49,9 @@ if with_mpi == '1':
     envF['F95']='mpifort'
     envF['LINK']=envF['F95']
 
-USE_NETCDF_OUTPUT='-DUSE_NETCDF_OUTPUT'
-envF.Append(LIBS=['netcdff'])
-
+if other =='':
+    USE_NETCDF_OUTPUT='-DUSE_NETCDF_OUTPUT'
+    envF.Append(LIBS=['netcdff'])
 
 if os.uname()[1] == 'togian.dcs.gla.ac.uk' and with_mpi == '1':
     envF['F95'] = '/scratch1/1002536r/mpich_install/bin/mpifort'
