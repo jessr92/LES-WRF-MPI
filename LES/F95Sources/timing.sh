@@ -1,7 +1,8 @@
 #!/bin/sh
 # Setup timing runs
 HOSTNAME=$(hostname)
-TIMING_DIRECTORY="timingRuns/"$HOSTNAME
+MPI_VERSION=$(mpiexec --version | awk '/Version:/ {print $2}')
+TIMING_DIRECTORY="timingRuns/"$HOSTNAME"/"$MPI_VERSION
 MAX_PER_DIMENSION=16
 mkdir -p $TIMING_DIRECTORY
 mkdir -p $TIMING_DIRECTORY"/MPI_SharedMemory"
