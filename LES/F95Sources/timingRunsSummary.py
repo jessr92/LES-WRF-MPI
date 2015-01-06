@@ -30,9 +30,12 @@ for path in fileList:
             sys.exit(-1)
         originalRuntime = runtime
     else:
-        mpiRuns[processCount] = runtime
+        try:
+            mpiRuns[processCount] = min(mpiRuns[processCount], runtime)
+        except KeyError:
+            mpiRuns[processCount] = runtime
 
 print("Original single threaded code executed in " + str(originalRuntime) + " seconds")
 
 for key in mpiRuns.keys():
-    print(str(key) + " MPI processes executed in " + str(mpiRuns[key]) + " seconds")
+    print(str(key) + ", " + str(mpiRuns[key]))
