@@ -49,6 +49,15 @@ if with_mpi == '1':
     envF['F95']='mpifort'
     envF['LINK']=envF['F95']
 
+EXPANDING_AREA=''
+expanding_area = getOpt('expandingArea', 'Processes have same size area (150x150x90), irrespective of process count', '0')
+if expanding_area == '1':
+    EXPANDING_AREA='-DEXPANDING_AREA'
+    if PROC_PER_ROW == '':
+        PROC_PER_ROW = '-DPROC_PER_ROW=1'
+    if PROC_PER_COL == '':
+        PROC_PER_COL = '-DPROC_PER_COL=1'
+
 if other =='':
     USE_NETCDF_OUTPUT='-DUSE_NETCDF_OUTPUT'
     envF.Append(LIBS=['netcdff'])
@@ -83,7 +92,10 @@ IFBF='-DIFBF=1'
 IANIME='-DIANIME=0'
 IADAM='-DIADAM=0'
 
-FFLAGS  = [USE_NETCDF_OUTPUT, WITH_MPI, FAST_MPI, ESTIMATE_CORNERS, GR_DEBUG, WV_DEBUG, PROC_PER_ROW, PROC_PER_COL, WITH_OCL, NO_FILE_IO, ICAL, IFBF,IANIME, IADAM] 
+if expanding_area == '1':
+    IFBF='-DIFBF=0'
+
+FFLAGS  = [USE_NETCDF_OUTPUT, WITH_MPI, FAST_MPI, EXPANDING_AREA, ESTIMATE_CORNERS, GR_DEBUG, WV_DEBUG, PROC_PER_ROW, PROC_PER_COL, WITH_OCL, NO_FILE_IO, ICAL, IFBF,IANIME, IADAM] 
 
 if with_ocl == '0':
     FFLAGS += ['-cpp','-Ofast', '-m64', '-Wall','-ffree-form', '-fconvert=big-endian', VERBOSE,TIMINGS]

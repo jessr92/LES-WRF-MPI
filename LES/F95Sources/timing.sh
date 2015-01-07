@@ -6,6 +6,7 @@ TIMING_DIRECTORY="timingRuns/"$HOSTNAME"/"$MPI_VERSION
 MAX_PER_DIMENSION=16
 mkdir -p $TIMING_DIRECTORY
 mkdir -p $TIMING_DIRECTORY"/MPI_SharedMemory"
+mkdir -p $TIMING_DIRECTORY"/MPI_SharedMemoryExpandingArea"
 HARDWARE_THREAD_COUNT=$(grep -c ^processor /proc/cpuinfo)
 # Max per dimension needs to be at least enough such that NxN will use all
 # available hardware threads on the shared memory system
@@ -33,4 +34,22 @@ do
         fi
     done
 done
+# Expanding area
+# Execute original code with IFBF = 0
+scons ocl=0 mpi=0 D=TIMINGS expandingArea=1
+./les_main > $TIMING_DIRECTORY"/les_main_ifbf0.txt"
+# Execute MPI code for all combinations that fit on the number of hardware threads
+for procPerRow in $(seq $MAX_DIMENSION_PROCESSES)
+do
+    for procPerCol in $(seq $MAX_DIMENSION_PROCESSES)
+    do
+        PROCESSES=`expr $procPerCol \\* $procPerRow`
+        if [ $PROCESSES -le $HARDWARE_THREAD_COUNT ]; then
+            OUTPUT_FILE=$TIMING_DIRECTORY"/MPI_SharedMemoryExpandingArea/les_main_mpi_row"$procPerRow"_col"$procPerCol".txt"
+            scons ocl=0 mpi=1 D=TIMINGS procPerRow=$procPerRow procPerCol=$procPerCol expandingArea=1
+            mpiexec -np $PROCESSES ./les_main_mpi > $OUTPUT_FILE
+        fi
+    done
+done
+
 
