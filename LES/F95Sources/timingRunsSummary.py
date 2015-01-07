@@ -42,7 +42,7 @@ for path in fileList:
         if originalIFBF0Runtime != 0.0:
             print("Error, two ifbf=0 runs found")
             sys.exit(-1)
-        originalIFBF0Runtime = 0.0
+        originalIFBF0Runtime = runtime
     # Found a runtime for the MPI code where total area is 150x150x90
     if "/MPI_SharedMemory/" in path:
         try:
@@ -59,12 +59,12 @@ for path in fileList:
 if originalRuntime != 0.0:
     print("Original single threaded code, " + str(originalRuntime))
 
-if originalIFBF0Runtime != 0.0:
-    print("Original single threaded ifbf=0 code, " + str(originalIFBF0Runtime))
-
 print("\nMPI_SharedMemory Runs")
 for key in mpiRuns.keys():
     print(str(key) + ", " + str(mpiRuns[key]))
+
+if originalIFBF0Runtime != 0.0:
+    print("\nOriginal single threaded ifbf=0 code, " + str(originalIFBF0Runtime))
 
 print("\nMPI_SharedMemoryExpandingArea Runs")
 for key in mpiExpandingAreaRuns.keys():
