@@ -76,7 +76,15 @@ Places where corner estimated values are used:
     - dvdxx1 = ... diu4(i+1,j-1,k) ... - Bottom Left\\
     These are then used to calculate values for sm\\
     sm is then used to calculate values for eddyviscosity values\\
-    eddyviscosity values are then used to calculate values for f, g, and h.
+    eddyviscosity values are then used to calculate values for f, g, and h\\
+    and so on and so forth, called every timestep.
+    \item vel2.f95\\
+    - nou2(i,j,k) = ... v(i+1,j-1,k) ... - Bottom Left \\
+    Used to calculate cov2
+    \item vel2\_init.f95\\
+    - nou2(i,j,k) = ... v(i+1,j-1,k) ... - Bottom Left \\
+    Used to calculate cov2\\
+    Doesn't seem to be called however.
 \end{itemize}
 
 \begin{figure}
