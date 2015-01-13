@@ -9,11 +9,11 @@ subroutine getGlobalSumOf(value)
     real(kind=4), intent(inout) :: value
 #ifdef GR_DEBUG
     !print*, 'Rank: ', rank, ' before sum: ', value
-#endif 
+#endif
     call MPI_AllReduce(MPI_IN_PLACE, value, 1, MPI_REAL, MPI_SUM, communicator, ierror)
 #ifdef GR_DEBUG
     !print*, 'Rank: ', rank, ' after sum: ', value
-#endif 
+#endif
     call checkMPIError()
 end subroutine getGlobalSumOf
 
@@ -22,11 +22,11 @@ subroutine getGlobalMaxOf(value)
     real(kind=4), intent(inout) :: value
 #ifdef GR_DEBUG
     !print*, 'Rank: ', rank, ' before max: ', value
-#endif 
+#endif
     call MPI_AllReduce(MPI_IN_PLACE, value, 1, MPI_REAL, MPI_MAX, communicator, ierror)
 #ifdef GR_DEBUG
     !print*, 'Rank: ', rank, ' after max: ', value
-#endif 
+#endif
     call checkMPIError()
 end subroutine getGlobalMaxOf
 
@@ -35,11 +35,11 @@ subroutine getGlobalMinOf(value)
     real(kind=4), intent(inout) :: value
 #ifdef GR_DEBUG
     !print*, 'Rank: ', rank, ' before min: ', value
-#endif 
+#endif
     call MPI_AllReduce(MPI_IN_PLACE, value, 1, MPI_REAL, MPI_MIN, communicator, ierror)
 #ifdef GR_DEBUG
     !print*, 'Rank: ', rank, ' after min: ', value
-#endif 
+#endif
     call checkMPIError()
 end subroutine getGlobalMinOf
 
@@ -54,7 +54,7 @@ subroutine calculateCornersReal(array, procPerRow, leftThickness, rightThickness
         ! There is a top left corner to specify
         do r=topThickness,1,-1
             do c=leftThickness,1,-1
-                array(r, c) = (array(r+1, c) + array(r, c+1) - array(r+1, c+1)) / 2.0
+                array(r, c) = (array(r+1, c) + array(r, c+1) + array(r+1, c+1)) / 3.0
             end do
         end do
     end if
@@ -62,7 +62,7 @@ subroutine calculateCornersReal(array, procPerRow, leftThickness, rightThickness
         ! There is a top right corner to specify
         do r=topThickness,1,-1
             do c=size(array,2)-rightThickness+1,size(array,2)
-                array(r, c) = (array(r+1, c) + array(r, c-1) - array(r+1, c-1)) / 2.0
+                array(r, c) = (array(r+1, c) + array(r, c-1) + array(r+1, c-1)) / 3.0
             end do
         end do
     end if
@@ -70,7 +70,7 @@ subroutine calculateCornersReal(array, procPerRow, leftThickness, rightThickness
         ! There is a bottom left corner to specify
         do r=size(array,1)-bottomThickness+1,size(array,1)
             do c=leftThickness,1,-1
-                array(r, c) = (array(r-1, c) + array(r, c+1) - array(r-1, c+1)) / 2.0
+                array(r, c) = (array(r-1, c) + array(r, c+1) + array(r-1, c+1)) / 3.0
             end do
         end do
     end if
@@ -257,7 +257,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
                 end do
             end do
         end do
-    end if    
+    end if
     do i=1, depthSize
         call calculateCornersReal(array(:,:,i), procPerRow, leftThickness, &
                               rightThickness, topThickness, bottomThickness)
@@ -570,4 +570,3 @@ subroutine collect3DReal4Array(array, arrayTot, leftBoundary, rightBoundary, &
 end subroutine collect3DReal4Array
 
 end module
-

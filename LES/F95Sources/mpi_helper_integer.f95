@@ -2,6 +2,9 @@ module mpi_helper_integer
 use mpi_helper_base
 implicit none
 
+! May not be kept as up to date as mpi_helper_real since mpi_helper_integer is
+! just to test things out!
+
 contains
 
 subroutine sideflowRightLeftInteger(array, procPerRow, colToSend, colToRecv, topThickness, bottomThickness)
@@ -85,7 +88,7 @@ subroutine calculateCorners(array, procPerRow, leftThickness, rightThickness, &
         ! There is a top left corner to specify
         do r=topThickness,1,-1
             do c=leftThickness,1,-1
-                array(r, c) = (array(r+1, c) + array(r, c+1) - array(r+1, c+1)) / 2
+                array(r, c) = (array(r+1, c) + array(r, c+1) + array(r+1, c+1)) / 3
             end do
         end do
     end if
@@ -93,7 +96,7 @@ subroutine calculateCorners(array, procPerRow, leftThickness, rightThickness, &
         ! There is a top right corner to specify
         do r=topThickness,1,-1
             do c=size(array,2)-rightThickness+1,size(array,2)
-                array(r, c) = (array(r+1, c) + array(r, c-1) - array(r+1, c-1)) / 2
+                array(r, c) = (array(r+1, c) + array(r, c-1) + array(r+1, c-1)) / 3
             end do
         end do
     end if
@@ -101,7 +104,7 @@ subroutine calculateCorners(array, procPerRow, leftThickness, rightThickness, &
         ! There is a bottom left corner to specify
         do r=size(array,1)-bottomThickness+1,size(array,1)
             do c=leftThickness,1,-1
-                array(r, c) = (array(r-1, c) + array(r, c+1) - array(r-1, c+1)) / 2
+                array(r, c) = (array(r-1, c) + array(r, c+1) + array(r-1, c+1)) / 3
             end do
         end do
     end if
