@@ -1,5 +1,7 @@
 \documentclass{article}
 \usepackage{fullpage}
+\usepackage{graphicx}
+\usepackage{url}
 
 \title{Limitations}
 
@@ -48,6 +50,34 @@ section, the halo exchange would need to be eight messages instead of four. This
 would cause an unacceptable performance hit thus the corner values are estimated
 based on the three neighbouring values known to the process at the cost of
 absolute correctness.
+
+\subsection{Effect of Corner Estimation in Halo Boundaries}
+
+As shown by a Github Issues comment
+\footnote{\url{https://github.com/gordon1992/LES-WRF-MPI/issues/15#issuecomment-65896162}}
+the corner estimation code makes a difference to output. Taking the original LES
+code and executing it on a 37x37x90 example with and without corner estimation
+code resulted in differing timesteps where non-convergence occurred. This does
+not suggest a place where corner estimation makes a difference but shows that it
+has some effect on the data. Only a single place needs to exist where estimated
+values are used to calculate another value for the difference to occur. Once
+this occurs the effect of the estimation will `infect' the rest of the array,
+radiating out from the estimated corner. This was found in netCDF output for
+pressure in the MPI version where there was a slightly different value for
+pressure compared to the original non-estimated code radiating out from corners
+of the array.
+
+Places where corner estimated values are used:
+
+\begin{itemize}
+    \item les.f95\\
+    ! --calculation of sgs eddy viscosity coeficient\\
+    - dudyx1 = ... diu2(i-1,j+1,k) ... - Top Right\\
+    - dvdxx1 = ... diu4(i+1,j-1,k) ... - Bottom Left\\
+    These are then used to calculate values for sm\\
+    sm is then used to calculate values for eddyviscosity values\\
+    eddyviscosity values are then used to calculate values for f, g, and h.
+\end{itemize}
 
 \begin{figure}
     \includegraphics[width=\linewidth]{Diagrams/standardLESGrid.pdf}
