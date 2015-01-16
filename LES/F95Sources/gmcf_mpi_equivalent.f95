@@ -2,6 +2,8 @@ module gmcf_mpi_equivalent
 use gmcfAPI
 implicit none
 
+integer, parameter :: topTag = 1, bottomTag = 2, leftTag = 3, rightTag = 4
+
 ! This is currently a skeleton with only communication between LES instances
 ! in mind.
 
@@ -158,19 +160,45 @@ subroutine GMCF_MPI_Recv3DFloatArray()
     implicit none
     ! Equivalent to
     call GMCF_MPI_IRecv3DFloatArray()
+    ! Perhaps not? GMCF seems to force you to go through all packets so if the
+    ! instance is waiting for multiple boundaries (in almost every case) then
+    ! we need to be ready to have all of them at once?
     ! GMCF_MPI_Wait()
 end subroutine GMCF_MPI_Recv3DFloatArray
 
-subroutine GMCF_MPI_Wait()
+subroutine GMCF_MPI_WaitAll(rank, topBoundary, bottomBoundary, leftBoundary, rightBoundary) ! also any side flows and broadcasts?
     implicit none
-    ! Equivalent to
-    ! gmcfHasPackets()
-    ! do while (hasPackets)
-    !     gmcfShiftPending()
-    !     select case (...)
-    !         gmcfRead(1D/3D)FloatArray()
-    !     etc ...
-    ! end do
-end subroutine GMCF_MPI_Wait
+    integer, intent(in) :: rank, topNeighbour, bottomNeighbour, leftNeighbour, rightNeighbour
+    real, dimension(:,:,:), intent(out) :: topBoundary, bottomBoundary, leftBoundary, rightBoundary)
+    integer :: has_packets, fifo_empty
+    type(gmcfPacket) :: packet
+    if (topNeighbour .ne. -1) then
+        call gmcfWaitFor(rank, RESPDATA, topNeighbour, 1)
+    end if
+    if (bottomNeighbour .ne. -1) then
+        call gmcfWaitFor(rank, RESPDATA, bottomNeighbour, 1)
+    end if
+    if (leftNeighbour .ne. -1) then
+        call gmcfWaitFor(rank, RESPDATA, leftNeighbour, 1)
+    end if
+    if (rightNeighbour .ne. -1) then
+        call gmcfWaitFor(rank, RESPDATA, rightNeighbour, 1)
+    end if
+    call gmcfHasPackets(rank, RESPDATA, has_packets)
+    do while (has_packets == 1)
+        call gmcfShiftPending(rank, RESPDATA, packet, fifo_empty)
+        select case (packet%data_id)
+            case (topTag)
+                call gmcfRead3DFloatArray(topBoundary, shape(topBoundary), packet)
+            case (bottomTag)
+                call gmcfRead3DFloatArray(bottomBoundary, shape(bottomBoundary), packet)
+            case (leftTag)
+                call gmcfRead3DFloatArray(leftBoundary, shape(leftBoundary), packet)
+            case (rightTag)
+                call gmcfRead3DFloatArray(rightBoundary, shape(rightBoundary), packet)
+        end select
+        call gmcfHasPackets(rank, RESPDATA, has_packets)
+    end do
+end subroutine GMCF_MPI_WaitAll
 
 end module
