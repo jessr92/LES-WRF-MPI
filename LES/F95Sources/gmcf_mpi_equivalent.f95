@@ -18,7 +18,7 @@ subroutine GMCF_MPI_AllReduceInPlaceRealSum(rank, value, instanceCount)
     integer :: i
     master = rank .eq. 0
     allocate(gatheredValues(instanceCount - 1))
-    call GMCF_MPI_GatherReal(gatheredValues, instanceCount, master)
+    call GMCF_MPI_GatherSingleFloatReal(gatheredValues, instanceCount, master)
     if (master) then
         do i=1, instanceCount
             value = value + gatheredValues(i)
@@ -37,7 +37,7 @@ subroutine GMCF_MPI_AllReduceInPlaceRealMax(value)
     integer :: i
     master = rank .eq. 0
     allocate(gatheredValues(instanceCount - 1))
-    call GMCF_MPI_GatherReal(gatheredValues, instanceCount, master)
+    call GMCF_MPI_GatherSingleFloatReal(gatheredValues, instanceCount, master)
     if (master) then
         do i=1, instanceCount
             if (gatheredValues(i) > value) then
@@ -58,7 +58,7 @@ subroutine GMCF_MPI_AllReduceInPlaceRealMin(value)
     integer :: i
     master = rank .eq. 0
     allocate(gatheredValues(instanceCount - 1))
-    call GMCF_MPI_GatherReal(gatheredValues, instanceCount, master)
+    call GMCF_MPI_GatherSingleFloatReal(gatheredValues, instanceCount, master)
     if (master) then
         do i=1, instanceCount
             if (gatheredValues(i) < value) then
@@ -70,22 +70,22 @@ subroutine GMCF_MPI_AllReduceInPlaceRealMin(value)
     deallocate(gatheredValues)
 end subroutine GMCF_API_AllReduceInPlaceRealMin
 
-subroutine GMCF_MPI_GatherReal(gatheredValues, instanceCount, master)
+subroutine GMCF_MPI_GatherSingleFloatReal(gatheredValues, instanceCount, master)
     implicit none
-    real(kind=4), dimension(:), intent(inout) :: gatherdValues
+    real(kind=4), dimension(:), intent(inout) :: gatheredValues
     integer, intent(in) :: instanceCount
     logical, intent(in) :: master
     integer :: i
     if (master) then
         do i=1, instanceCount
-    !       MPI_Recv()
+    !       GMCF_MPI_RecvSingleFloat()
         end do
     else
-    !    MPI_Send()
+    !    GMCF_MPI_SendSingleFloat()
     end if
-end subroutine GMCF_MPI_Gather
+end subroutine GMCF_MPI_GatherSingleFloat
 
-subroutine GMCF_MPI_Broadcast(value, instanceCount, master)
+subroutine GMCF_MPI_BroadcastSingleFloat(value, instanceCount, master)
     implicit none
     real(kind=4), intent(inout) :: value  
     integer, intent(in) :: instanceCount  
@@ -93,12 +93,12 @@ subroutine GMCF_MPI_Broadcast(value, instanceCount, master)
     integer :: i
     if (master) then
         do i=1, instanceCount
-    !       MPI_Send()
+    !       GMCF_MPI_RecvSingleFloat()
         end do
     else
-    !   MPI_Recv()
+    !   GMCF_MPI_RecvSingleFloat()
     end if
-end subroutine GMCF_MPI_Broadcast
+end subroutine GMCF_MPI_BroadcastSingleFloat
 
 subroutine GMCF_MPI_ISend1DFloatArray(rank, array, tag, destination, time)
     implicit none
@@ -179,7 +179,7 @@ subroutine GMCF_MPI_Recv3DFloatArray()
     ! GMCF_MPI_Wait()
 end subroutine GMCF_MPI_Recv3DFloatArray
 
-subroutine GMCF_MPI_WaitAll(rank, topBoundary, bottomBoundary, leftBoundary, rightBoundary) ! also any side flows and broadcasts?
+subroutine GMCF_MPI_WaitFloatHaloBoundaries(rank, topBoundary, bottomBoundary, leftBoundary, rightBoundary)
     implicit none
     integer, intent(in) :: rank, topNeighbour, bottomNeighbour, leftNeighbour, rightNeighbour
     real, dimension(:,:,:), intent(out) :: topBoundary, bottomBoundary, leftBoundary, rightBoundary)
@@ -212,6 +212,6 @@ subroutine GMCF_MPI_WaitAll(rank, topBoundary, bottomBoundary, leftBoundary, rig
         end select
         call gmcfHasPackets(rank, RESPDATA, has_packets)
     end do
-end subroutine GMCF_MPI_WaitAll
+end subroutine GMCF_MPI_WaitFloatHaloBoundaries
 
 end module
