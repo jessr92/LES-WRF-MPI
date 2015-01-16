@@ -7,8 +7,11 @@ implicit none
 
 contains
 
-subroutine GMCF_MPI_AllReduceInPlaceRealSum()
+subroutine GMCF_MPI_AllReduceInPlaceRealSum(value)
     implicit none
+    real(kind=4), intent(inout) :: value
+    logical :: master
+    ! master = <0th instance>
     ! Equivalent to
     ! MPI_Gather(xs)
     ! if (master) then
@@ -19,8 +22,11 @@ subroutine GMCF_MPI_AllReduceInPlaceRealSum()
     ! MPI_Broadcast(x)
 end subroutine GMCF_API_AllReduceInPlaceRealSum
 
-subroutine GMCF_MPI_AllReduceInPlaceRealMax()
+subroutine GMCF_MPI_AllReduceInPlaceRealMax(value)
     implicit none
+    real(kind=4), intent(inout) :: value
+    logical :: master
+    ! master = <0th instance>
     ! Equivalent to
     ! MPI_Gather(xs)
     ! if (master) then
@@ -33,8 +39,11 @@ subroutine GMCF_MPI_AllReduceInPlaceRealMax()
     ! MPI_Broadcast(x)          
 end subroutine GMCF_API_AllReduceInPlaceRealMax
 
-subroutine GMCF_MPI_AllReduceInPlaceRealMin()
+subroutine GMCF_MPI_AllReduceInPlaceRealMin(value)
     implicit none
+    real(kind=4), intent(inout) :: value
+    logical :: master
+    ! master = <0th instance>
     ! Equivalent to
     ! MPI_Gather(xs)
     ! if (master) then
@@ -49,6 +58,8 @@ end subroutine GMCF_API_AllReduceInPlaceRealMin
 
 subroutine GMCF_MPI_Gather()
     implicit none
+    logical :: master
+    ! master = <0th instance>
     ! Equivalent to
     ! if (master) then
     !     do for all other processes
@@ -59,7 +70,11 @@ subroutine GMCF_MPI_Gather()
     ! end if
 end subroutine GMCF_MPI_Gather
 
-subroutine GMCF_MPI_Broadcast()
+subroutine GMCF_MPI_Broadcast(value)
+    implicit none
+    real(kind=4), intent(inout) :: value    
+    logical :: master
+    ! master = <0th instance>
     ! Equivalent to
     ! if (master) then
     !     do for all other processes
@@ -70,17 +85,25 @@ subroutine GMCF_MPI_Broadcast()
     ! end if
 end subroutine GMCF_MPI_Broadcast
 
-subroutine GMCF_MPI_ISend1DFloatArray()
+subroutine GMCF_MPI_ISend1DFloatArray(rank, array, tag, destination, time)
     implicit none
-    ! Equivalent to
-    ! gmcfSend1DFloatArray()
+    integer, intent(in) :: rank, tag, destination, time
+    real, dimension(:) :: array
+    integer :: pre_post
+    pre_post = PRE ! Arbitrary
+    call gmcfSend1DFloatArray(rank, array, size(array), tag, destination, pre_post, time)
 end subroutine GMCF_MPI_ISend1DFloatArray
 
-subroutine GMCF_MPI_Send1DFloatArray()
+subroutine GMCF_MPI_Send1DFloatArray(rank, array, tag, destination, time)
     implicit none
+    integer, intent(in) :: rank, tag, destination, time
+    real, dimension(:) :: array
     ! Equivalent to
-    ! GMCF_MPI_ISend1DFloatArray()
-    ! GMCF_MPI_Wait()
+    ! GMCF_MPI_ISend1DFloatArray
+    ! No wait call required as the GMCF framework makes a copy of array so it
+    ! is safe to reuse array straight away even though there is no blocking
+    ! call.
+    call GMCF_MPI_ISend1DFloatArray(rank, array, tag, destination, time)
 end subroutine GMCF_MPI_Send1DFloatArray
 
 subroutine GMCF_MPI_IRecv1DFloatArray()
@@ -96,7 +119,7 @@ end subroutine GMCF_MPI_IRecv1DFloatArray
 subroutine GMCF_MPI_Recv1DFloatArray()
     implicit none
     ! Equivalent to
-    ! GMCF_MPI_IRecv1DFloatArray()
+    call GMCF_MPI_IRecv1DFloatArray()
     ! GMCF_MPI_Wait()
 end subroutine GMCF_MPI_Recv1DFloatArray
 
