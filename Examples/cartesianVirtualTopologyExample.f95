@@ -1,5 +1,5 @@
 program cartesianVirtualTopologyExample
-use mpi_helper
+use communication_helper
 implicit none
 integer, parameter :: procPerRow = 4, procPerCol = 3, dimensions = 2
 integer :: dimensionSizes(dimensions)

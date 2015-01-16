@@ -1,0 +1,7 @@
+module communication_helper
+use communication_helper_integer
+use communication_helper_real
+implicit none
+
+end module communication_helper
+

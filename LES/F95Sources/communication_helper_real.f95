@@ -1,5 +1,5 @@
-module mpi_helper_real
-use mpi_helper_base
+module communication_helper_real
+use communication_helper_base
 implicit none
 
 contains

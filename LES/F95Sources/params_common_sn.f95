@@ -1,6 +1,6 @@
 module params_common_sn
 #ifdef MPI
-    use mpi_helper
+    use communication_helper
     integer, parameter :: procPerRow = PROC_PER_ROW, procPerCol = PROC_PER_COL, dimensions = 2
     integer :: dimensionSizes(dimensions)
     logical :: periodicDimensions(dimensions)

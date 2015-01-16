@@ -1,5 +1,5 @@
 program helloMPI
-use mpi_helper
+use communication_helper
 implicit none
 call main()
 

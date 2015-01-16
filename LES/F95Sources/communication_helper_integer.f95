@@ -1,8 +1,8 @@
-module mpi_helper_integer
-use mpi_helper_base
+module communication_helper_integer
+use communication_helper_base
 implicit none
 
-! May not be kept as up to date as mpi_helper_real since mpi_helper_integer is
+! May not be kept as up to date as communication_helper_real since communication_helper_integer is
 ! just to test things out!
 
 contains

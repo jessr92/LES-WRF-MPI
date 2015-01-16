@@ -1,5 +1,5 @@
 program haloExchangeExample
-use mpi_helper
+use communication_helper
 implicit none
 integer, parameter :: rows = 30, columns = 40, depthSize=2, dimensions = 2
 integer, parameter :: procPerCol = 3, procPerRow = 4

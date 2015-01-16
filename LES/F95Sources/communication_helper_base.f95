@@ -1,4 +1,4 @@
-module mpi_helper_base
+module communication_helper_base
 use mpi
 use fortran_helper
 implicit none
