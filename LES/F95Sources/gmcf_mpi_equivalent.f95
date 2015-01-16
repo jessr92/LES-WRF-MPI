@@ -18,7 +18,7 @@ subroutine GMCF_MPI_AllReduceInPlaceRealSum(rank, value, instanceCount)
     integer :: i
     master = rank .eq. 0
     allocate(gatheredValues(instanceCount - 1))
-    call GMCF_MPI_GatherSingleFloatReal(gatheredValues, instanceCount, master)
+    call GMCF_MPI_GatherSingleRealReal(gatheredValues, instanceCount, master)
     if (master) then
         do i=1, instanceCount
             value = value + gatheredValues(i)
@@ -37,7 +37,7 @@ subroutine GMCF_MPI_AllReduceInPlaceRealMax(value)
     integer :: i
     master = rank .eq. 0
     allocate(gatheredValues(instanceCount - 1))
-    call GMCF_MPI_GatherSingleFloatReal(gatheredValues, instanceCount, master)
+    call GMCF_MPI_GatherSingleRealReal(gatheredValues, instanceCount, master)
     if (master) then
         do i=1, instanceCount
             if (gatheredValues(i) > value) then
@@ -58,7 +58,7 @@ subroutine GMCF_MPI_AllReduceInPlaceRealMin(value)
     integer :: i
     master = rank .eq. 0
     allocate(gatheredValues(instanceCount - 1))
-    call GMCF_MPI_GatherSingleFloatReal(gatheredValues, instanceCount, master)
+    call GMCF_MPI_GatherSingleRealReal(gatheredValues, instanceCount, master)
     if (master) then
         do i=1, instanceCount
             if (gatheredValues(i) < value) then
@@ -70,7 +70,7 @@ subroutine GMCF_MPI_AllReduceInPlaceRealMin(value)
     deallocate(gatheredValues)
 end subroutine GMCF_API_AllReduceInPlaceRealMin
 
-subroutine GMCF_MPI_GatherSingleFloatReal(gatheredValues, instanceCount, master)
+subroutine GMCF_MPI_GatherSingleRealReal(gatheredValues, instanceCount, master)
     implicit none
     real(kind=4), dimension(:), intent(inout) :: gatheredValues
     integer, intent(in) :: instanceCount
@@ -78,14 +78,14 @@ subroutine GMCF_MPI_GatherSingleFloatReal(gatheredValues, instanceCount, master)
     integer :: i
     if (master) then
         do i=1, instanceCount
-    !       GMCF_MPI_RecvSingleFloat()
+    !       GMCF_MPI_RecvSingleReal()
         end do
     else
-    !    GMCF_MPI_SendSingleFloat()
+    !    GMCF_MPI_SendSingleReal()
     end if
-end subroutine GMCF_MPI_GatherSingleFloat
+end subroutine GMCF_MPI_GatherSingleReal
 
-subroutine GMCF_MPI_BroadcastSingleFloat(value, instanceCount, master)
+subroutine GMCF_MPI_BroadcastSingleReal(value, instanceCount, master)
     implicit none
     real(kind=4), intent(inout) :: value  
     integer, intent(in) :: instanceCount  
@@ -93,35 +93,35 @@ subroutine GMCF_MPI_BroadcastSingleFloat(value, instanceCount, master)
     integer :: i
     if (master) then
         do i=1, instanceCount
-    !       GMCF_MPI_RecvSingleFloat()
+    !       GMCF_MPI_RecvSingleReal()
         end do
     else
-    !   GMCF_MPI_RecvSingleFloat()
+    !   GMCF_MPI_RecvSingleReal()
     end if
-end subroutine GMCF_MPI_BroadcastSingleFloat
+end subroutine GMCF_MPI_BroadcastSingleReal
 
-subroutine GMCF_MPI_ISend1DFloatArray(rank, array, tag, destination, time)
+subroutine GMCF_MPI_ISend1DRealArray(rank, array, tag, destination, time)
     implicit none
     integer, intent(in) :: rank, tag, destination, time
     real, dimension(:) :: array
     integer :: pre_post
     pre_post = PRE ! Arbitrary
-    call gmcfSend1DFloatArray(rank, array, size(array), tag, destination, pre_post, time)
-end subroutine GMCF_MPI_ISend1DFloatArray
+    call gmcfSend1DRealArray(rank, array, size(array), tag, destination, pre_post, time)
+end subroutine GMCF_MPI_ISend1DRealArray
 
-subroutine GMCF_MPI_Send1DFloatArray(rank, array, tag, destination, time)
+subroutine GMCF_MPI_Send1DRealArray(rank, array, tag, destination, time)
     implicit none
     integer, intent(in) :: rank, tag, destination, time
     real, dimension(:) :: array
     ! Equivalent to
-    ! GMCF_MPI_ISend1DFloatArray
+    ! GMCF_MPI_ISend1DRealArray
     ! No wait call required as the GMCF framework makes a copy of array so it
     ! is safe to reuse array straight away even though there is no blocking
     ! call.
-    call GMCF_MPI_ISend1DFloatArray(rank, array, tag, destination, time)
-end subroutine GMCF_MPI_Send1DFloatArray
+    call GMCF_MPI_ISend1DRealArray(rank, array, tag, destination, time)
+end subroutine GMCF_MPI_Send1DRealArray
 
-subroutine GMCF_MPI_IRecv1DFloatArray()
+subroutine GMCF_MPI_IRecv1DRealArray()
     implicit none
     ! Equivalent to
     ! Nothing in this case? Within models doesn't need to request data from
@@ -129,37 +129,37 @@ subroutine GMCF_MPI_IRecv1DFloatArray()
     ! IRecv actually has any valid data until after MPI_Wait() returns. Since
     ! GMCF doesn't give unique labels to each request then there is nothing to
     ! do here...
-end subroutine GMCF_MPI_IRecv1DFloatArray
+end subroutine GMCF_MPI_IRecv1DRealArray
 
-subroutine GMCF_MPI_Recv1DFloatArray()
+subroutine GMCF_MPI_Recv1DRealArray()
     implicit none
     ! Equivalent to
-    call GMCF_MPI_IRecv1DFloatArray()
+    call GMCF_MPI_IRecv1DRealArray()
     ! GMCF_MPI_Wait()
-end subroutine GMCF_MPI_Recv1DFloatArray
+end subroutine GMCF_MPI_Recv1DRealArray
 
-subroutine GMCF_MPI_ISend3DFloatArray(rank, array, tag, destination, time)
+subroutine GMCF_MPI_ISend3DRealArray(rank, array, tag, destination, time)
     implicit none
     integer, intent(in) :: rank, tag, destination, time
     real, dimension(:,:,:) :: array
     integer :: pre_post
     pre_post = PRE ! Arbitrary
-    call gmcfSend3DFloatArray(rank, array, size(array), tag, destination, pre_post, time)
-end subroutine GMCF_MPI_ISend3DFloatArray
+    call gmcfSend3DRealArray(rank, array, size(array), tag, destination, pre_post, time)
+end subroutine GMCF_MPI_ISend3DRealArray
 
-subroutine GMCF_MPI_Send3DFloatArray(rank, array, tag, destination, time)
+subroutine GMCF_MPI_Send3DRealArray(rank, array, tag, destination, time)
     implicit none
     integer, intent(in) :: rank, tag, destination, time
     real, dimension(:,:,:) :: array
     ! Equivalent to
-    ! GMCF_MPI_ISend3DFloatArray
+    ! GMCF_MPI_ISend3DRealArray
     ! No wait call required as the GMCF framework makes a copy of array so it
     ! is safe to reuse array straight away even though there is no blocking
     ! call.
-    call GMCF_MPI_ISend3DFloatArray(rank, array, tag, destination, time)
-end subroutine GMCF_MPI_Send3DFloatArray
+    call GMCF_MPI_ISend3DRealArray(rank, array, tag, destination, time)
+end subroutine GMCF_MPI_Send3DRealArray
 
-subroutine GMCF_MPI_IRecv3DFloatArray()
+subroutine GMCF_MPI_IRecv3DRealArray()
     implicit none
     ! Equivalent to
     ! Nothing in this case? Within models doesn't need to request data from
@@ -167,19 +167,19 @@ subroutine GMCF_MPI_IRecv3DFloatArray()
     ! IRecv actually has any valid data until after MPI_Wait() returns. Since
     ! GMCF doesn't give unique labels to each request then there is nothing to
     ! do here...
-end subroutine GMCF_MPI_IRecv3DFloatArray
+end subroutine GMCF_MPI_IRecv3DRealArray
 
-subroutine GMCF_MPI_Recv3DFloatArray()
+subroutine GMCF_MPI_Recv3DRealArray()
     implicit none
     ! Equivalent to
-    call GMCF_MPI_IRecv3DFloatArray()
+    call GMCF_MPI_IRecv3DRealArray()
     ! Perhaps not? GMCF seems to force you to go through all packets so if the
     ! instance is waiting for multiple boundaries (in almost every case) then
     ! we need to be ready to have all of them at once?
     ! GMCF_MPI_Wait()
-end subroutine GMCF_MPI_Recv3DFloatArray
+end subroutine GMCF_MPI_Recv3DRealArray
 
-subroutine GMCF_MPI_WaitFloatHaloBoundaries(rank, topBoundary, bottomBoundary, leftBoundary, rightBoundary)
+subroutine GMCF_MPI_WaitRealHaloBoundaries(rank, topBoundary, bottomBoundary, leftBoundary, rightBoundary)
     implicit none
     integer, intent(in) :: rank, topNeighbour, bottomNeighbour, leftNeighbour, rightNeighbour
     real, dimension(:,:,:), intent(out) :: topBoundary, bottomBoundary, leftBoundary, rightBoundary)
@@ -202,16 +202,16 @@ subroutine GMCF_MPI_WaitFloatHaloBoundaries(rank, topBoundary, bottomBoundary, l
         call gmcfShiftPending(rank, RESPDATA, packet, fifo_empty)
         select case (packet%data_id)
             case (topTag)
-                call gmcfRead3DFloatArray(topBoundary, shape(topBoundary), packet)
+                call gmcfRead3DRealArray(topBoundary, shape(topBoundary), packet)
             case (bottomTag)
-                call gmcfRead3DFloatArray(bottomBoundary, shape(bottomBoundary), packet)
+                call gmcfRead3DRealArray(bottomBoundary, shape(bottomBoundary), packet)
             case (leftTag)
-                call gmcfRead3DFloatArray(leftBoundary, shape(leftBoundary), packet)
+                call gmcfRead3DRealArray(leftBoundary, shape(leftBoundary), packet)
             case (rightTag)
-                call gmcfRead3DFloatArray(rightBoundary, shape(rightBoundary), packet)
+                call gmcfRead3DRealArray(rightBoundary, shape(rightBoundary), packet)
         end select
         call gmcfHasPackets(rank, RESPDATA, has_packets)
     end do
-end subroutine GMCF_MPI_WaitFloatHaloBoundaries
+end subroutine GMCF_MPI_WaitRealHaloBoundaries
 
 end module
