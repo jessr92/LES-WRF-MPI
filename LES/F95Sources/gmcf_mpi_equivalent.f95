@@ -9,82 +9,95 @@ integer, parameter :: topTag = 1, bottomTag = 2, leftTag = 3, rightTag = 4
 
 contains
 
-subroutine GMCF_MPI_AllReduceInPlaceRealSum(value)
+subroutine GMCF_MPI_AllReduceInPlaceRealSum(rank, value, instanceCount)
     implicit none
+    integer, intent(in) :: rank
     real(kind=4), intent(inout) :: value
+    real(kind=4), dimension(:), allocatable :: gatheredValues
     logical :: master
-    ! master = <0th instance>
-    ! Equivalent to
-    ! MPI_Gather(xs)
-    ! if (master) then
-    !     do for all received values - value
-    !         x = x + value
-    !     end do
-    ! end if
-    ! MPI_Broadcast(x)
+    integer :: i
+    master = rank .eq. 0
+    allocate(gatheredValues(instanceCount - 1))
+    call GMCF_MPI_GatherReal(gatheredValues, instanceCount, master)
+    if (master) then
+        do i=1, instanceCount
+            value = value + gatheredValues(i)
+        end do
+    end if
+    call MPI_Broadcast(value, instanceCount, master)
+    deallocate(gatheredValues)
 end subroutine GMCF_API_AllReduceInPlaceRealSum
 
 subroutine GMCF_MPI_AllReduceInPlaceRealMax(value)
     implicit none
+    integer, intent(in) :: rank
     real(kind=4), intent(inout) :: value
+    real(kind=4), dimension(:), allocatable :: gatheredValues
     logical :: master
-    ! master = <0th instance>
-    ! Equivalent to
-    ! MPI_Gather(xs)
-    ! if (master) then
-    !     do for all recieved values - value
-    !         if (value > x) then
-    !             x = value
-    !         end if
-    !     end do
-    ! end if
-    ! MPI_Broadcast(x)          
+    integer :: i
+    master = rank .eq. 0
+    allocate(gatheredValues(instanceCount - 1))
+    call GMCF_MPI_GatherReal(gatheredValues, instanceCount, master)
+    if (master) then
+        do i=1, instanceCount
+            if (gatheredValues(i) > value) then
+                value = gatheredValues(i)
+            end if
+        end do
+    end if
+    call MPI_Broadcast(value, instanceCount, master)
+    deallocate(gatheredValues)
 end subroutine GMCF_API_AllReduceInPlaceRealMax
 
 subroutine GMCF_MPI_AllReduceInPlaceRealMin(value)
     implicit none
+    integer, intent(in) :: rank
     real(kind=4), intent(inout) :: value
+    real(kind=4), dimension(:), allocatable :: gatheredValues
     logical :: master
-    ! master = <0th instance>
-    ! Equivalent to
-    ! MPI_Gather(xs)
-    ! if (master) then
-    !     do for all recieved values - value
-    !         if (value < x) then
-    !             x = value
-    !         end if
-    !     end do
-    ! end if
-    ! MPI_Broadcast(x) 
+    integer :: i
+    master = rank .eq. 0
+    allocate(gatheredValues(instanceCount - 1))
+    call GMCF_MPI_GatherReal(gatheredValues, instanceCount, master)
+    if (master) then
+        do i=1, instanceCount
+            if (gatheredValues(i) < value) then
+                value = gatheredValues(i)
+            end if
+        end do
+    end if
+    call MPI_Broadcast(value, instanceCount, master)
+    deallocate(gatheredValues)
 end subroutine GMCF_API_AllReduceInPlaceRealMin
 
-subroutine GMCF_MPI_Gather()
+subroutine GMCF_MPI_GatherReal(gatheredValues, instanceCount, master)
     implicit none
-    logical :: master
-    ! master = <0th instance>
-    ! Equivalent to
-    ! if (master) then
-    !     do for all other processes
-    !         MPI_Recv()
-    !     end do
-    ! else
-    !     MPI_Send()
-    ! end if
+    real(kind=4), dimension(:), intent(inout) :: gatherdValues
+    integer, intent(in) :: instanceCount
+    logical, intent(in) :: master
+    integer :: i
+    if (master) then
+        do i=1, instanceCount
+    !       MPI_Recv()
+        end do
+    else
+    !    MPI_Send()
+    end if
 end subroutine GMCF_MPI_Gather
 
-subroutine GMCF_MPI_Broadcast(value)
+subroutine GMCF_MPI_Broadcast(value, instanceCount, master)
     implicit none
-    real(kind=4), intent(inout) :: value    
-    logical :: master
-    ! master = <0th instance>
-    ! Equivalent to
-    ! if (master) then
-    !     do for all other processes
-    !         MPI_Send()
-    !     end do
-    ! else
-    !     MPI_Recv()
-    ! end if
+    real(kind=4), intent(inout) :: value  
+    integer, intent(in) :: instanceCount  
+    logical, intent(in) :: master
+    integer :: i
+    if (master) then
+        do i=1, instanceCount
+    !       MPI_Send()
+        end do
+    else
+    !   MPI_Recv()
+    end if
 end subroutine GMCF_MPI_Broadcast
 
 subroutine GMCF_MPI_ISend1DFloatArray(rank, array, tag, destination, time)
