@@ -1,8 +1,8 @@
 FC = mpifort
 FCFLAGS += -fopenmp -cpp -Wall -Wextra -Wconversion -pedantic -std=f95 -fall-intrinsics -O2
 PROGRAMS = helloMPI helloOpenMP helloMPIOpenMP haloExchange3DExample haloExchange3DRealExample sideflowExample cartesianVirtualTopologyExample mpi_pi
-HELPER_OBJS = communication_helper.o communication_helper_integer.o communication_helper_base.o communication_helper_real.o fortran_helper.o
-HELPER_MODS = communication_helper_base.mod communication_helper_integer.mod communication_helper_real.mod communication_helper.mod fortran_helper.mod
+HELPER_OBJS = communication_common.o communication_helper.o communication_helper_integer.o communication_helper_base.o communication_helper_real.o fortran_helper.o
+HELPER_MODS = communication_common.mod  communication_helper_base.mod communication_helper_integer.mod communication_helper_real.mod communication_helper.mod fortran_helper.mod
 HELLO_MPI_OBJS = helloMPI.o $(HELPER_OBJS)
 HELLO_OPEN_MP_OBJS = helloOpenMP.o
 HELLO_MPI_OPEN_MP_OBJS = helloMPIOpenMP.o $(HELPER_OBJS)
@@ -43,6 +43,9 @@ cartesianVirtualTopologyExample.o: cartesianVirtualTopologyExample.f95 $(HELPER_
 mpi_pi: $(MPI_PI_OBJS)
 
 mpi_pi.o: mpi_pi.f95 $(HELPER_MODS)
+
+communication_common.mod: ../LES/F95Sources/communication_common.f95
+	$(FC) $(FCFLAGS) -c $<
 
 communication_helper.mod: ../LES/F95Sources/communication_helper.f95
 	$(FC) $(FCFLAGS) -c $<
