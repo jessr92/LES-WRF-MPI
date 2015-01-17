@@ -2,8 +2,6 @@ module gmcf_mpi_equivalent
 use gmcfAPI
 implicit none
 
-integer, parameter :: topTag = 1, bottomTag = 2, leftTag = 3, rightTag = 4
-
 ! This is currently a skeleton with only communication between LES instances
 ! in mind.
 
@@ -18,7 +16,7 @@ subroutine GMCF_MPI_AllReduceInPlaceRealSum(rank, value, instanceCount)
     integer :: i
     master = rank .eq. 0
     allocate(gatheredValues(instanceCount - 1))
-    call GMCF_MPI_GatherSingleRealReal(gatheredValues, instanceCount, master)
+    call GMCF_MPI_GatherSingleReal(gatheredValues, instanceCount, master)
     if (master) then
         do i=1, instanceCount
             value = value + gatheredValues(i)
@@ -37,7 +35,7 @@ subroutine GMCF_MPI_AllReduceInPlaceRealMax(value)
     integer :: i
     master = rank .eq. 0
     allocate(gatheredValues(instanceCount - 1))
-    call GMCF_MPI_GatherSingleRealReal(gatheredValues, instanceCount, master)
+    call GMCF_MPI_GatherSingleReal(gatheredValues, instanceCount, master)
     if (master) then
         do i=1, instanceCount
             if (gatheredValues(i) > value) then
@@ -58,7 +56,7 @@ subroutine GMCF_MPI_AllReduceInPlaceRealMin(value)
     integer :: i
     master = rank .eq. 0
     allocate(gatheredValues(instanceCount - 1))
-    call GMCF_MPI_GatherSingleRealReal(gatheredValues, instanceCount, master)
+    call GMCF_MPI_GatherSingleReal(gatheredValues, instanceCount, master)
     if (master) then
         do i=1, instanceCount
             if (gatheredValues(i) < value) then
@@ -70,7 +68,7 @@ subroutine GMCF_MPI_AllReduceInPlaceRealMin(value)
     deallocate(gatheredValues)
 end subroutine GMCF_API_AllReduceInPlaceRealMin
 
-subroutine GMCF_MPI_GatherSingleRealReal(gatheredValues, instanceCount, master)
+subroutine GMCF_MPI_GatherSingleReal(gatheredValues, instanceCount, master)
     implicit none
     real(kind=4), dimension(:), intent(inout) :: gatheredValues
     integer, intent(in) :: instanceCount

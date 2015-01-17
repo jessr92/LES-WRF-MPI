@@ -109,7 +109,7 @@ if csources:
 fsources = []
 
 if with_mpi == '1':
-    fsources += ['./fortran_helper.f95', './communication_helper.f95', './communication_helper_integer.f95', './communication_helper_base.f95', './communication_helper_real.f95']
+    fsources += ['./fortran_helper.f95', './communication_common.f95', './communication_helper.f95', './communication_helper_integer.f95', './communication_helper_base.f95', './communication_helper_real.f95']
 
 if USE_NETCDF_OUTPUT != '':
     fsources += ['./module_LES_write_netcdf.f95']

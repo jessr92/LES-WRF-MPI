@@ -1,14 +1,19 @@
 module communication_helper_base
+use communication_common
+#ifdef GMCF_API
+use gmcf_mpi_equivalent
+#else
 use mpi
+#endif
 use fortran_helper
 implicit none
+
+#ifdef GMCF_API
+#else
 integer(kind=4) :: rank, cartRank, mpi_size, ierror, status(MPI_STATUS_SIZE)
 integer :: communicator, cartTopComm
-integer, parameter :: topTag = 1, bottomTag = 2, leftTag = 3, rightTag = 4
-integer, parameter :: zbmTag = 5
-integer, parameter :: leftSideTag = 6, rightSideTag = 7
-integer, parameter :: dxTag = 8, dyTag = 9, collect3DReal4Tag = 10
-integer, parameter :: leftNeighbour = 1, rightNeighbour = 2, topNeighbour = 3, bottomNeighbour = 4
+#endif
+
 contains
 
 subroutine initialise_mpi()
