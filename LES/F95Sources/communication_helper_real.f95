@@ -107,6 +107,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
     real(kind=4), dimension(:,:,:), allocatable :: leftRecv, leftSend, rightSend, rightRecv
     real(kind=4), dimension(:,:,:), allocatable :: topRecv, topSend, bottomSend, bottomRecv
 #ifdef GMCF_API
+    ! Not sure. Unlikely to be necessary since MPI_Barrier isn't really necessary.
 #else
     call MPI_Barrier(communicator, ierror)
 #endif
@@ -114,6 +115,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
     !print*, 'GR: rank ', rank, ' is starting exchangeRealHalos'
 #endif
 #ifdef GMCF_API
+    ! Not sure
 #else
     if (size(neighbours, 1) .lt. 4) then
         print*, "Error: cannot have a 4-way halo exchange with less than 4 neighbours"
@@ -133,6 +135,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
     allocate(bottomRecv(topThickness, colCount, depthSize))
     allocate(topSend(bottomThickness, colCount, depthSize))
 #ifdef GMCF_API
+    ! Nothing?
 #else
     do i=1,8
         requests(i)= MPI_REQUEST_NULL
@@ -140,6 +143,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
 #endif
     ! Top edge to send, bottom edge to receive
 #ifdef GMCF_API
+    ! Not sure
 #else
     commWith = neighbours(topNeighbour)
 #endif
@@ -153,6 +157,9 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
             end do
         end do
 #ifdef GMCF_API
+        ! Sending is maybe fine. Receiving not so much at the moment
+        call GMCF_MPI_ISend3DRealArray(rank, topSend, topTag, commWith, 0)
+        ! call receive or maybe not?
 #else
         call MPI_ISend(topSend, bottomThickness*colCount*depthSize, MPI_REAL, commWith, topTag, &
                       cartTopComm, requests(1), ierror)
@@ -176,6 +183,9 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
             end do
         end do
 #ifdef GMCF_API
+        ! Sending is maybe fine. Receiving not so much at the moment
+        call GMCF_MPI_ISend3DRealArray(rank, bottomSend, bottomTag, commWith, 0)
+        ! call receive or maybe not?
 #else
         call MPI_IRecv(topRecv, bottomThickness*colCount*depthSize, MPI_REAL, commWith, topTag, &
                       cartTopComm, requests(3), ierror)
@@ -197,6 +207,9 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
             end do
         end do
 #ifdef GMCF_API
+        ! Sending is maybe fine. Receiving not so much at the moment
+        call GMCF_MPI_ISend3DRealArray(rank, leftSend, leftTag, commWith, 0)
+        ! call receive or maybe not?
 #else
         call MPI_ISend(leftSend, rightThickness*rowCount*depthSize, MPI_REAL, commWith, leftTag, &
                       communicator, requests(5), ierror)
@@ -220,6 +233,9 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
             end do
         end do
 #ifdef GMCF_API
+        ! Sending is maybe fine. Receiving not so much at the moment
+        call GMCF_MPI_ISend3DRealArray(rank, rightSend, rightTag, commWith, 0)
+        ! call receive or maybe not?
 #else
         call MPI_IRecv(leftRecv, rightThickness*rowCount*depthSize, MPI_REAL, commWith, leftTag, &
                       communicator, requests(7), ierror)
@@ -230,6 +246,8 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
 #endif
     end if
 #ifdef GMCF_API
+    ! Not sure, probably just GMCF_MPI_WaitRealHaloBoundaries and not have
+    ! receive calls above
 #else
     if (neighbours(topNeighbour) .ne. -1) then
         call MPI_Wait(requests(1), status, ierror)
@@ -310,6 +328,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
     deallocate(bottomSend)
     deallocate(bottomRecv)
 #ifdef GMCF_API
+    ! Not sure. Unlikely to be necessary since MPI_Barrier isn't really necessary.
 #else
     call MPI_Barrier(communicator, ierror)
 #endif
@@ -331,6 +350,7 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, &
         allocate(leftRecv(rowCount, depthSize))
         commWith = rank + procPerRow - 1
 #ifdef GMCF_API
+        ! GMCF_MPI_WaitSOMETHING only? No receive?
 #else
         call MPI_Recv(leftRecv, rowCount*depthSize, MPI_REAL, commWith, rightSideTag, &
                       communicator, status, ierror)
@@ -351,6 +371,7 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, &
             end do
         end do
 #ifdef GMCF_API
+        call GMCF_MPI_ISend2DRealArray(rank, rightSend, rightSideTag, commWith, 0) ! GMCF doesn't support this
 #else
         call MPI_Send(rightSend, rowCount*depthSize, MPI_REAL, commWith, rightSideTag, &
                       communicator, ierror)
@@ -381,6 +402,7 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, &
             end do
         end do
 #ifdef GMCF_API
+        call GMCF_MPI_ISend2DRealArray(rank, leftSend, leftSideTag, commWith, 0) ! GMCF doesn't support this
 #else
         call MPI_Send(leftSend, rowCount*depthSize, MPI_REAL, commWith, leftSideTag, &
                       communicator, ierror)
@@ -391,6 +413,7 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, &
         allocate(rightRecv(rowCount, depthSize))
         commWith = rank - procPerRow + 1
 #ifdef GMCF_API
+        ! GMCF_MPI_WaitSOMETHING only? No receive?
 #else
         call MPI_Recv(rightRecv, rowCount*depthSize, MPI_REAL, commWith, leftSideTag, &
                       communicator, status, ierror)
@@ -411,7 +434,11 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
     real(kind=4), dimension(-1:ipmax+1,-1:jpmax+1) , intent(InOut) :: zbm
     integer :: startRow, startCol, i, r, c
     real(kind=4), dimension(ip, jp) :: sendBuffer, recvBuffer
+#ifdef GMCF_API
+    ! Not sure. Unlikely to be necesssary since MPI_Barrier isn't really necessary.
+#else
     call MPI_Barrier(communicator, ierror)
+#endif
 #ifdef GR_DEBUG
     !print*, 'GR: rank ', rank, ' is starting distributeZBM'
 #endif
@@ -430,6 +457,7 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
                 end do
             end do
 #ifdef GMCF_API
+            call GMCF_MPI_ISend2DRealArray(rank, sendBuffer, zbmTag, i, 0) ! GMCF doesn't support this
 #else
             call MPI_Send(sendBuffer, (ip*jp), MPI_REAL, i, zbmTag, &
                           communicator, ierror)
@@ -439,6 +467,7 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
     else
         ! Receive appropriate 2D section from master
 #ifdef GMCF_API
+        ! GMCF_MPI_WaitSOMETHING only? No receive?
 #else
         call MPI_Recv(recvBuffer, (ip*jp), MPI_REAL, 0, zbmTag, communicator, &
                       status, ierror)
@@ -450,7 +479,11 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
             end do
         end do
     end if
+#ifdef GMCF_API
+    ! Not sure. Unlikely to be necesssary since MPI_Barrier isn't really necessary.
+#else
     call MPI_Barrier(communicator, ierror)
+#endif
 #ifdef GR_DEBUG
     print*, 'GR: rank ', rank, ' has finished distributeZBM'
 #endif
@@ -486,6 +519,7 @@ subroutine distribute1DRealRowWiseArray(arrayToBeSent, receivingArray, leftBound
                 sendBuffer(currentI-startI+1) = arrayToBeSent(currentI)
             end do
 #ifdef GMCF_API
+            call GMCF_MPI_ISend1DRealArray(rank, sendBuffer, dxTag, i, 0)
 #else
             call MPI_Send(sendBuffer, receivingSize, MPI_Real, i, dxTag, communicator, &
                           ierror)
@@ -496,6 +530,7 @@ subroutine distribute1DRealRowWiseArray(arrayToBeSent, receivingArray, leftBound
     else
         ! Receive receivingSize reals
 #ifdef GMCF_API
+        ! GMCF_MPI_WaitSOMETHING only? No receive?
 #else
         call MPI_Recv(receivingArray, receivingSize, MPI_REAL, 0, dxTag, communicator, &
                       status, ierror)
@@ -534,6 +569,7 @@ subroutine distribute1DRealColumnWiseArray(arrayToBeSent, receivingArray, leftBo
                 sendBuffer(currentI-startI+1) = arrayToBeSent(currentI)
             end do
 #ifdef GMCF_API
+            call GMCF_MPI_ISend1DRealArray(rank, sendBuffer, dyTag, i, 0)
 #else
             call MPI_Send(sendBuffer, receivingSize, MPI_Real, i, dyTag, communicator, &
                           ierror)
@@ -544,6 +580,7 @@ subroutine distribute1DRealColumnWiseArray(arrayToBeSent, receivingArray, leftBo
     else
         ! Receive receivingSize reals
 #ifdef GMCF_API
+        ! GMCF_WaitSOMETHING only? No receive?
 #else
         call MPI_Recv(receivingArray, receivingSize, MPI_REAL, 0, dyTag, communicator, &
                       status, ierror)
@@ -575,6 +612,7 @@ subroutine collect3DReal4ArrayP(array, arrayTot, leftBoundary, rightBoundary, &
             startRow = topLeftRowValue(i, procPerRow, ip)
             startCol = topLeftColValue(i, procPerRow, jp)
 #ifdef GMCF_API
+            ! GMCF_MPI_WaitSOMETHING only? No receive?
 #else
             call MPI_Recv(sendRecvBuffer, bufferSize, MPI_Real, i, collect3DReal4Tag, &
                           communicator, status, ierror)
@@ -597,6 +635,7 @@ subroutine collect3DReal4ArrayP(array, arrayTot, leftBoundary, rightBoundary, &
             end do
         end do
 #ifdef GMCF_API
+        call GMCF_MPI_ISend3DRealArray(rank, sendRecvBuffer, collect3DReal4Tag, 0, 0)
 #else
         call MPI_Send(sendRecvBuffer, bufferSize, MPI_Real, 0, collect3DReal4Tag, &
                       communicator, ierror)
@@ -629,6 +668,7 @@ subroutine collect3DReal4Array(array, arrayTot, leftBoundary, rightBoundary, &
             startRow = topLeftRowValue(i, procPerRow, ip)
             startCol = topLeftColValue(i, procPerRow, jp)
 #ifdef GMCF_API
+            ! GMCF_MPI_WaitSOMETHING only? No receive?
 #else
             call MPI_Recv(recvBuffer, bufferSize, MPI_Real, i, collect3DReal4Tag, &
                           communicator, status, ierror)
@@ -645,6 +685,7 @@ subroutine collect3DReal4Array(array, arrayTot, leftBoundary, rightBoundary, &
         deallocate(recvBuffer)
     else
 #ifdef GMCF_API
+        call GMCF_MPI_ISend3DRealArray(rank, sendRecvBuffer, collect3DReal4Tag, 0, 0)
 #else
         call MPI_Send(array, bufferSize, MPI_Real, 0, collect3DReal4Tag, &
                       communicator, ierror)
