@@ -154,6 +154,9 @@
 #endif
 ! -----------------------------------------------------------------------
 !
+#ifdef GMCF_API
+! Not sure
+#else
 #ifdef MPI
 ! GR: MPI Start
       call initialise_mpi()
@@ -172,6 +175,7 @@
     print*, 'GR: rank ', rank, ' top neighbour ', neighbours(topNeighbour),  &
             ' bottom neighbour ', neighbours(bottomNeighbour)
 #endif 
+#endif
 #endif
 #ifdef USE_NETCDF_OUTPUT
     call init_netcdf_file()
@@ -292,10 +296,12 @@
     print *,"Total time:" ,timestamp(9)-timestamp(8),"s for ",nmax-n0,"iterations"
 #endif
 
+#ifdef GMCF_API
+      ! Not sure
+#else
 #ifdef MPI
-!
-! GR: Finialise MPI
       call finalise_mpi()
+#endif
 #endif
       end program
 
