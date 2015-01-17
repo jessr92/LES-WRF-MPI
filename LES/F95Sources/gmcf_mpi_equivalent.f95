@@ -177,7 +177,8 @@ subroutine GMCF_MPI_Recv3DRealArray()
     ! GMCF_MPI_Wait()
 end subroutine GMCF_MPI_Recv3DRealArray
 
-subroutine GMCF_MPI_WaitRealHaloBoundaries(rank, topBoundary, bottomBoundary, leftBoundary, rightBoundary)
+subroutine GMCF_MPI_WaitRealHaloBoundaries(rank, topBoundary, bottomBoundary, leftBoundary, rightBoundary, &
+                                                 topNeighbour, bottomNeighbour, leftNeighbour, rightNeighbour)
     implicit none
     integer, intent(in) :: rank, topNeighbour, bottomNeighbour, leftNeighbour, rightNeighbour
     real, dimension(:,:,:), intent(out) :: topBoundary, bottomBoundary, leftBoundary, rightBoundary)
