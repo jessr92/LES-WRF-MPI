@@ -22,7 +22,7 @@ subroutine GMCF_MPI_AllReduceInPlaceRealSum(rank, value, instanceCount)
             value = value + gatheredValues(i)
         end do
     end if
-    call MPI_Broadcast(value, instanceCount, master)
+    call GMCF_MPI_BroadcastSingleReal(value, instanceCount, master)
     deallocate(gatheredValues)
 end subroutine GMCF_API_AllReduceInPlaceRealSum
 
@@ -43,7 +43,7 @@ subroutine GMCF_MPI_AllReduceInPlaceRealMax(value)
             end if
         end do
     end if
-    call MPI_Broadcast(value, instanceCount, master)
+    call GMCF_MPI_BroadcastSingleReal(value, instanceCount, master)
     deallocate(gatheredValues)
 end subroutine GMCF_API_AllReduceInPlaceRealMax
 
@@ -64,7 +64,7 @@ subroutine GMCF_MPI_AllReduceInPlaceRealMin(value)
             end if
         end do
     end if
-    call MPI_Broadcast(value, instanceCount, master)
+    call GMCF_MPI_BroadcastSingleReal(value, instanceCount, master)
     deallocate(gatheredValues)
 end subroutine GMCF_API_AllReduceInPlaceRealMin
 
