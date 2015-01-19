@@ -99,4 +99,22 @@ Places where corner estimated values are used:
     \label{fig:mpiLESGrid}
 \end{figure}
 
+\section{GMCF}
+
+\subsection{Workarounds and Hacks}
+
+With GMCF being a work in progress there are a number of desired features that
+are not currently implemented and a number of workarounds and hacks including
+hard coded values that should be worked out at compile-time instead.
+
+\begin{itemize}
+    \item The td files for defining each model in the coupling and the model's
+    unique ID are manually created.
+    \item The yml files for defining model communication, method names etc are
+    manually created instead of being defined from the td file and the model
+    code.
+    \item The gmcfConnectivityMatrix is currently hard coded instead of being
+    calculated based on the contents of the yml file.
+\end{itemize}
+
 \end{document}
