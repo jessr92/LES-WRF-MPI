@@ -57,11 +57,11 @@ def output_models(model_count):
     indented_output("Models:")
     for i in range(1, model_count + 1):
         indentation_increase()
-        output_model(model_count, i)
+        output_model(i)
         indentation_decrease()
 
 
-def output_model(model_count, i):
+def output_model(i):
     indented_output("model" + str(i))
     indentation_increase()
     indented_output("ModelId: " + str(i))
