@@ -19,17 +19,18 @@ def indentation_decrease():
     if indentationLevel < 0:
         indentationLevel = 0
 
-if len(sys.argv) != 2:
-    print("We need one argument, the number of LES models required.")
+if len(sys.argv) != 3:
+    print("We need two arguments, the number of model instances required then the model instance name.")
 
-lesCountRequired = int(sys.argv[1])
+modelCountRequired = int(sys.argv[1])
+modelName = sys.argv[2]
 
 indented_output("; GMCF.yml")
 indented_output("")
 indented_output("(begin")
 indentation_increase()
-for i in range(1, lesCountRequired + 1):
-    indented_output("(les '" + str(i) + ")")
+for i in range(1, modelCountRequired + 1):
+    indented_output("(" + modelName + " '" + str(i) + ")")
 indentation_decrease()
 indented_output(")")
 indented_output("")

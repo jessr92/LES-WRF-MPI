@@ -20,7 +20,7 @@ def indentation_decrease():
         indentationLevel = 0
 
 
-def output_system_config(model_count):
+def output_system_config(model_count, model_name):
     indented_output("System:")
     indentation_increase()
     indented_output("Libraries: [GMCF, CoreServices]")
@@ -29,7 +29,7 @@ def output_system_config(model_count):
     indented_output("")
     output_aliases_nodes(model_count)
     indented_output("")
-    indented_output("ModelLibPaths: ['libles.a']")
+    indented_output("ModelLibPaths: ['lib" + model_name + ".a']")
     indented_output("")
     output_models(model_count)
     indentation_decrease()
@@ -67,9 +67,10 @@ def output_model(i):
     indented_output("ModelId: " + str(i))
     indentation_decrease()
 
-if len(sys.argv) != 2:
-    print("We need one argument, the number of LES models required.")
+if len(sys.argv) != 3:
+    print("We need two arguments, the number of model instances required then the model instance name.")
 
-lesCountRequired = int(sys.argv[1])
+modelCountRequired = int(sys.argv[1])
+modelName = sys.argv[2]
 
-output_system_config(lesCountRequired)
+output_system_config(modelCountRequired, modelName)
