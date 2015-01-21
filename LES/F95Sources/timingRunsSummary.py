@@ -8,6 +8,9 @@ import sys
 # 3. Only supports les_main.txt, les_main_ifbf=0.txt, MPI_SharedMemory/*.txt, MPI_SharedMemoryExpandingArea/*.txt,
 #    MPI_SharedMemoryExactCorners/*.txt, and MPI_SharedMemoryExactCornersExpandingArea/*.txt
 
+if len(sys.argv) != 2:
+    print("Please run this script with a starting directory as a command line argument.")
+
 fileList = []
 rootDir = sys.argv[1] # For example, timingRuns/<hostname>
 originalRuntime = 0.0
