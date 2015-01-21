@@ -73,7 +73,7 @@ do
     do
         PROCESSES=`expr $procPerCol \\* $procPerRow`
         if [ $PROCESSES -le $HARDWARE_THREAD_COUNT ]; then
-            OUTPUT_FILE=$TIMING_DIRECTORY"/MPI_SharedMemoryExpandingArea/les_main_mpi_row"$procPerRow"_col"$procPerCol".txt"
+            OUTPUT_FILE=$TIMING_DIRECTORY"/MPI_SharedMemoryExactCornersExpandingArea/les_main_mpi_row"$procPerRow"_col"$procPerCol".txt"
             scons ocl=0 mpi=1 D=TIMINGS procPerRow=$procPerRow procPerCol=$procPerCol exactCorners=1 expandingArea=1
             mpiexec -np $PROCESSES ./les_main_mpi > $OUTPUT_FILE
         fi
