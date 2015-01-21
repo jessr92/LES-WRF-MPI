@@ -7,6 +7,8 @@ MAX_PER_DIMENSION=16
 mkdir -p $TIMING_DIRECTORY
 mkdir -p $TIMING_DIRECTORY"/MPI_SharedMemory"
 mkdir -p $TIMING_DIRECTORY"/MPI_SharedMemoryExpandingArea"
+mkdir -p $TIMING_DIRECTORY"/MPI_SharedMemoryExactCorners"
+mkdir -p $TIMING_DIRECTORY"/MPI_SharedMemoryExactCornersExpandingArea"
 HARDWARE_THREAD_COUNT=$(grep -c ^processor /proc/cpuinfo)
 # Max per dimension needs to be at least enough such that NxN will use all
 # available hardware threads on the shared memory system
@@ -52,4 +54,29 @@ do
     done
 done
 
+# Exact corners
+for procPerRow in $(seq $MAX_DIMENSION_PROCESSES)
+do
+    for procPerCol in $(seq $MAX_DIMENSION_PROCESSES)
+    do
+        PROCESSES=`expr $procPerCol \\* $procPerRow`
+        if [ $PROCESSES -le $HARDWARE_THREAD_COUNT ]; then
+            OUTPUT_FILE=$TIMING_DIRECTORY"/MPI_SharedMemoryExactCorners/les_main_mpi_row"$procPerRow"_col"$procPerCol".txt"
+            scons ocl=0 mpi=1 D=TIMINGS procPerRow=$procPerRow procPerCol=$procPerCol exactCorners=1
+            mpiexec -np $PROCESSES ./les_main_mpi > $OUTPUT_FILE
+        fi
+    done
+done
+for procPerRow in $(seq $MAX_DIMENSION_PROCESSES)
+do
+    for procPerCol in $(seq $MAX_DIMENSION_PROCESSES)
+    do
+        PROCESSES=`expr $procPerCol \\* $procPerRow`
+        if [ $PROCESSES -le $HARDWARE_THREAD_COUNT ]; then
+            OUTPUT_FILE=$TIMING_DIRECTORY"/MPI_SharedMemoryExpandingArea/les_main_mpi_row"$procPerRow"_col"$procPerCol".txt"
+            scons ocl=0 mpi=1 D=TIMINGS procPerRow=$procPerRow procPerCol=$procPerCol exactCorners=1 expandingArea=1
+            mpiexec -np $PROCESSES ./les_main_mpi > $OUTPUT_FILE
+        fi
+    done
+done
 

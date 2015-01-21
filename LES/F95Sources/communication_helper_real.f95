@@ -315,10 +315,14 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
             end do
         end do
     end if
+#ifdef MPI_CORNER_EXCHANGE
+    call exchangeRealCorners(array, procPerRow, leftThickness, rightThickness, topThickness, bottomThickness)
+#else
     do i=1, depthSize
         call calculateCornersReal(array(:,:,i), procPerRow, leftThickness, &
                               rightThickness, topThickness, bottomThickness)
     end do
+#endif
     deallocate(leftRecv)
     deallocate(leftSend)
     deallocate(rightSend)
@@ -333,6 +337,147 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
     call MPI_Barrier(communicator, ierror)
 #endif
 end subroutine exchangeRealHalos
+
+subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness, topThickness, bottomThickness)
+    implicit none
+    integer, intent(in) :: procPerRow, leftThickness, rightThickness, topThickness, bottomThickness
+    real(kind=4), dimension(:,:,:), intent(inout) :: array
+    real(kind=4), dimension(:,:,:), allocatable :: topLeftRecv, topRightRecv, bottomLeftRecv, bottomRightRecv
+    real(kind=4), dimension(:,:,:), allocatable :: topLeftSend, topRightSend, bottomLeftSend, bottomRightSend
+    integer :: depthSize, requests(8), i, commWith, r, c, d
+    depthSize = size(array, 3)
+    allocate(topLeftRecv(bottomThickness, rightThickness, depthSize))
+    allocate(topLeftSend(bottomThickness, rightThickness, depthSize))
+    allocate(topRightRecv(bottomThickness, leftThickness, depthSize))
+    allocate(topRightSend(bottomThickness, leftThickness, depthSize))
+    allocate(bottomLeftRecv(topThickness, rightThickness, depthSize))
+    allocate(bottomLeftSend(topThickness, rightThickness, depthSize))
+    allocate(bottomRightRecv(topThickness, leftThickness, depthSize))
+    allocate(bottomRightSend(topThickness, leftThickness, depthSize))
+    do i=1,8
+        requests(i) = MPI_REQUEST_NULL
+    end do
+    if (.not. isTopRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
+        commWith = rank - procPerRow - 1
+        !print*, 'Rank ', rank, ' has a top left neighbour with rank ', commWith
+        do r=1,bottomThickness
+            do c=1,rightThickness
+                do d=1,depthSize
+                    topLeftSend(r, c, d) = array(r + topThickness, c + leftThickness, d)
+                end do
+            end do
+        end do
+        call MPI_ISend(topLeftSend, bottomThickness*rightThickness*depthSize, MPI_REAL, &
+                       commWith, topLeftTag, communicator, requests(1), ierror)
+        call checkMPIError()
+        call MPI_IRecv(bottomRightRecv, topThickness*leftThickness*depthSize, &
+                       MPI_Real, commWith, bottomRightTag, communicator, requests(2), ierror)
+        call checkMPIError()
+    end if
+    if (.not. isTopRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
+        commWith = rank - procPerRow + 1
+        !print*, 'Rank ', rank, ' has a top right neighbour with rank ', commWith
+        do r=1, bottomThickness
+            do c=1, leftThickness
+                do d=1, depthSize
+                    topRightSend(r, c, d) = array(r + topThickness, size(array, 2) - leftThickness - rightThickness + c, d)
+                end do
+            end do
+        end do
+        call MPI_ISend(topRightSend, bottomThickness*leftThickness*depthSize, MPI_REAL, &
+                       commWith, topRightTag, communicator, requests(3), ierror)
+        call checkMPIError()
+        call MPI_IRecv(bottomLeftRecv, topThickness*rightThickness*depthSize, MPI_REAL, &
+                       commWith, bottomLeftTag, communicator, requests(4), ierror)
+        call checkMPIError()
+    end if
+    if (.not. isBottomRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
+        commWith = rank + procPerRow - 1
+        !print*, 'Rank ', rank, ' has a bottom left neighbour with rank ', commWith
+        do r=1, topThickness
+            do c=1, rightThickness
+                do d=1, depthSize
+                    bottomLeftSend(r, c, d) = array(size(array, 1) - topThickness - bottomThickness + r, &
+                                                    c + leftThickness, d)
+                end do
+            end do
+        end do
+        call MPI_ISend(bottomLeftSend, topThickness*rightThickness*depthSize, MPI_REAL, &
+                      commWith, bottomLeftTag, communicator, requests(5), ierror)
+        call checkMPIError()
+        call MPI_IRecv(topRightRecv, bottomThickness*leftThickness*depthSize, MPI_REAL, &
+                       commWith, topRightTag, communicator, requests(6), ierror)
+        call checkMPIError()
+    end if
+    if (.not. isBottomRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
+        commWith = rank + procPerRow + 1
+        !print*, 'Rank ', rank, ' has a bottom right neighbour with rank ', commWith
+        do r=1,topThickness
+            do c=1,leftThickness
+                do d=1,depthSize
+                    bottomRightSend(r, c, d) = array(size(array, 1) - topThickness - bottomThickness + r, &
+                                                     size(array, 2) - leftThickness - rightThickness + c,d)
+                end do
+            end do
+        end do
+        call MPI_ISend(bottomRightSend, topThickness*leftThickness*depthSize, MPI_REAL, &
+                       commWith, bottomRightTag, communicator, requests(7), ierror)
+        call checkMPIError()
+        call MPI_IRecv(topLeftRecv, bottomThickness*rightThickness*depthSize, &
+                       MPI_Real, commWith, topLeftTag, communicator, requests(8), ierror)
+        call checkMPIError()
+    end if
+    do i=1,8
+        if (requests(i) .ne. MPI_REQUEST_NULL) then
+            call MPI_Wait(requests(i), status, ierror)
+            call checkMPIError()
+        end if
+    end do
+    if (.not. isTopRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
+        do r=1,topThickness
+            do c=1,leftThickness
+                do d=1,depthSize
+                    array(r, c, d) = bottomRightRecv(r, c, d)
+                end do
+            end do
+        end do
+    end if
+    if (.not. isTopRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
+        do r=1,topThickness
+            do c=1,rightThickness
+                do d=1,depthSize
+                    array(r, size(array, 2) - rightThickness + c, d) = bottomLeftRecv(r, c, d)
+                end do
+            end do
+        end do
+    end if
+    if (.not. isBottomRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
+        do r=1,bottomThickness
+            do c=1, leftThickness
+                do d=1, rightThickness
+                    array(size(array, 1) - bottomThickness + r, c, d) = topRightRecv(r, c, d)
+                end do
+            end do
+        end do
+    end if
+    if (.not. isBottomRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
+        do r=1, bottomThickness
+            do c=1, rightThickness
+                do d=1, depthSize
+                    array(size(array, 1) - bottomThickness + r, size(array, 2) - rightThickness + c, d) = topLeftRecv(r, c, d)
+                end do
+            end do
+        end do
+    end if
+    deallocate(topLeftRecv)
+    deallocate(topLeftSend)
+    deallocate(topRightRecv)
+    deallocate(topRightSend)
+    deallocate(bottomLeftRecv)
+    deallocate(bottomLeftSend)
+    deallocate(bottomRightRecv)
+    deallocate(bottomRightSend)
+end subroutine exchangeRealCorners
 
 subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, &
                              topThickness, bottomThickness, ignoreFirstK, ignoreLastK)
