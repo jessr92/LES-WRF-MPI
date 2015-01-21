@@ -40,33 +40,37 @@ for path in fileList:
             sys.exit(-1)
         originalRuntime = runtime
     # Found the runtime for the original code but with IFBF=0
-    if path.endswith("les_main_ifbf0.txt"):
+    elif path.endswith("les_main_ifbf0.txt"):
         if originalIFBF0Runtime != 0.0:
             print("Error, two ifbf=0 runs found")
             sys.exit(-1)
         originalIFBF0Runtime = runtime
     # Found a runtime for the MPI code where total area is 150x150x90
-    if "/MPI_SharedMemory/" in path:
+    elif "/MPI_SharedMemory/" in path:
         try:
             mpiRuns[processCount] = min(mpiRuns[processCount], runtime)
         except KeyError:
             mpiRuns[processCount] = runtime
     # Found a runtime for the MPI code where each process has its own 150x150x90 area
-    if "/MPI_SharedMemoryExpandingArea/" in path:
+    elif "/MPI_SharedMemoryExpandingArea/" in path:
         try:
             mpiExpandingAreaRuns[processCount] = min(mpiExpandingAreaRuns[processCount], runtime)
         except KeyError:
             mpiExpandingAreaRuns[processCount] = runtime
-    if "/MPI_SharedMemoryExactCorners/" in path:
+    # Found a runtime for the MPI code where total area is 150x150x90 with exact corner code
+    elif "/MPI_SharedMemoryExactCorners/" in path:
         try:
             mpiExactCornerRuns[processCount] = min(mpiExactCornerRuns[processCount], runtime)
         except KeyError:
             mpiExactCornerRuns[processCount] = runtime
-    if "/MPI_SharedMemoryExactCornersExpandingArea/" in path:
+    # Found a runtime for the MPI code where each process has its own 150x150x90 area with exact corner code
+    elif "/MPI_SharedMemoryExactCornersExpandingArea/" in path:
         try:
             mpiExactCornerExpandingAreaRuns[processCount] = min(mpiExactCornerExpandingAreaRuns[processCount], runtime)
         except KeyError:
             mpiExactCornerExpandingAreaRuns[processCount] = runtime
+    else:
+        print(path + " is unexpected.")
 
 if originalRuntime != 0.0:
     print("Original single threaded code, " + str(originalRuntime))
