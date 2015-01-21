@@ -5,7 +5,8 @@ import sys
 # Known Limitations:
 # 1. Doesn't deal with multiple hosts
 # 2. Doesn't deal with multiple MPI Versions on a single host
-# 3. Only supports les_main.txt, les_main_ifbf=0.txt, MPI_SharedMemory/*.txt, and MPI_SharedMemoryExpandingArea/*.txt
+# 3. Only supports les_main.txt, les_main_ifbf=0.txt, MPI_SharedMemory/*.txt, MPI_SharedMemoryExpandingArea/*.txt,
+#    MPI_SharedMemoryExactCorners/*.txt, and MPI_SharedMemoryExactCornersExpandingArea/*.txt
 
 fileList = []
 rootDir = sys.argv[1] # For example, timingRuns/<hostname>
@@ -75,12 +76,12 @@ for path in fileList:
 if originalRuntime != 0.0:
     print("Original single threaded code, " + str(originalRuntime))
 
+if originalIFBF0Runtime != 0.0:
+    print("\nOriginal single threaded ifbf=0 code, " + str(originalIFBF0Runtime))
+
 print("\nMPI_SharedMemory Runs")
 for key in mpiRuns.keys():
     print(str(key) + ", " + str(mpiRuns[key]))
-
-if originalIFBF0Runtime != 0.0:
-    print("\nOriginal single threaded ifbf=0 code, " + str(originalIFBF0Runtime))
 
 print("\nMPI_SharedMemoryExpandingArea Runs")
 for key in mpiExpandingAreaRuns.keys():
