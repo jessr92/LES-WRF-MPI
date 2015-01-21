@@ -13,6 +13,8 @@ originalRuntime = 0.0
 originalIFBF0Runtime = 0.0
 mpiRuns = {}
 mpiExpandingAreaRuns = {}
+mpiExactCornerRuns = {}
+mpiExactCornerExpandingAreaRuns = {}
 
 for root, subFolders, files in os.walk(rootDir):
     for filename in files:
@@ -55,6 +57,16 @@ for path in fileList:
             mpiExpandingAreaRuns[processCount] = min(mpiExpandingAreaRuns[processCount], runtime)
         except KeyError:
             mpiExpandingAreaRuns[processCount] = runtime
+    if "/MPI_SharedMemoryExactCorners/" in path:
+        try:
+            mpiExactCornerRuns[processCount] = min(mpiExactCornerRuns[processCount], runtime)
+        except KeyError:
+            mpiExactCornerRuns[processCount] = runtime
+    if "/MPI_SharedMemoryExactCornersExpandingArea/" in path:
+        try:
+            mpiExactCornerExpandingAreaRuns[processCount] = min(mpiExactCornerExpandingAreaRuns[processCount], runtime)
+        except KeyError:
+            mpiExactCornerExpandingAreaRuns[processCount] = runtime
 
 if originalRuntime != 0.0:
     print("Original single threaded code, " + str(originalRuntime))
@@ -69,3 +81,11 @@ if originalIFBF0Runtime != 0.0:
 print("\nMPI_SharedMemoryExpandingArea Runs")
 for key in mpiExpandingAreaRuns.keys():
     print(str(key) + ", " + str(mpiExpandingAreaRuns[key]))
+
+print("\nMPI_SharedMemoryExactCorner Runs")
+for key in mpiExactCornerRuns.keys():
+    print(str(key) + ", " + str(mpiExactCornerRuns[key]))
+
+print("\nMPI_SharedMemoryExactCornerExpandingArea Runs")
+for key in mpiExactCornerExpandingAreaRuns.keys():
+    print(str(key) + ", " + str(mpiExactCornerExpandingAreaRuns[key]))
