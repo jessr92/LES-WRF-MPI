@@ -82,10 +82,10 @@ print("\nMPI_SharedMemoryExpandingArea Runs")
 for key in mpiExpandingAreaRuns.keys():
     print(str(key) + ", " + str(mpiExpandingAreaRuns[key]))
 
-print("\nMPI_SharedMemoryExactCorner Runs")
+print("\nMPI_SharedMemoryExactCorners Runs")
 for key in mpiExactCornerRuns.keys():
     print(str(key) + ", " + str(mpiExactCornerRuns[key]))
 
-print("\nMPI_SharedMemoryExactCornerExpandingArea Runs")
+print("\nMPI_SharedMemoryExactCornersExpandingArea Runs")
 for key in mpiExactCornerExpandingAreaRuns.keys():
     print(str(key) + ", " + str(mpiExactCornerExpandingAreaRuns[key]))
