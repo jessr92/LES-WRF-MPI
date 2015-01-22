@@ -756,13 +756,9 @@ subroutine collect3DReal4ArrayP(array, arrayTot, leftBoundary, rightBoundary, &
         do i=1, mpi_size - 1
             startRow = topLeftRowValue(i, procPerRow, ip)
             startCol = topLeftColValue(i, procPerRow, jp)
-#ifdef GMCF_API
-            ! GMCF_MPI_WaitSOMETHING only? No receive?
-#else
             call MPI_Recv(sendRecvBuffer, bufferSize, MPI_Real, i, collect3DReal4Tag, &
                           communicator, status, ierror)
             call checkMPIError()
-#endif
             do r=startRow+1, startRow+1+ip+bottomBoundary
                 do c=startCol+1, startCol+1+jp+rightBoundary
                     do d=1, size(array, 3)
@@ -779,13 +775,9 @@ subroutine collect3DReal4ArrayP(array, arrayTot, leftBoundary, rightBoundary, &
                 end do
             end do
         end do
-#ifdef GMCF_API
-        call GMCF_MPI_ISend3DRealArray(rank, sendRecvBuffer, collect3DReal4Tag, 0, 0)
-#else
         call MPI_Send(sendRecvBuffer, bufferSize, MPI_Real, 0, collect3DReal4Tag, &
                       communicator, ierror)
         call checkMPIError()
-#endif
     end if
     deallocate(sendRecvBuffer)
 end subroutine collect3DReal4ArrayP
@@ -812,13 +804,9 @@ subroutine collect3DReal4Array(array, arrayTot, leftBoundary, rightBoundary, &
         do i=1, mpi_size - 1
             startRow = topLeftRowValue(i, procPerRow, ip)
             startCol = topLeftColValue(i, procPerRow, jp)
-#ifdef GMCF_API
-            ! GMCF_MPI_WaitSOMETHING only? No receive?
-#else
             call MPI_Recv(recvBuffer, bufferSize, MPI_Real, i, collect3DReal4Tag, &
                           communicator, status, ierror)
             call checkMPIError()
-#endif
             do r=startRow+1, startRow+1+size(array, 1)
                 do c=startCol+1, startCol+1+size(array, 2)
                     do d=1, size(array, 3)
@@ -829,13 +817,9 @@ subroutine collect3DReal4Array(array, arrayTot, leftBoundary, rightBoundary, &
         end do
         deallocate(recvBuffer)
     else
-#ifdef GMCF_API
-        call GMCF_MPI_ISend3DRealArray(rank, sendRecvBuffer, collect3DReal4Tag, 0, 0)
-#else
         call MPI_Send(array, bufferSize, MPI_Real, 0, collect3DReal4Tag, &
                       communicator, ierror)
         call checkMPIError()
-#endif
     end if
 end subroutine collect3DReal4Array
 
