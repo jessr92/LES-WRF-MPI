@@ -15,6 +15,7 @@ def output_system_config(model_count, model_name):
     indented_output("")
     output_models(model_count)
     indentation_decrease()
+    indented_output("")
 
 
 def output_service_nodes(model_count):
@@ -51,6 +52,7 @@ def output_model(i):
 
 if len(sys.argv) != 3:
     print("We need two arguments, the number of model instances required then the model instance name.")
+    return
 
 modelCountRequired = int(sys.argv[1])
 modelName = sys.argv[2]

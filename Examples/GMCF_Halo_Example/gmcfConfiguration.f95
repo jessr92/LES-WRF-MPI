@@ -15,3 +15,4 @@ module gmcfConfiguration
         0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0 &
      /), shape(gmcfConnectivityMatrix) )
 end module gmcfConfiguration
+

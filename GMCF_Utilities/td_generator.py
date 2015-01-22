@@ -3,6 +3,7 @@ import sys
 
 if len(sys.argv) != 3:
     print("We need two arguments, the number of model instances required then the model instance name.")
+    return
 
 modelCountRequired = int(sys.argv[1])
 modelName = sys.argv[2]

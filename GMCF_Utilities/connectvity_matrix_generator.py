@@ -47,6 +47,7 @@ def output_matrix():
     indented_output(" /), shape(gmcfConnectivityMatrix) )")
     indentation_decrease()
     indented_output("end module gmcfConfiguration")
+    indented_output("")
 
 
 def output_matrix_string():
@@ -66,6 +67,7 @@ def output_matrix_string():
 
 if len(sys.argv) != 3:
     print("Please enter two numbers in command line for the number of processes per row and per column")
+    return
 
 processesPerRow = int(sys.argv[1])
 processesPerCol = int(sys.argv[2])

@@ -16,3 +16,4 @@ def indentation_decrease():
     indentationLevel -= INDENTATION_STEPPING
     if indentationLevel < 0:
         indentationLevel = 0
+
