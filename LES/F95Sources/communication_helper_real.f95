@@ -315,7 +315,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
             end do
         end do
     end if
-#ifdef MPI_CORNER_EXCHANGE
+#ifdef EXACT_CORNERS
     call exchangeRealCorners(array, procPerRow, leftThickness, rightThickness, topThickness, bottomThickness)
 #else
     do i=1, depthSize
