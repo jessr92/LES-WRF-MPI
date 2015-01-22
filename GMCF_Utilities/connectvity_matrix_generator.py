@@ -73,9 +73,6 @@ processes = processesPerRow * processesPerCol
 
 matrix = [[0 for x in range(processes)] for y in range(processes)]
 
-print("Generating connectivity matrix for " + str(processesPerRow) + " processes per row and " +
-      str(processesPerCol) + " processes per column")
-
 generate_matrix()
 
 output_matrix()
