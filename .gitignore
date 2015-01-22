@@ -56,3 +56,5 @@ sideflowExample
 haloExchange3DRealExample
 timingRuns/
 .idea/
+
+*.pyc
