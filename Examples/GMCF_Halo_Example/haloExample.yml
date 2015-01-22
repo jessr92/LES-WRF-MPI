@@ -1,0 +1,60 @@
+System:
+    Libraries: [GMCF, CoreServices]
+    NServiceNodes: 13
+    ServiceNodes:
+        mn1: [ 1 , [GMCF.GMCF] ]
+        mn2: [ 2 , [GMCF.GMCF] ]
+        mn3: [ 3 , [GMCF.GMCF] ]
+        mn4: [ 4 , [GMCF.GMCF] ]
+        mn5: [ 5 , [GMCF.GMCF] ]
+        mn6: [ 6 , [GMCF.GMCF] ]
+        mn7: [ 7 , [GMCF.GMCF] ]
+        mn8: [ 8 , [GMCF.GMCF] ]
+        mn9: [ 9 , [GMCF.GMCF] ]
+        mn10: [ 10 , [GMCF.GMCF] ]
+        mn11: [ 11 , [GMCF.GMCF] ]
+        mn12: [ 12 , [GMCF.GMCF] ]
+        ctrl: [ 13, [CoreServices.BEGIN] ]
+    
+    Aliases
+        begin: ctrl.CoreServices.BEGIN.begin
+        model1: mn1.GMCF.GMCF.run_model1
+        model2: mn2.GMCF.GMCF.run_model2
+        model3: mn3.GMCF.GMCF.run_model3
+        model4: mn4.GMCF.GMCF.run_model4
+        model5: mn5.GMCF.GMCF.run_model5
+        model6: mn6.GMCF.GMCF.run_model6
+        model7: mn7.GMCF.GMCF.run_model7
+        model8: mn8.GMCF.GMCF.run_model8
+        model9: mn9.GMCF.GMCF.run_model9
+        model10: mn10.GMCF.GMCF.run_model10
+        model11: mn11.GMCF.GMCF.run_model11
+        model12: mn12.GMCF.GMCF.run_model12
+    
+    ModelLibPaths: ['libles.a']
+    
+    Models:
+        model1
+            ModelId: 1
+        model2
+            ModelId: 2
+        model3
+            ModelId: 3
+        model4
+            ModelId: 4
+        model5
+            ModelId: 5
+        model6
+            ModelId: 6
+        model7
+            ModelId: 7
+        model8
+            ModelId: 8
+        model9
+            ModelId: 9
+        model10
+            ModelId: 10
+        model11
+            ModelId: 11
+        model12
+            ModelId: 12
