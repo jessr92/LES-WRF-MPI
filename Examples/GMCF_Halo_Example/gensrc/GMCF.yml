@@ -1,0 +1,9 @@
+--- # SBA Core Library Configuration
+System:
+  Version: 3.0
+  Library: GMCF
+
+  Services: # last value is control bit (1=control, 0=computational) 
+    GMCF: [ 32, kernel_GMCF, 0 ]
+  ServiceClasses:
+    GMCF: [ run_model1, run_model10, run_model11, run_model12, run_model2, run_model3, run_model4, run_model5, run_model6, run_model7, run_model8, run_model9 ]

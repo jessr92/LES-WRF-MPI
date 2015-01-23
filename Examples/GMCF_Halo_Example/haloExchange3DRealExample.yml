@@ -35,28 +35,28 @@ System:
     ModelLibPaths: ['libhaloExchange3DRealExample.a']
     
     Models:
-        model1
+        model1:
             ModelId: 1
-        model2
+        model2:
             ModelId: 2
-        model3
+        model3:
             ModelId: 3
-        model4
+        model4:
             ModelId: 4
-        model5
+        model5:
             ModelId: 5
-        model6
+        model6:
             ModelId: 6
-        model7
+        model7:
             ModelId: 7
-        model8
+        model8:
             ModelId: 8
-        model9
+        model9:
             ModelId: 9
-        model10
+        model10:
             ModelId: 10
-        model11
+        model11:
             ModelId: 11
-        model12
+        model12:
             ModelId: 12
 
