@@ -1,0 +1,12 @@
+import os
+FC=os.environ.get('FC')
+
+fsources = ['/.haloExchange3DRealExample.f95']
+
+LDFLAGS= []
+FFLAGS = ['Wall', 'cpp', '-ffree-form', '-ffree-line-length-0']
+
+envF=Environment(F95=FC,LINK=FC,LINKFLAGS=LDFLAGS,F95FLAGS=FFLAGS,F95PATH=['.'])
+
+envF.Library('haloExchange3DRealExample',fsources,LIBS=['gmcfAPI','m'],LIBPATH=['.'])
+

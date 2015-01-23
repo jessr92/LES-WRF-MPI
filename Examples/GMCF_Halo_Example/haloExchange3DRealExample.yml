@@ -31,7 +31,7 @@ System:
         model11: mn11.GMCF.GMCF.run_model11
         model12: mn12.GMCF.GMCF.run_model12
     
-    ModelLibPaths: ['libles.a']
+    ModelLibPaths: ['libhaloExchange3DRealExample.a']
     
     Models:
         model1

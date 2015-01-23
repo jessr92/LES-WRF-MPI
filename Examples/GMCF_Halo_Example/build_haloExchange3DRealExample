@@ -1,0 +1,5 @@
+python ../../GMCF_Utilities/connectvity_matrix_generator.py 4 3 > gmcfConfiguration.f95
+python ../../GMCF_Utilities/td_generator.py 12 haloExchange3DRealExample > haloExchange3DRealExample.td
+python ../../GMCF_Utilities/yml_generator.py 12 haloExchange3DRealExample > haloExchange3DRealExample.yml
+build.pl -Y haloExchange3DRealExample.yml -L
+
