@@ -1,5 +1,11 @@
-python ../../GMCF_Utilities/connectvity_matrix_generator.py 4 3 > gmcfConfiguration.f95
-python ../../GMCF_Utilities/td_generator.py 12 haloExchange3DRealExample > haloExchange3DRealExample.td
-python ../../GMCF_Utilities/yml_generator.py 12 haloExchange3DRealExample > haloExchange3DRealExample.yml
-build.pl -Y haloExchange3DRealExample.yml -L
+#!/bin/bash
+MODEL_NAME="haloExchange3DRealExample"
+PROC_PER_ROW=4
+PROC_PER_COL=3
+INSTANCES=$(($PROC_PER_ROW * $PROC_PER_COL))
+python ../../GMCF_Utilities/connectvity_matrix_generator.py "$PROC_PER_ROW" "$PROC_PER_COL" > gmcfConfiguration.f95
+python ../../GMCF_Utilities/td_generator.py "$INSTANCES" "$MODEL_NAME" > "$MODEL_NAME".td
+python ../../GMCF_Utilities/yml_generator.py "$INSTANCES" "$MODEL_NAME" > "$MODEL_NAME".yml
+build.pl -Y "$MODEL_NAME.yml" -L
+scons -f SConstruct."$MODEL_NAME"
 
