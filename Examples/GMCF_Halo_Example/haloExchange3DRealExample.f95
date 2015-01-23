@@ -5,7 +5,7 @@ integer, parameter :: rows = 30, columns = 40, depthSize=2, dimensions = 2
 integer, parameter :: procPerCol = 3, procPerRow = 4
 integer, parameter :: rowCount = rows / procPerCol
 integer, parameter :: colCount = columns / procPerRow
-
+integer :: rank
 integer :: leftThickness, rightThickness, topThickness, bottomThickness
 
 call main()
@@ -16,6 +16,7 @@ subroutine main()
     implicit none
     real(kind=4), dimension(:,:,:), allocatable :: processArray
     integer :: i
+    rank = 1 ! Will be replaced with model id
     leftThickness = 3
     rightThickness = 2
     topThickness = 2
@@ -24,7 +25,7 @@ subroutine main()
                           colCount + leftThickness + rightThickness, &
                           depthSize))
     call initArray(processArray)
-    call exchangeRealHalos(processArray, procPerRow, neighbours, leftThickness, rightThickness, topThickness, bottomThickness)
+    call exchangeRealHalos(processArray, procPerRow, leftThickness, rightThickness, topThickness, bottomThickness)
     deallocate(processArray)
 end subroutine main
 
@@ -54,12 +55,11 @@ subroutine initArray(processArray)
     end do
 end subroutine initArray
 
-subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
+subroutine exchangeRealHalos(array, procPerRow, leftThickness, &
                                 rightThickness, topThickness, &
                                 bottomThickness)
     implicit none
     real(kind=4), dimension(:,:,:), intent(inout) :: array
-    integer, dimension(:), intent(in) :: neighbours
     integer, intent(in) :: procPerRow, leftThickness, rightThickness, topThickness, bottomThickness
     integer :: i, commWith, r, c, d, rowCount, colCount, depthSize, requests(8)
     real(kind=4), dimension(:,:,:), allocatable :: leftRecv, leftSend, rightSend, rightRecv
