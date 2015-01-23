@@ -5,6 +5,7 @@ import sys
 def output_system_config(model_count, model_name):
     indented_output("System:")
     indentation_increase()
+    indented_output("Version: 3.0")
     indented_output("Libraries: [GMCF, CoreServices]")
     indented_output("NServiceNodes: " + str(model_count + 1))
     output_service_nodes(model_count)
@@ -28,7 +29,7 @@ def output_service_nodes(model_count):
 
 
 def output_aliases_nodes(model_count):
-    indented_output("Aliases")
+    indented_output("Aliases:")
     indentation_increase()
     indented_output("begin: ctrl.CoreServices.BEGIN.begin")
     for i in range(1, model_count + 1):

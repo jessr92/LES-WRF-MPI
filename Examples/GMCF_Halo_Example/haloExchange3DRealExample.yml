@@ -1,4 +1,5 @@
 System:
+    Version: 3.0
     Libraries: [GMCF, CoreServices]
     NServiceNodes: 13
     ServiceNodes:
@@ -16,7 +17,7 @@ System:
         mn12: [ 12 , [GMCF.GMCF] ]
         ctrl: [ 13, [CoreServices.BEGIN] ]
     
-    Aliases
+    Aliases:
         begin: ctrl.CoreServices.BEGIN.begin
         model1: mn1.GMCF.GMCF.run_model1
         model2: mn2.GMCF.GMCF.run_model2
