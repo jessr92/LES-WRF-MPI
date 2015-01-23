@@ -51,8 +51,7 @@ def output_model(i):
     indentation_decrease()
 
 if len(sys.argv) != 3:
-    print("We need two arguments, the number of model instances required then the model instance name.")
-    return
+    sys.exit("We need two arguments, the number of model instances required then the model instance name.")
 
 modelCountRequired = int(sys.argv[1])
 modelName = sys.argv[2]

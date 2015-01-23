@@ -66,8 +66,7 @@ def output_matrix_string():
     indentation_decrease()
 
 if len(sys.argv) != 3:
-    print("Please enter two numbers in command line for the number of processes per row and per column")
-    return
+    sys.exit("Please enter two numbers in command line for the number of processes per row and per column")
 
 processesPerRow = int(sys.argv[1])
 processesPerCol = int(sys.argv[2])
