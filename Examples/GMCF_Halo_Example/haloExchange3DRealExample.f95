@@ -1,37 +1,42 @@
-program haloExchangeRealExample
+module haloExchange3DRealExample
 
+use gmcfAPI
 implicit none
-integer, parameter :: rows = 30, columns = 40, depthSize=2, dimensions = 2
-integer, parameter :: procPerCol = 3, procPerRow = 4
-integer, parameter :: rowCount = rows / procPerCol
-integer, parameter :: colCount = columns / procPerRow
-integer :: rank
-integer :: leftThickness, rightThickness, topThickness, bottomThickness
-
-call main()
 
 contains
 
-subroutine main()
+subroutine program_haloExchange3DRealExample(sys, tile, model_id) ! This replaces 'program main'
     implicit none
+    integer(8) , intent(In) :: sys
+    integer(8) , intent(In) :: tile
+    integer , intent(In) :: model_id
+    integer, parameter :: rows = 30, columns = 40, depthSize=2, dimensions = 2
+    integer, parameter :: procPerCol = 3, procPerRow = 4
+    integer, parameter :: rowCount = rows / procPerCol
+    integer, parameter :: colCount = columns / procPerRow
+    integer :: rank
+    integer :: leftThickness, rightThickness, topThickness, bottomThickness
     real(kind=4), dimension(:,:,:), allocatable :: processArray
     integer :: i
-    rank = 1 ! Will be replaced with model id
+
+    rank = model_id
     leftThickness = 3
     rightThickness = 2
     topThickness = 2
     bottomThickness = 3
+
     allocate(processArray(rowCount + topThickness + bottomThickness, &
                           colCount + leftThickness + rightThickness, &
                           depthSize))
-    call initArray(processArray)
+    call initArray(processArray, leftThickness, rightThickness, topThickness, bottomThickness, rank)
     call exchangeRealHalos(processArray, procPerRow, leftThickness, rightThickness, topThickness, bottomThickness)
     deallocate(processArray)
-end subroutine main
+end subroutine program_haloExchange3DRealExample
 
-subroutine initArray(processArray)
+subroutine initArray(processArray, leftThickness, rightThickness, topThickness, bottomThickness, rank)
     implicit none
     real(kind=4), dimension(:,:,:), intent(out) :: processArray
+    integer, intent(in) :: leftThickness, rightThickness, topThickness, bottomThickness, rank
     integer :: col, row, depth
     do row = 1, size(processArray, 1)
         do col = 1, size(processArray, 2)
@@ -66,4 +71,5 @@ subroutine exchangeRealHalos(array, procPerRow, leftThickness, &
     real(kind=4), dimension(:,:,:), allocatable :: topRecv, topSend, bottomSend, bottomRecv
 end subroutine exchangeRealHalos
 
-end program haloExchangeRealExample
+end module haloExchange3DRealExample
+
