@@ -12,6 +12,9 @@ python ../../GMCF_Utilities/connectvity_matrix_generator.py "$PROC_PER_ROW" "$PR
 python ../../GMCF_Utilities/td_generator.py "$INSTANCES" "$MODEL_NAME" > src/GMCF/Task/"$MODEL_NAME".td
 python ../../GMCF_Utilities/yml_generator.py "$INSTANCES" "$MODEL_NAME" > src/GMCF/Task/"$MODEL_NAME".yml
 build.pl -Y src/GMCF/Task/"$MODEL_NAME.yml" -L
-scons -f src/GMCF/Models/SConstruct."$MODEL_NAME"
-mv lib"$MODEL_NAME".a lib/lib"$MODEL_NAME".a
+cd src/GMCF/Models
+scons -f SConstruct."$MODEL_NAME"
+mv lib"$MODEL_NAME".a ../../../lib/lib"$MODEL_NAME".a
+cd ../../..
 scons -f "$GANNET_DIR"/t/ModelCoupling/SConstruct models="$MODEL_NAME"
+
