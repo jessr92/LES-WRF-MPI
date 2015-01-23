@@ -1,11 +1,5 @@
-module haloExchange3DRealExample
-
-use gmcfAPI
-implicit none
-
-contains
-
 subroutine program_haloExchange3DRealExample_(sys, tile, model_id) ! This replaces 'program main'
+    use gmcfAPI
     implicit none
     integer(8) , intent(In) :: sys
     integer(8) , intent(In) :: tile
@@ -70,6 +64,4 @@ subroutine exchangeRealHalos(array, procPerRow, leftThickness, &
     real(kind=4), dimension(:,:,:), allocatable :: leftRecv, leftSend, rightSend, rightRecv
     real(kind=4), dimension(:,:,:), allocatable :: topRecv, topSend, bottomSend, bottomRecv
 end subroutine exchangeRealHalos
-
-end module haloExchange3DRealExample
 
