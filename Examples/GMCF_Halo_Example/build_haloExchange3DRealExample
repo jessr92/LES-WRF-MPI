@@ -11,4 +11,4 @@ python ../../GMCF_Utilities/td_generator.py "$INSTANCES" "$MODEL_NAME" > "$MODEL
 python ../../GMCF_Utilities/yml_generator.py "$INSTANCES" "$MODEL_NAME" > "$MODEL_NAME".yml
 build.pl -Y "$MODEL_NAME.yml" -L
 scons -f SConstruct."$MODEL_NAME"
-
+scons -f "$GANNET_DIR"/t/ModelCoupling/SConstruct models="$MODEL_NAME"

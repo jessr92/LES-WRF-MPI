@@ -42,7 +42,7 @@ def output_matrix():
     indented_output("module gmcfConfiguration")
     indentation_increase()
     indented_output("implicit none")
-    indented_output("integer, dimension(NMODELS, NMODELS) :: gmcfConnectivityMatrix = reshape( / &")
+    indented_output("integer, dimension(NMODELS, NMODELS) :: gmcfConnectivityMatrix = reshape( (/ &")
     output_matrix_string()
     indented_output(" /), shape(gmcfConnectivityMatrix) )")
     indentation_decrease()
