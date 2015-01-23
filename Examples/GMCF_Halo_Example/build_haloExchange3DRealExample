@@ -1,5 +1,5 @@
 #!/bin/bash
-. ../../../gmcf/etc/gannetrc
+. $GANNET_DIR/etc/gannetrc
 MODEL_NAME="haloExchange3DRealExample"
 PROC_PER_ROW=4
 PROC_PER_COL=3
