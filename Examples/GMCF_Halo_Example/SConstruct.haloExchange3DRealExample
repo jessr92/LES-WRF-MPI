@@ -1,7 +1,7 @@
 import os
 FC=os.environ.get('FC')
 
-fsources = ['/.haloExchange3DRealExample.f95']
+fsources = ['./haloExchange3DRealExample.f95']
 
 LDFLAGS= []
 FFLAGS = ['Wall', 'cpp', '-ffree-form', '-ffree-line-length-0']
