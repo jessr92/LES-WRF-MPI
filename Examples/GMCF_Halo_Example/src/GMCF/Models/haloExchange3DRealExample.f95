@@ -1,4 +1,4 @@
-subroutine program_haloExchange3DRealExample_(sys, tile, model_id) ! This replaces 'program main'
+subroutine program_haloExchange3DRealExample(sys, tile, model_id) ! This replaces 'program main'
     use gmcfAPI
     implicit none
     integer(8) , intent(In) :: sys
@@ -25,7 +25,7 @@ subroutine program_haloExchange3DRealExample_(sys, tile, model_id) ! This replac
     call initArray(processArray, leftThickness, rightThickness, topThickness, bottomThickness, rank)
     call exchangeRealHalos(processArray, procPerRow, leftThickness, rightThickness, topThickness, bottomThickness)
     deallocate(processArray)
-end subroutine program_haloExchange3DRealExample_
+end subroutine program_haloExchange3DRealExample
 
 subroutine initArray(processArray, leftThickness, rightThickness, topThickness, bottomThickness, rank)
     implicit none
