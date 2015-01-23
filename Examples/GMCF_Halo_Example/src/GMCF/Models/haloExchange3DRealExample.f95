@@ -5,7 +5,7 @@ implicit none
 
 contains
 
-subroutine program_haloExchange3DRealExample(sys, tile, model_id) ! This replaces 'program main'
+subroutine program_haloExchange3DRealExample_(sys, tile, model_id) ! This replaces 'program main'
     implicit none
     integer(8) , intent(In) :: sys
     integer(8) , intent(In) :: tile
@@ -31,7 +31,7 @@ subroutine program_haloExchange3DRealExample(sys, tile, model_id) ! This replace
     call initArray(processArray, leftThickness, rightThickness, topThickness, bottomThickness, rank)
     call exchangeRealHalos(processArray, procPerRow, leftThickness, rightThickness, topThickness, bottomThickness)
     deallocate(processArray)
-end subroutine program_haloExchange3DRealExample
+end subroutine program_haloExchange3DRealExample_
 
 subroutine initArray(processArray, leftThickness, rightThickness, topThickness, bottomThickness, rank)
     implicit none

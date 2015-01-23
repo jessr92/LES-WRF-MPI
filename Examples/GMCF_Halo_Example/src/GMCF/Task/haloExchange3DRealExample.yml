@@ -35,28 +35,28 @@ System:
     ModelLibPaths: ['libhaloExchange3DRealExample.a']
     
     Models:
-        model1:
+        haloExchange3DRealExample:
             ModelId: 1
-        model2:
+        haloExchange3DRealExample:
             ModelId: 2
-        model3:
+        haloExchange3DRealExample:
             ModelId: 3
-        model4:
+        haloExchange3DRealExample:
             ModelId: 4
-        model5:
+        haloExchange3DRealExample:
             ModelId: 5
-        model6:
+        haloExchange3DRealExample:
             ModelId: 6
-        model7:
+        haloExchange3DRealExample:
             ModelId: 7
-        model8:
+        haloExchange3DRealExample:
             ModelId: 8
-        model9:
+        haloExchange3DRealExample:
             ModelId: 9
-        model10:
+        haloExchange3DRealExample:
             ModelId: 10
-        model11:
+        haloExchange3DRealExample:
             ModelId: 11
-        model12:
+        haloExchange3DRealExample:
             ModelId: 12
 

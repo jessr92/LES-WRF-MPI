@@ -5,13 +5,10 @@ PROC_PER_ROW=4
 PROC_PER_COL=3
 INSTANCES=$(($PROC_PER_ROW * $PROC_PER_COL))
 mkdir -p src/GMCF/Models
-mkdir -p src/GMCF/Task
 mkdir -p gensrc/GMCF/Models
-mkdir -p lib
 python ../../GMCF_Utilities/connectvity_matrix_generator.py "$PROC_PER_ROW" "$PROC_PER_COL" > src/GMCF/Models/gmcfConfiguration.f95
-python ../../GMCF_Utilities/td_generator.py "$INSTANCES" "$MODEL_NAME" > src/GMCF/Task/"$MODEL_NAME".td
-python ../../GMCF_Utilities/yml_generator.py "$INSTANCES" "$MODEL_NAME" > src/GMCF/Task/"$MODEL_NAME".yml
-build.pl -Y src/GMCF/Task/"$MODEL_NAME.yml" -L
-scons -f src/GMCF/Models/SConstruct."$MODEL_NAME"
-mv lib"$MODEL_NAME".a lib/lib"$MODEL_NAME".a
+python ../../GMCF_Utilities/td_generator.py "$INSTANCES" "$MODEL_NAME" > "$MODEL_NAME".td
+python ../../GMCF_Utilities/yml_generator.py "$INSTANCES" "$MODEL_NAME" > "$MODEL_NAME".yml
+build.pl -Y "$MODEL_NAME.yml" -L
+scons -f SConstruct."$MODEL_NAME"
 scons -f "$GANNET_DIR"/t/ModelCoupling/SConstruct models="$MODEL_NAME"
