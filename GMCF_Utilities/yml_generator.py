@@ -46,7 +46,7 @@ def output_models(model_count):
 
 
 def output_model(i):
-    indented_output("model" + str(i) + ":")
+    indented_output(modelName + ":")
     indentation_increase()
     indented_output("ModelId: " + str(i))
     indentation_decrease()
