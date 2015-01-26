@@ -11,7 +11,7 @@ mkdir -p lib
 python ../../GMCF_Utilities/connectvity_matrix_generator.py "$PROC_PER_ROW" "$PROC_PER_COL" > src/GMCF/Models/gmcfConfiguration.f95
 python ../../GMCF_Utilities/td_generator.py "$INSTANCES" "$MODEL_NAME" > src/GMCF/Task/"$MODEL_NAME".td
 python ../../GMCF_Utilities/yml_generator.py "$INSTANCES" "$MODEL_NAME" > src/GMCF/Task/"$MODEL_NAME".yml
-build.pl -Y src/GMCF/Task/"$MODEL_NAME.yml" -L
+build.pl -d -w -v -Y src/GMCF/Task/"$MODEL_NAME.yml" -L
 cd src/GMCF/Models
 scons -f SConstruct."$MODEL_NAME"
 mv lib"$MODEL_NAME".a ../../../lib/lib"$MODEL_NAME".a
