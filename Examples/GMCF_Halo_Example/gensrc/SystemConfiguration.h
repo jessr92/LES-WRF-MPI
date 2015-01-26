@@ -30,7 +30,7 @@ typedef unsigned int UINT;
 
 namespace SBA {
 
-const UINT M_GMCF_GMCF_run_model12 = 73729;
+const UINT M_GMCF_GMCF_run_model1 = 73729;
 const UINT M_CoreServices_LET_let = 131841;
 const UINT M_CoreServices_LET_assign = 131842;
 const UINT M_CoreServices_LET_read = 131843;

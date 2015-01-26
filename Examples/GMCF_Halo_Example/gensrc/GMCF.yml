@@ -6,4 +6,4 @@ System:
   Services: # last value is control bit (1=control, 0=computational) 
     GMCF: [ 32, kernel_GMCF, 0 ]
   ServiceClasses:
-    GMCF: [ run_model12 ]
+    GMCF: [ run_model1 ]

@@ -1,17 +1,17 @@
-; haloExchange3DRealExample.yml
+; haloexchange3drealexample.yml
 
 (begin
-    (haloExchange3DRealExample '1)
-    (haloExchange3DRealExample '2)
-    (haloExchange3DRealExample '3)
-    (haloExchange3DRealExample '4)
-    (haloExchange3DRealExample '5)
-    (haloExchange3DRealExample '6)
-    (haloExchange3DRealExample '7)
-    (haloExchange3DRealExample '8)
-    (haloExchange3DRealExample '9)
-    (haloExchange3DRealExample '10)
-    (haloExchange3DRealExample '11)
-    (haloExchange3DRealExample '12)
+    (haloexchange3drealexample1 '1)
+    (haloexchange3drealexample2 '2)
+    (haloexchange3drealexample3 '3)
+    (haloexchange3drealexample4 '4)
+    (haloexchange3drealexample5 '5)
+    (haloexchange3drealexample6 '6)
+    (haloexchange3drealexample7 '7)
+    (haloexchange3drealexample8 '8)
+    (haloexchange3drealexample9 '9)
+    (haloexchange3drealexample10 '10)
+    (haloexchange3drealexample11 '11)
+    (haloexchange3drealexample12 '12)
 )
 

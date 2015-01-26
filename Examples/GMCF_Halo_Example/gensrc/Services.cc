@@ -22,9 +22,9 @@ void Services::kernel_GMCF() {
     std::cout << "CALLING method "<< method() << std::endl; 
 #endif     
     switch ( method() ) {
-        case M_GMCF_GMCF_run_model12:
+        case M_GMCF_GMCF_run_model1:
 		{
-			int64_t retval = inst->run_model12((SBA::System*)sba_system_ptr, (SBA::Tile*)sba_tile_ptr, (uint64_t)arg(0));
+			int64_t retval = inst->run_model1((SBA::System*)sba_system_ptr, (SBA::Tile*)sba_tile_ptr, (uint64_t)arg(0));
 			res = (void*)retval;
 			res_symbol=mkPointerSymbol(res);
 			break;

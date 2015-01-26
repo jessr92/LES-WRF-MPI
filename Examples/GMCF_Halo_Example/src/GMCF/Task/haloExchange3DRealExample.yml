@@ -19,44 +19,22 @@ System:
     
     Aliases:
         begin: ctrl.CoreServices.BEGIN.begin
-        model1: mn1.GMCF.GMCF.run_model1
-        model2: mn2.GMCF.GMCF.run_model2
-        model3: mn3.GMCF.GMCF.run_model3
-        model4: mn4.GMCF.GMCF.run_model4
-        model5: mn5.GMCF.GMCF.run_model5
-        model6: mn6.GMCF.GMCF.run_model6
-        model7: mn7.GMCF.GMCF.run_model7
-        model8: mn8.GMCF.GMCF.run_model8
-        model9: mn9.GMCF.GMCF.run_model9
-        model10: mn10.GMCF.GMCF.run_model10
-        model11: mn11.GMCF.GMCF.run_model11
-        model12: mn12.GMCF.GMCF.run_model12
+        haloexchange3drealexample1: mn1.GMCF.GMCF.run_model1
+        haloexchange3drealexample2: mn2.GMCF.GMCF.run_model1
+        haloexchange3drealexample3: mn3.GMCF.GMCF.run_model1
+        haloexchange3drealexample4: mn4.GMCF.GMCF.run_model1
+        haloexchange3drealexample5: mn5.GMCF.GMCF.run_model1
+        haloexchange3drealexample6: mn6.GMCF.GMCF.run_model1
+        haloexchange3drealexample7: mn7.GMCF.GMCF.run_model1
+        haloexchange3drealexample8: mn8.GMCF.GMCF.run_model1
+        haloexchange3drealexample9: mn9.GMCF.GMCF.run_model1
+        haloexchange3drealexample10: mn10.GMCF.GMCF.run_model1
+        haloexchange3drealexample11: mn11.GMCF.GMCF.run_model1
+        haloexchange3drealexample12: mn12.GMCF.GMCF.run_model1
     
-    ModelLibPaths: ['libhaloExchange3DRealExample.a']
+    ModelLibPaths: ['libhaloexchange3drealexample.a']
     
     Models:
-        haloExchange3DRealExample:
+        haloexchange3drealexample:
             ModelId: 1
-        haloExchange3DRealExample:
-            ModelId: 2
-        haloExchange3DRealExample:
-            ModelId: 3
-        haloExchange3DRealExample:
-            ModelId: 4
-        haloExchange3DRealExample:
-            ModelId: 5
-        haloExchange3DRealExample:
-            ModelId: 6
-        haloExchange3DRealExample:
-            ModelId: 7
-        haloExchange3DRealExample:
-            ModelId: 8
-        haloExchange3DRealExample:
-            ModelId: 9
-        haloExchange3DRealExample:
-            ModelId: 10
-        haloExchange3DRealExample:
-            ModelId: 11
-        haloExchange3DRealExample:
-            ModelId: 12
 

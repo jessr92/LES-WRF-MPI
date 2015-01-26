@@ -5,6 +5,6 @@
 
 class GMCF {
     public:
-		int64_t run_model12(SBA::System* sba_sysptr, SBA::Tile* sba_tileptr, uint64_t);
+		int64_t run_model1(SBA::System* sba_sysptr, SBA::Tile* sba_tileptr, uint64_t);
 
 };
