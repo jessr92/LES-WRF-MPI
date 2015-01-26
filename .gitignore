@@ -58,3 +58,5 @@ timingRuns/
 .idea/
 
 *.pyc
+core
+gmcfCoupler

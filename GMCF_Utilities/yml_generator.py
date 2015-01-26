@@ -33,16 +33,15 @@ def output_aliases_nodes(model_count):
     indentation_increase()
     indented_output("begin: ctrl.CoreServices.BEGIN.begin")
     for i in range(1, model_count + 1):
-        indented_output("model" + str(i) + ": mn" + str(i) + ".GMCF.GMCF.run_model" + str(i))
+        indented_output(modelName + str(i) + ": mn" + str(i) + ".GMCF.GMCF.run_model1")
     indentation_decrease()
 
 
 def output_models(model_count):
     indented_output("Models:")
-    for i in range(1, model_count + 1):
-        indentation_increase()
-        output_model(i)
-        indentation_decrease()
+    indentation_increase()
+    output_model(1)
+    indentation_decrease()
 
 
 def output_model(i):

@@ -9,5 +9,5 @@ FFLAGS = ['-Wall', '-cpp', '-ffree-form', '-ffree-line-length-0']
 
 envF=Environment(F95=FC,LINK=FC,LINKFLAGS=LDFLAGS,F95FLAGS=FFLAGS,F95PATH=['.', '../../../lib','/opt/local/include','/usr/local/include'])
 
-envF.Library('haloExchange3DRealExample',fsources,LIBS=['gmcfAPI'],LIBPATH=['../../../lib','/opt/local/include','/usr/local/include'])
+envF.Library('haloexchange3drealexample',fsources,LIBS=['gmcfAPI'],LIBPATH=['../../../lib','/opt/local/include','/usr/local/include'])
 

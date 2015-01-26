@@ -12,7 +12,7 @@ indented_output("")
 indented_output("(begin")
 indentation_increase()
 for i in range(1, modelCountRequired + 1):
-    indented_output("(" + modelName + " '" + str(i) + ")")
+    indented_output("(" + modelName + str(i) + " '" + str(i) + ")")
 indentation_decrease()
 indented_output(")")
 indented_output("")

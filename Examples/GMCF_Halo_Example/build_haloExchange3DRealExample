@@ -1,7 +1,6 @@
 #!/bin/bash
 . $GANNET_DIR/etc/gannetrc
-MODEL_NAME="haloExchange3DRealExample"
-MODEL_LOWER_NAME="haloexchange3drealexample"
+MODEL_NAME="haloexchange3drealexample"
 PROC_PER_ROW=4
 PROC_PER_COL=3
 INSTANCES=$(($PROC_PER_ROW * $PROC_PER_COL))
@@ -10,12 +9,12 @@ mkdir -p src/GMCF/Task
 mkdir -p gensrc/GMCF/Models
 mkdir -p lib
 python ../../GMCF_Utilities/connectvity_matrix_generator.py "$PROC_PER_ROW" "$PROC_PER_COL" > src/GMCF/Models/gmcfConfiguration.f95
-python ../../GMCF_Utilities/td_generator.py "$INSTANCES" "$MODEL_LOWER_NAME" > src/GMCF/Task/"$MODEL_NAME".td
-python ../../GMCF_Utilities/yml_generator.py "$INSTANCES" "$MODEL_LOWER_NAME" > src/GMCF/Task/"$MODEL_NAME".yml
+python ../../GMCF_Utilities/td_generator.py "$INSTANCES" "$MODEL_NAME" > src/GMCF/Task/"$MODEL_NAME".td
+python ../../GMCF_Utilities/yml_generator.py "$INSTANCES" "$MODEL_NAME" > src/GMCF/Task/"$MODEL_NAME".yml
 build.pl -Y src/GMCF/Task/"$MODEL_NAME.yml" -L
 cd src/GMCF/Models
 scons -f SConstruct."$MODEL_NAME"
-mv lib"$MODEL_NAME".a ../../../lib/lib"$MODEL_LOWER_NAME".a
+mv lib"$MODEL_NAME".a ../../../lib/lib"$MODEL_NAME".a
 cd ../../..
-scons -f "$GANNET_DIR"/t/ModelCoupling/SConstruct models="$MODEL_LOWER_NAME"
+scons -f "$GANNET_DIR"/t/ModelCoupling/SConstruct models="$MODEL_NAME"
 
