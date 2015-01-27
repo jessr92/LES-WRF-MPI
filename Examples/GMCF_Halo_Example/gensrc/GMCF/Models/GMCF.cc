@@ -8,7 +8,7 @@ int64_t GMCF::run_model1(SBA::System* sba_sysptr, SBA::Tile* sba_tileptr, uint64
 #ifdef VERBOSE
 	std::cout << "INSIDE run_model1" << std::endl;
 #endif
-	const int model = 1;
+	int model = (int)model_id;
 
     // Cast void* to int64_t
     // We need to cast to int64_t and then pass the address rather than casting to uint64_t* I think
