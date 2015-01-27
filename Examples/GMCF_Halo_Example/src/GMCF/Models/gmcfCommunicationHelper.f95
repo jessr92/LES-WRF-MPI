@@ -87,8 +87,8 @@ subroutine exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
         call gmcfRequestData(model_id, leftTag, rowCount * leftThickness * depthSize, commWith, PRE, 1)
     end if
     ! TODO: GMCF Respond to requests and receive requested data
-    call sendRecvHaloBoundaries(leftRecv, leftSend, rightSend, rightRecv, topRecv, topSend, bottomSend, bottomRecv)
-    return
+    call sendHaloBoundaries(leftSend, rightSend, topSend, bottomSend, model_id, procPerRow, procPerCol)
+    call recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, model_id, procPerRow, procPerCol)
     if (.not. isTopRow(model_id, procPerRow)) then
         ! Top edge to send, bottom edge to receive
         do r=1, topThickness
@@ -139,11 +139,81 @@ subroutine exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
     deallocate(bottomRecv)
 end subroutine exchangeRealHalos
 
-subroutine sendRecvHaloBoundaries(leftRecv, leftSend, rightSend, rightRecv, topRecv, topSend, bottomSend, bottomRecv)
+subroutine sendHaloBoundaries(leftSend, rightSend, topSend, bottomSend, model_id, procPerRow, procPerCol)
     implicit none
-    real(kind=4), dimension(:,:,:) :: leftRecv, leftSend, rightSend, rightRecv
-    real(kind=4), dimension(:,:,:) :: topRecv, topSend, bottomSend, bottomRecv
-end subroutine sendRecvHaloBoundaries
+    real(kind=4), dimension(:,:,:), intent(in) :: leftSend, rightSend, topSend, bottomSend
+    integer, intent(in) :: model_id, procPerRow, procPerCol
+    integer :: has_packets, fifo_empty
+    type(gmcfPacket) :: packet
+    if (.not. isTopRow(model_id, procPerRow)) then
+        call gmcfWaitFor(model_id, REQDATA, model_id - procPerRow, 1)
+    end if
+    if (.not. isBottomRow(model_id, procPerRow, procPerCol)) then
+        call gmcfWaitFor(model_id, REQDATA, model_id + procPerRow, 1)
+    end if
+    if (.not. isLeftmostColumn(model_id, procPerRow)) then
+        call gmcfWaitFor(model_id, REQDATA, model_id - 1, 1)
+    end if
+    if (.not. isRightmostColumn(model_id, procPerRow)) then
+        call gmcfWaitFor(model_id, REQDATA, model_id + 1, 1)
+    end if
+    print*, 'Model_id ', model_id, ' is here'
+    call gmcfHasPackets(model_id, REQDATA, has_packets)
+    do while (has_packets == 1)
+        call gmcfShiftPending(model_id, REQDATA, packet, fifo_empty)
+        select case (packet%data_id)
+            case (topTag)
+                call gmcfSend3DFloatArray(model_id, topSend, shape(topSend), topTag, model_id - procPerRow, PRE, 1)
+            case (bottomTag)
+                call gmcfSend3DFloatArray(model_id, bottomSend, shape(bottomSend), bottomTag, model_id + procPerRow, PRE, 1)
+            case (leftTag)
+                call gmcfSend3DFloatArray(model_id, leftSend, shape(leftSend), leftTag, model_id - 1, PRE, 1)
+            case (rightTag)
+                call gmcfSend3DFloatArray(model_id, rightSend, shape(rightSend), rightTag, model_id + 1, PRE, 1)
+            case default
+                print*, 'Model_id  ', model_id, ' received an unexpected REQDATA.'
+        end select
+        call gmcfHasPackets(model_id, REQDATA, has_packets)
+    end do
+end subroutine sendHaloBoundaries
+
+subroutine recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, model_id, procPerRow, procPerCol)
+    implicit none
+    real(kind=4), dimension(:,:,:), intent(out) :: leftRecv, rightRecv, topRecv, bottomRecv
+    integer, intent(in) :: model_id, procPerRow, procPerCol
+    integer :: has_packets, fifo_empty
+    type(gmcfPacket) :: packet
+    if (.not. isTopRow(model_id, procPerRow)) then
+        call gmcfWaitFor(model_id, RESPDATA, model_id - procPerRow, 1)
+    end if
+    if (.not. isBottomRow(model_id, procPerRow, procPerCol)) then
+        call gmcfWaitFor(model_id, RESPDATA, model_id + procPerRow, 1)
+    end if
+    if (.not. isLeftmostColumn(model_id, procPerRow)) then
+        call gmcfWaitFor(model_id, RESPDATA, model_id - 1, 1)
+    end if
+    if (.not. isRightmostColumn(model_id, procPerRow)) then
+        call gmcfWaitFor(model_id, RESPDATA, model_id + 1, 1)
+    end if
+    print*, 'Model_id ', model_id, ' is here'
+    call gmcfHasPackets(model_id, RESPDATA, has_packets)
+    do while (has_packets == 1)
+        call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
+        select case (packet%data_id)
+            case (topTag)
+                call gmcfRead3DFloatArray(topRecv, shape(topRecv), packet)
+            case (bottomTag)
+                call gmcfRead3DFloatArray(bottomRecv, shape(bottomRecv), packet)
+            case (leftTag)
+                call gmcfRead3DFloatArray(leftRecv, shape(leftRecv), packet)
+            case (rightTag)
+                call gmcfRead3DFloatArray(rightRecv, shape(rightRecv), packet)
+            case default
+                print*, 'Model_id  ', model_id, ' received an unexpected RESPDATA.'
+        end select
+        call gmcfHasPackets(model_id, RESPDATA, has_packets)
+    end do
+end subroutine recvHaloBoundaries
 
 logical function isMaster(model_id)
     implicit none
@@ -177,13 +247,20 @@ logical function isRightmostColumn(model_id, procPerRow)
     isRightmostColumn = modulo(model_id, procPerRow) .eq. (0)
 end function isRightmostColumn
 
-subroutine initArray(array, model_id)
+subroutine initArray(array, model_id, topThickness, bottomThickness, leftThickness, rightThickness)
     implicit none
     real(kind=4), dimension(:,:,:), intent(out) :: array
-    integer, intent(in) :: model_id
+    integer, intent(in) :: model_id, topThickness, bottomThickness, leftThickness, rightThickness
     integer :: r, c, d
     do r=1,size(array,1)
         do c=1,size(array,2)
+            do d=1,size(array,3)
+                array(r, c, d) = -1
+            end do
+        end do
+    end do
+    do r=1+topThickness,size(array,1)-bottomThickness
+        do c=1+leftThickness,size(array,2)-rightThickness
             do d=1,size(array,3)
                 array(r, c, d) = model_id
             end do

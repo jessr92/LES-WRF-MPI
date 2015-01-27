@@ -21,7 +21,7 @@ subroutine program_haloexchange3drealexample(sys, tile, model_id) ! This replace
                    colCount + leftThickness + rightThickness, &
                    depthSize))
     call gmcfInitCoupler(sys, tile, model_id)
-    call initArray(array, model_id)
+    call initArray(array, model_id, topThickness, bottomThickness, leftThickness, rightThickness)
     call exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
                                 rightThickness, topThickness, &
                                 bottomThickness, model_id)
