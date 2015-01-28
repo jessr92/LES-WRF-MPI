@@ -84,7 +84,7 @@ const UINT M_CoreServices_REG_sub = 134150;
 const UINT M_CoreServices_REG_mul = 134151;
 const UINT M_CoreServices_REG_div = 134152;
 const UINT M_CoreServices_REG_mulacc = 134153;
-const UINT S_CoreServices_BEGIN = 13;
+const UINT S_CoreServices_BEGIN = 5;
 const UINT SC_GMCF_GMCF = 288;
 const UINT SC_CoreServices_BEGIN = 513;
 const UINT SC_CoreServices_SEQ = 514;
@@ -100,8 +100,8 @@ const UINT SC_CoreServices_CTRL = 523;
 const UINT SC_CoreServices_REG = 524;
 
 // Not elegant, but static arrays are a lot faster than linked lists!
-const UINT NSERVICES = 13;
-const UINT SERVICE_ADDRESSES[13]={1,2,3,4,5,6,7,8,9,10,11,12,13};
+const UINT NSERVICES = 5;
+const UINT SERVICE_ADDRESSES[5]={1,2,3,4,5};
      
 } // SBA
 #endif /*_SBA_SYSTEM_CONFIGURATION_H_*/

@@ -87,8 +87,11 @@ subroutine exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
         call gmcfRequestData(model_id, leftTag, rowCount * rightThickness * depthSize, commWith, PRE, 1)
     end if
     ! TODO: GMCF Respond to requests and receive requested data
+    call sleep(1)
     call sendHaloBoundaries(leftSend, rightSend, topSend, bottomSend, model_id, procPerRow, procPerCol)
+    call sleep(1)
     call recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, model_id, procPerRow, procPerCol)
+    call sleep(1)
     if (.not. isTopRow(model_id, procPerRow)) then
         ! Top edge to send, bottom edge to receive
         do r=1, topThickness
@@ -147,16 +150,24 @@ subroutine sendHaloBoundaries(leftSend, rightSend, topSend, bottomSend, model_id
     type(gmcfPacket) :: packet
     print*, 'Model_id ', model_id, ' is waiting for halo boundary requests'
     if (.not. isTopRow(model_id, procPerRow)) then
+        print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id - procPerRow
         call gmcfWaitFor(model_id, REQDATA, model_id - procPerRow, 1)
+        print*, 'Model_id ', model_id, ' has received a request from ', model_id - procPerRow
     end if
     if (.not. isBottomRow(model_id, procPerRow, procPerCol)) then
+        print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id + procPerRow
         call gmcfWaitFor(model_id, REQDATA, model_id + procPerRow, 1)
+        print*, 'Model_id ', model_id, ' has received a request from ', model_id + procPerRow
     end if
     if (.not. isLeftmostColumn(model_id, procPerRow)) then
+        print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id - 1
         call gmcfWaitFor(model_id, REQDATA, model_id - 1, 1)
+        print*, 'Model_id ', model_id, ' has received a request from ', model_id - 1
     end if
     if (.not. isRightmostColumn(model_id, procPerRow)) then
+        print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id + 1
         call gmcfWaitFor(model_id, REQDATA, model_id + 1, 1)
+        print*, 'Model_id ', model_id, ' has received a request from ', model_id + 1
     end if
     print*, 'Model_id ', model_id, ' has received halo boundary requests'
     call gmcfHasPackets(model_id, REQDATA, has_packets)
@@ -187,16 +198,24 @@ subroutine recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, model_id
     type(gmcfPacket) :: packet
     print*, 'Model_id ', model_id, ' is waiting for halo boundaries'
     if (.not. isTopRow(model_id, procPerRow)) then
+        print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id - procPerRow
         call gmcfWaitFor(model_id, RESPDATA, model_id - procPerRow, 1)
+        print*, 'Model_id ', model_id, ' has received a response from ', model_id - procPerRow
     end if
     if (.not. isBottomRow(model_id, procPerRow, procPerCol)) then
+        print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id + procPerRow
         call gmcfWaitFor(model_id, RESPDATA, model_id + procPerRow, 1)
+        print*, 'Model_id ', model_id, ' has received a response from ', model_id + procPerRow
     end if
     if (.not. isLeftmostColumn(model_id, procPerRow)) then
+        print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id - 1
         call gmcfWaitFor(model_id, RESPDATA, model_id - 1, 1)
+        print*, 'Model_id ', model_id, ' has received a response from ', model_id - 1
     end if
     if (.not. isRightmostColumn(model_id, procPerRow)) then
+        print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id + 1
         call gmcfWaitFor(model_id, RESPDATA, model_id + 1, 1)
+        print*, 'Model_id ', model_id, ' has received a response from ', model_id + 1
     end if
     print*, 'Model_id ', model_id, ' has finished waiting for halo boundaries'
     call gmcfHasPackets(model_id, RESPDATA, has_packets)

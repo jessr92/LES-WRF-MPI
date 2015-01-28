@@ -1,8 +1,8 @@
 #!/bin/bash
 . $GANNET_DIR/etc/gannetrc
 MODEL_NAME="haloexchange3drealexample"
-PROC_PER_ROW=4
-PROC_PER_COL=3
+PROC_PER_ROW=2
+PROC_PER_COL=2
 INSTANCES=$(($PROC_PER_ROW * $PROC_PER_COL))
 mkdir -p src/GMCF/Models
 mkdir -p src/GMCF/Task
