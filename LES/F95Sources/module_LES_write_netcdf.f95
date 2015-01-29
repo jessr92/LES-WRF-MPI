@@ -357,7 +357,7 @@ subroutine write_to_netcdf_file(p,u,v,w,usum,vsum,wsum,n)
     real(kind=4), dimension(0:(ip*procPerCol),0:(jp*procPerRow),0:kp) :: usumTot
     real(kind=4), dimension(0:(ip*procPerCol),0:(jp*procPerRow),0:kp) :: vsumTot
     real(kind=4), dimension(0:(ip*procPerCol),0:(jp*procPerRow),0:kp) :: wsumTot
-    call collect3DReal4ArrayP(p, pTot, 1, 2, 1, 2, ip, jp, kp, procPerRow)
+    call collect3DReal4Array(p, pTot, 1, 2, 1, 2, ip, jp, kp, procPerRow)
     call collect3DReal4Array(u, uTot, 2, 1, 1, 1, ip, jp, kp, procPerRow)
     call collect3DReal4Array(v, vTot, 2, 1, 1, 1, ip, jp, kp, procPerRow)
     call collect3DReal4Array(w, wTot, 2, 1, 1, 1, ip, jp, kp, procPerRow)
