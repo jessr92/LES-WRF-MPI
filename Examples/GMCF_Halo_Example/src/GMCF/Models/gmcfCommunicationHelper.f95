@@ -175,13 +175,13 @@ subroutine sendHaloBoundaries(leftSend, rightSend, topSend, bottomSend, model_id
         call gmcfShiftPending(model_id, REQDATA, packet, fifo_empty)
         select case (packet%data_id)
             case (topTag)
-                call gmcfSend3DFloatArray(model_id, topSend, shape(topSend), topTag, model_id - procPerRow, PRE, 1)
+                call gmcfSend3DFloatArray(model_id, topSend, shape(topSend), topTag, packet%source, PRE, 1)
             case (bottomTag)
-                call gmcfSend3DFloatArray(model_id, bottomSend, shape(bottomSend), bottomTag, model_id + procPerRow, PRE, 1)
+                call gmcfSend3DFloatArray(model_id, bottomSend, shape(bottomSend), bottomTag, packet%source, PRE, 1)
             case (leftTag)
-                call gmcfSend3DFloatArray(model_id, leftSend, shape(leftSend), leftTag, model_id - 1, PRE, 1)
+                call gmcfSend3DFloatArray(model_id, leftSend, shape(leftSend), leftTag, packet%source, PRE, 1)
             case (rightTag)
-                call gmcfSend3DFloatArray(model_id, rightSend, shape(rightSend), rightTag, model_id + 1, PRE, 1)
+                call gmcfSend3DFloatArray(model_id, rightSend, shape(rightSend), rightTag, packet%source, PRE, 1)
             case default
                 print*, 'Model_id  ', model_id, ' received an unexpected REQDATA.'
         end select
