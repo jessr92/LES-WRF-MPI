@@ -37,7 +37,6 @@ subroutine exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
                 end do
             end do
         end do
-        ! TODO: GMCF Request bottom edge
         call gmcfRequestData(model_id, bottomTag, topThickness * colCount * depthSize, commWith, PRE, 1)
     end if
     ! Bottom edge to send, top edge to receive
@@ -53,7 +52,6 @@ subroutine exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
                 end do
             end do
         end do
-        ! TODO: GMCF Request top edge
         call gmcfRequestData(model_id, topTag, bottomThickness * colCount * depthSize, commWith, PRE, 1)
     end if
     ! Left edge to send, right edge to receive
@@ -67,7 +65,6 @@ subroutine exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
                 end do
             end do
         end do
-        ! TODO: GMCF Request right edge
         call gmcfRequestData(model_id, rightTag, rowCount * leftThickness * depthSize, commWith, PRE, 1)
     end if
     ! Right edge to send, left edge to receive
@@ -83,15 +80,10 @@ subroutine exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
                 end do
             end do
         end do
-        ! TODO: GMCF Request left edge
         call gmcfRequestData(model_id, leftTag, rowCount * rightThickness * depthSize, commWith, PRE, 1)
     end if
-    ! TODO: GMCF Respond to requests and receive requested data
-    call sleep(1)
     call sendHaloBoundaries(leftSend, rightSend, topSend, bottomSend, model_id, procPerRow, procPerCol)
-    call sleep(1)
     call recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, model_id, procPerRow, procPerCol)
-    call sleep(1)
     if (.not. isTopRow(model_id, procPerRow)) then
         ! Top edge to send, bottom edge to receive
         do r=1, topThickness
@@ -261,13 +253,13 @@ end function isBottomRow
 logical function isLeftmostColumn(model_id, procPerRow)
     implicit none
     integer, intent(in) :: model_id, procPerRow
-    isLeftmostColumn = modulo(model_id, procPerRow) .eq. 1
+    isLeftmostColumn = modulo(model_id - 1, procPerRow) .eq. 0
 end function isLeftmostColumn
 
 logical function isRightmostColumn(model_id, procPerRow)
     implicit none
     integer, intent(in) :: model_id, procPerRow
-    isRightmostColumn = modulo(model_id, procPerRow) .eq. (0)
+    isRightmostColumn = modulo(model_id - 1, procPerRow) .eq. (procPerRow - 1)
 end function isRightmostColumn
 
 subroutine initArray(array, model_id, topThickness, bottomThickness, leftThickness, rightThickness)
