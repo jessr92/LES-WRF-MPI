@@ -157,9 +157,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
             end do
         end do
 #ifdef GMCF_API
-        ! Sending is maybe fine. Receiving not so much at the moment
-        call GMCF_MPI_ISend3DRealArray(rank, topSend, topTag, commWith, 0)
-        ! call receive or maybe not?
+        !
 #else
         call MPI_ISend(topSend, bottomThickness*colCount*depthSize, MPI_REAL, commWith, topTag, &
                       cartTopComm, requests(1), ierror)
@@ -183,9 +181,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
             end do
         end do
 #ifdef GMCF_API
-        ! Sending is maybe fine. Receiving not so much at the moment
-        call GMCF_MPI_ISend3DRealArray(rank, bottomSend, bottomTag, commWith, 0)
-        ! call receive or maybe not?
+        !
 #else
         call MPI_IRecv(topRecv, bottomThickness*colCount*depthSize, MPI_REAL, commWith, topTag, &
                       cartTopComm, requests(3), ierror)
@@ -207,9 +203,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
             end do
         end do
 #ifdef GMCF_API
-        ! Sending is maybe fine. Receiving not so much at the moment
-        call GMCF_MPI_ISend3DRealArray(rank, leftSend, leftTag, commWith, 0)
-        ! call receive or maybe not?
+        !
 #else
         call MPI_ISend(leftSend, rightThickness*rowCount*depthSize, MPI_REAL, commWith, leftTag, &
                       communicator, requests(5), ierror)
@@ -233,9 +227,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
             end do
         end do
 #ifdef GMCF_API
-        ! Sending is maybe fine. Receiving not so much at the moment
-        call GMCF_MPI_ISend3DRealArray(rank, rightSend, rightTag, commWith, 0)
-        ! call receive or maybe not?
+        !
 #else
         call MPI_IRecv(leftRecv, rightThickness*rowCount*depthSize, MPI_REAL, commWith, leftTag, &
                       communicator, requests(7), ierror)
@@ -246,8 +238,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
 #endif
     end if
 #ifdef GMCF_API
-    ! Not sure, probably just GMCF_MPI_WaitRealHaloBoundaries and not have
-    ! receive calls above
+        !
 #else
     if (neighbours(topNeighbour) .ne. -1) then
         call MPI_Wait(requests(1), status, ierror)
@@ -275,8 +266,6 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
     end if
 #endif
     if (.not. isTopRow(procPerRow)) then
-        ! Top edge to send, bottom edge to receive
-        commWith = rank - procPerRow
         do r=1, topThickness
             do c=1, colCount
                 do d=1, depthSize
@@ -286,7 +275,6 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
         end do
     end if
     if (.not. isBottomRow(procPerRow)) then
-        ! Bottom edge to send, top edge to receive
         do r=1, bottomThickness
             do c=1, colCount
                 do d=1, depthSize
@@ -296,7 +284,6 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
         end do
     end if
     if (.not. isLeftmostColumn(procPerRow)) then
-        ! Left edge to send, right edge to receive
         do r=1, rowCount
             do c=1, leftThickness
                 do d=1, depthSize
@@ -306,7 +293,6 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
         end do
     end if
     if (.not. isRightmostColumn(procPerRow)) then
-        ! Right edge to send, left edge to receive
         do r=1, rowCount
             do c=1, rightThickness
                 do d=1, depthSize

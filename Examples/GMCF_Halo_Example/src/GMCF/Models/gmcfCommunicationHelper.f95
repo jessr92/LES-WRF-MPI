@@ -282,7 +282,7 @@ subroutine outputArrayReal(array)
     do row = 1, size(array, 1)
         do col = 1, size(array,2)
             if (array(row, col) .ne. -1.0) then
-                write(*,"(F6.0)",advance="no") array(row,col)
+                write(*,"(F6.2)",advance="no") array(row,col)
             else
                 write(*,"(A6)", advance="no") '-'
             end if
