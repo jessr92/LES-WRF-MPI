@@ -27,9 +27,9 @@ subroutine program_haloexchange3drealexample(sys, tile, model_id) ! This replace
                                 bottomThickness, model_id)
     call gmcfFinished(model_id)
     do i=1, depthSize
-        call sleep(model_id+1)
+        call sleep(model_id)
         call outputArrayReal(array(:,:,i))
-        call sleep((procPerCol*procPerRow) - 1)
+        call sleep((procPerCol*procPerRow) - model_id)
     end do
     deallocate(array)
 end subroutine program_haloexchange3drealexample
