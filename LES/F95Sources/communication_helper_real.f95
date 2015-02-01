@@ -107,14 +107,6 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
     real(kind=4), dimension(:,:,:), allocatable :: leftRecv, leftSend, rightSend, rightRecv
     real(kind=4), dimension(:,:,:), allocatable :: topRecv, topSend, bottomSend, bottomRecv
 #ifdef GMCF_API
-    ! Not sure. Unlikely to be necessary since MPI_Barrier isn't really necessary.
-#else
-    call MPI_Barrier(communicator, ierror)
-#endif
-#ifdef GR_DEBUG
-    !print*, 'GR: rank ', rank, ' is starting exchangeRealHalos'
-#endif
-#ifdef GMCF_API
     ! Not sure
 #else
     if (size(neighbours, 1) .lt. 4) then
@@ -240,30 +232,12 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
 #ifdef GMCF_API
         !
 #else
-    if (neighbours(topNeighbour) .ne. -1) then
-        call MPI_Wait(requests(1), status, ierror)
-        call checkMPIError()
-        call MPI_Wait(requests(2), status, ierror)
-        call checkMPIError()
-    end if
-    if (neighbours(bottomNeighbour) .ne. -1) then
-        call MPI_Wait(requests(3), status, ierror)
-        call checkMPIError()
-        call MPI_Wait(requests(4), status, ierror)
-        call checkMPIError()
-    end if
-    if (neighbours(leftNeighbour) .ne. -1) then
-        call MPI_Wait(requests(5), status, ierror)
-        call checkMPIError()
-        call MPI_Wait(requests(6), status, ierror)
-        call checkMPIError()
-    end if
-    if (neighbours(rightNeighbour) .ne. -1) then
-        call MPI_Wait(requests(7), status, ierror)
-        call checkMPIError()
-        call MPI_Wait(requests(8), status, ierror)
-        call checkMPIError()
-    end if
+    do i=1,8
+        if (requests(i) .ne. MPI_REQUEST_NULL) then
+            call MPI_Wait(requests(i), status, ierror)
+            call checkMPIError()
+        end if
+    end do
 #endif
     if (.not. isTopRow(procPerRow)) then
         do r=1, topThickness
@@ -317,11 +291,6 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
     deallocate(topSend)
     deallocate(bottomSend)
     deallocate(bottomRecv)
-#ifdef GMCF_API
-    ! Not sure. Unlikely to be necessary since MPI_Barrier isn't really necessary.
-#else
-    call MPI_Barrier(communicator, ierror)
-#endif
 end subroutine exchangeRealHalos
 
 subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness, topThickness, bottomThickness)
@@ -565,11 +534,6 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
     real(kind=4), dimension(-1:ipmax+1,-1:jpmax+1) , intent(InOut) :: zbm
     integer :: startRow, startCol, i, r, c
     real(kind=4), dimension(ip, jp) :: sendBuffer, recvBuffer
-#ifdef GMCF_API
-    ! Not sure. Unlikely to be necesssary since MPI_Barrier isn't really necessary.
-#else
-    call MPI_Barrier(communicator, ierror)
-#endif
 #ifdef GR_DEBUG
     !print*, 'GR: rank ', rank, ' is starting distributeZBM'
 #endif
@@ -610,11 +574,6 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
             end do
         end do
     end if
-#ifdef GMCF_API
-    ! Not sure. Unlikely to be necesssary since MPI_Barrier isn't really necessary.
-#else
-    call MPI_Barrier(communicator, ierror)
-#endif
 #ifdef GR_DEBUG
     print*, 'GR: rank ', rank, ' has finished distributeZBM'
 #endif
