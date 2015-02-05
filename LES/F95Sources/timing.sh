@@ -2,6 +2,9 @@
 # Setup timing runs
 HOSTNAME=$(hostname)
 MPI_VERSION=$(mpiexec --version | awk '/Version:/ {print $2}')
+if [ -z "$MPI_VERSION" ]; then
+    MPI_VERSION=$(mpiexec --version | awk '/mpiexec/ {print $3}')
+fi
 TIMING_DIRECTORY="timingRuns/"$HOSTNAME"/"$MPI_VERSION
 MAX_PER_DIMENSION=16
 mkdir -p $TIMING_DIRECTORY
@@ -79,4 +82,3 @@ do
         fi
     done
 done
-
