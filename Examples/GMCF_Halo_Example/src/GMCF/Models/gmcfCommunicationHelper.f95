@@ -124,22 +124,7 @@ subroutine exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
             end do
         end do
     end if
-    if (.not. isTopRow(model_id, procPerRow)) then
-        print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id - procPerRow
-        call gmcfWaitFor(model_id, ACKDATA, model_id - procPerRow, 1)
-    end if
-    if (.not. isBottomRow(model_id, procPerRow, procPerCol)) then
-        print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id + procPerRow
-        call gmcfWaitFor(model_id, ACKDATA, model_id + procPerRow, 1)
-    end if
-    if (.not. isLeftmostColumn(model_id, procPerRow)) then
-        print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id - 1
-        call gmcfWaitFor(model_id, ACKDATA, model_id - 1, 1)
-    end if
-    if (.not. isRightmostColumn(model_id, procPerRow)) then
-        print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id + 1
-        call gmcfWaitFor(model_id, ACKDATA, model_id + 1, 1)
-    end if
+    call waitForHaloAcks(model_id, procPerRow, procPerCol)
     deallocate(leftRecv)
     deallocate(leftSend)
     deallocate(rightSend)
@@ -156,24 +141,24 @@ subroutine sendHaloBoundaries(leftSend, rightSend, topSend, bottomSend, model_id
     integer, intent(in) :: model_id, procPerRow, procPerCol
     integer :: has_packets, fifo_empty
     type(gmcfPacket) :: packet
-    print*, 'Model_id ', model_id, ' is waiting for halo boundary requests'
+    !print*, 'Model_id ', model_id, ' is waiting for halo boundary requests'
     if (.not. isTopRow(model_id, procPerRow)) then
-        print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id - procPerRow
+        !print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id - procPerRow
         call gmcfWaitFor(model_id, REQDATA, model_id - procPerRow, 1)
     end if
     if (.not. isBottomRow(model_id, procPerRow, procPerCol)) then
-        print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id + procPerRow
+        !print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id + procPerRow
         call gmcfWaitFor(model_id, REQDATA, model_id + procPerRow, 1)
     end if
     if (.not. isLeftmostColumn(model_id, procPerRow)) then
-        print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id - 1
+        !print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id - 1
         call gmcfWaitFor(model_id, REQDATA, model_id - 1, 1)
     end if
     if (.not. isRightmostColumn(model_id, procPerRow)) then
-        print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id + 1
+        !print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id + 1
         call gmcfWaitFor(model_id, REQDATA, model_id + 1, 1)
     end if
-    print*, 'Model_id ', model_id, ' has received halo boundary requests'
+    !print*, 'Model_id ', model_id, ' has received halo boundary requests'
     call gmcfHasPackets(model_id, REQDATA, has_packets)
     do while (has_packets == 1)
         call gmcfShiftPending(model_id, REQDATA, packet, fifo_empty)
@@ -191,7 +176,7 @@ subroutine sendHaloBoundaries(leftSend, rightSend, topSend, bottomSend, model_id
         end select
         call gmcfHasPackets(model_id, REQDATA, has_packets)
     end do
-    print*, 'Model_id ', model_id, ' has responded to halo boundary requests'
+    !print*, 'Model_id ', model_id, ' has responded to halo boundary requests'
 end subroutine sendHaloBoundaries
 
 subroutine recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, model_id, procPerRow, procPerCol)
@@ -200,24 +185,24 @@ subroutine recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, model_id
     integer, intent(in) :: model_id, procPerRow, procPerCol
     integer :: has_packets, fifo_empty
     type(gmcfPacket) :: packet
-    print*, 'Model_id ', model_id, ' is waiting for halo boundaries'
+    !print*, 'Model_id ', model_id, ' is waiting for halo boundaries'
     if (.not. isTopRow(model_id, procPerRow)) then
-        print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id - procPerRow
+        !print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id - procPerRow
         call gmcfWaitFor(model_id, RESPDATA, model_id - procPerRow, 1)
     end if
     if (.not. isBottomRow(model_id, procPerRow, procPerCol)) then
-        print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id + procPerRow
+        !print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id + procPerRow
         call gmcfWaitFor(model_id, RESPDATA, model_id + procPerRow, 1)
     end if
     if (.not. isLeftmostColumn(model_id, procPerRow)) then
-        print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id - 1
+        !print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id - 1
         call gmcfWaitFor(model_id, RESPDATA, model_id - 1, 1)
     end if
     if (.not. isRightmostColumn(model_id, procPerRow)) then
-        print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id + 1
+        !print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id + 1
         call gmcfWaitFor(model_id, RESPDATA, model_id + 1, 1)
     end if
-    print*, 'Model_id ', model_id, ' has finished waiting for halo boundaries'
+    !print*, 'Model_id ', model_id, ' has finished waiting for halo boundaries'
     call gmcfHasPackets(model_id, RESPDATA, has_packets)
     do while (has_packets == 1)
         call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
@@ -235,8 +220,42 @@ subroutine recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, model_id
         end select
         call gmcfHasPackets(model_id, RESPDATA, has_packets)
     end do
-    print*, 'Model_id ', model_id, ' has received halo boundaries'
+    !print*, 'Model_id ', model_id, ' has received halo boundaries'
 end subroutine recvHaloBoundaries
+
+subroutine waitForHaloAcks(model_id, procPerRow, procPerCol)
+    implicit none
+    integer, intent(in) :: model_id, procPerRow, procPerCol
+    integer :: has_packets, fifo_empty
+    type(gmcfPacket) :: packet
+    if (.not. isTopRow(model_id, procPerRow)) then
+        !print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id - procPerRow
+        call gmcfWaitFor(model_id, ACKDATA, model_id - procPerRow, 1)
+    end if
+    if (.not. isBottomRow(model_id, procPerRow, procPerCol)) then
+        !print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id + procPerRow
+        call gmcfWaitFor(model_id, ACKDATA, model_id + procPerRow, 1)
+    end if
+    if (.not. isLeftmostColumn(model_id, procPerRow)) then
+        !print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id - 1
+        call gmcfWaitFor(model_id, ACKDATA, model_id - 1, 1)
+    end if
+    if (.not. isRightmostColumn(model_id, procPerRow)) then
+        !print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id + 1
+        call gmcfWaitFor(model_id, ACKDATA, model_id + 1, 1)
+    end if
+    call gmcfHasPackets(model_id, ACKDATA, has_packets)
+    do while (has_packets == 1)
+        call gmcfShiftPending(model_id, ACKDATA, packet, fifo_empty)
+        if (packet%source .ne. model_id - procPerRow .and. \
+              packet%source .ne. model_id + procPerRow .and. \
+              packet%source .ne. model_id - 1 .and. \
+              packet%source .ne. model_id + 1) then
+            print*, 'Model_id  ', model_id, ' received an unexpected ACKDATA.'
+        end if
+        call gmcfHasPackets(model_id, RESPDATA, has_packets)
+    end do
+end subroutine waitForHaloAcks
 
 logical function isMaster(model_id)
     implicit none
