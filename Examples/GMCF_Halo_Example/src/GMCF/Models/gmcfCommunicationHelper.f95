@@ -124,6 +124,22 @@ subroutine exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
             end do
         end do
     end if
+    if (.not. isTopRow(model_id, procPerRow)) then
+        print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id - procPerRow
+        call gmcfWaitFor(model_id, ACKDATA, model_id - procPerRow, 1)
+    end if
+    if (.not. isBottomRow(model_id, procPerRow, procPerCol)) then
+        print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id + procPerRow
+        call gmcfWaitFor(model_id, ACKDATA, model_id + procPerRow, 1)
+    end if
+    if (.not. isLeftmostColumn(model_id, procPerRow)) then
+        print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id - 1
+        call gmcfWaitFor(model_id, ACKDATA, model_id - 1, 1)
+    end if
+    if (.not. isRightmostColumn(model_id, procPerRow)) then
+        print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id + 1
+        call gmcfWaitFor(model_id, ACKDATA, model_id + 1, 1)
+    end if
     deallocate(leftRecv)
     deallocate(leftSend)
     deallocate(rightSend)
