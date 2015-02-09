@@ -29,7 +29,7 @@ subroutine exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
     ! Top edge to send, bottom edge to receive
     if (.not. isTopRow(model_id, procPerRow)) then
         commWith = model_id - procPerRow
-        print*, 'Model_id ', model_id, ' communicating with top neighbour ', commWith
+        !print*, 'Model_id ', model_id, ' communicating with top neighbour ', commWith
         do r=1, bottomThickness
             do c=1, colCount
                 do d=1, depthSize
@@ -42,7 +42,7 @@ subroutine exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
     ! Bottom edge to send, top edge to receive
     if (.not. isBottomRow(model_id, procPerRow, procPerCol)) then
         commWith = model_id + procPerRow
-        print*, 'Model_id ', model_id, ' communicating with bottom neighbour ', commWith
+        !print*, 'Model_id ', model_id, ' communicating with bottom neighbour ', commWith
         do r=1, topThickness
             do c=1, colCount
                 do d=1, depthSize
@@ -57,7 +57,7 @@ subroutine exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
     ! Left edge to send, right edge to receive
     if (.not. isLeftmostColumn(model_id, procPerRow)) then
         commWith = model_id - 1
-        print*, 'Model_id ', model_id, ' communicating with left neighbour ', commWith
+        !print*, 'Model_id ', model_id, ' communicating with left neighbour ', commWith
         do r=1, rowCount
             do c=1, rightThickness
                 do d=1, depthSize
@@ -70,7 +70,7 @@ subroutine exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
     ! Right edge to send, left edge to receive
     if (.not. isRightmostColumn(model_id, procPerRow)) then
         commWith = model_id + 1
-        print*, 'Model_id ', model_id, ' communicating with right neighbour ', commWith
+        !print*, 'Model_id ', model_id, ' communicating with right neighbour ', commWith
         do r=1, rowCount
             do c=1, leftThickness
                 do d=1, depthSize

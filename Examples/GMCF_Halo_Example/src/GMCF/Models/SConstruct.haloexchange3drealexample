@@ -15,7 +15,7 @@ PROC_PER_ROW = '-DPROC_PER_ROW=' + procPerRow
 PROC_PER_COL = '-DPROC_PER_COL=' + procPerCol
 
 LDFLAGS= []
-FFLAGS = ['-Wall', '-cpp', '-ffree-form', '-ffree-line-length-0', PROC_PER_ROW, PROC_PER_COL, '-O0', '-g']
+FFLAGS = ['-Wall', '-cpp', '-ffree-form', '-ffree-line-length-0', PROC_PER_ROW, PROC_PER_COL]
 
 envF=Environment(F95=FC,LINK=FC,LINKFLAGS=LDFLAGS,F95FLAGS=FFLAGS,F95PATH=['.', '../../../lib','/opt/local/include','/usr/local/include'])
 
