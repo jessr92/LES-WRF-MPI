@@ -1,4 +1,8 @@
+#ifdef GMCF
+    subroutine program_les(sys, tile, model_id)
+#else
       program main
+#endif
         use module_init 
         use module_grid 
         use module_set 
@@ -154,8 +158,8 @@
 #endif
 ! -----------------------------------------------------------------------
 !
-#ifdef GMCF_API
-! Not sure
+#ifdef GMCF
+print*, 'Hello from model ', model_id
 #else
 #ifdef MPI
 ! GR: MPI Start
@@ -303,7 +307,11 @@
       call finalise_mpi()
 #endif
 #endif
-      end program
 
+#ifdef GMCF
+end subroutine program_les
+#else
+      end program
+#endif
 
 

@@ -1,0 +1,4 @@
+#!/bin/bash
+cp -r src/GMCF/Models/GIS .
+./gmcfCoupler
+rm -r GIS
