@@ -115,12 +115,13 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
     real(kind=4), dimension(:,:,:), intent(inout) :: array
     integer, dimension(:), intent(in) :: neighbours
     integer, intent(in) :: procPerRow, leftThickness, rightThickness, topThickness, bottomThickness
-    integer :: i, commWith, r, c, d, rowCount, colCount, depthSize, requests(8)
+    integer :: i, commWith, r, c, d, rowCount, colCount, depthSize
+#ifdef MPI
+    integer :: requests(8)
+#endif
     real(kind=4), dimension(:,:,:), allocatable :: leftRecv, leftSend, rightSend, rightRecv
     real(kind=4), dimension(:,:,:), allocatable :: topRecv, topSend, bottomSend, bottomRecv
-#ifdef GMCF
-    ! Not sure
-#else
+#ifdef MPI
     if (size(neighbours, 1) .lt. 4) then
         print*, "Error: cannot have a 4-way halo exchange with less than 4 neighbours"
         call finalise_mpi()
@@ -138,21 +139,20 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
     allocate(bottomSend(topThickness, colCount, depthSize))
     allocate(bottomRecv(topThickness, colCount, depthSize))
     allocate(topSend(bottomThickness, colCount, depthSize))
-#ifdef GMCF
-    ! Nothing?
-#else
+#ifdef MPI
     do i=1,8
         requests(i)= MPI_REQUEST_NULL
     end do
 #endif
     ! Top edge to send, bottom edge to receive
 #ifdef GMCF
-    ! Not sure
+    if (.not. isTopRow(procPerRow)) then
+        commWith = rank - procPerRow
 #else
     commWith = neighbours(topNeighbour)
-#endif
     if (commWith .ne. -1) then
-        !print*, 'rank ', rank, ' communicating with top neighbour ', commWith
+#endif
+        print*, 'rank ', rank, ' communicating with top neighbour ', commWith
         do r=1, bottomThickness
             do c=1, colCount
                 do d=1, depthSize
@@ -161,7 +161,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
             end do
         end do
 #ifdef GMCF
-        !
+        call gmcfRequestData(rank, bottomTag, topThickness * colCount * depthSize, commWith, PRE, 1)
 #else
         call MPI_ISend(topSend, bottomThickness*colCount*depthSize, MPI_REAL, commWith, topTag, &
                       cartTopComm, requests(1), ierror)
@@ -172,9 +172,14 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
 #endif
     end if
     ! Bottom edge to send, top edge to receive
+#ifdef GMCF
+    if (.not. isBottomRow(procPerRow)) then
+        commWith = rank + procPerRow
+#else
     commWith = neighbours(bottomNeighbour)
     if (commWith .ne. -1) then
-        !print*, 'rank ', rank, ' communicating with bottom neighbour ', commWith
+#endif
+        print*, 'rank ', rank, ' communicating with bottom neighbour ', commWith
         do r=1, topThickness
             do c=1, colCount
                 do d=1, depthSize
@@ -185,7 +190,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
             end do
         end do
 #ifdef GMCF
-        !
+        call gmcfRequestData(rank, topTag, bottomThickness * colCount * depthSize, commWith, PRE, 1)
 #else
         call MPI_IRecv(topRecv, bottomThickness*colCount*depthSize, MPI_REAL, commWith, topTag, &
                       cartTopComm, requests(3), ierror)
@@ -196,9 +201,14 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
 #endif
     end if
     ! Left edge to send, right edge to receive
+#ifdef GMCF
+    if (.not. isLeftmostColumn(procPerRow)) then
+        commWith = rank - 1
+#else
     commWith = neighbours(leftNeighbour)
     if (commWith .ne. -1) then
-        !print*, 'rank ', rank, ' communicating with left neighbour ', commWith
+#endif
+        print*, 'rank ', rank, ' communicating with left neighbour ', commWith
         do r=1, rowCount
             do c=1, rightThickness
                 do d=1, depthSize
@@ -207,7 +217,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
             end do
         end do
 #ifdef GMCF
-        !
+        call gmcfRequestData(rank, rightTag, rowCount * leftThickness * depthSize, commWith, PRE, 1)
 #else
         call MPI_ISend(leftSend, rightThickness*rowCount*depthSize, MPI_REAL, commWith, leftTag, &
                       communicator, requests(5), ierror)
@@ -218,9 +228,14 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
 #endif
     end if
     ! Right edge to send, left edge to receive
+#ifdef GMCF
+    if (.not. isRightmostColumn(procPerRow)) then
+        commWith = rank + 1
+#else
     commWith = neighbours(rightNeighbour)
     if (commWith .ne. -1) then
-        !print*, 'rank ', rank, ' communicating with right neighbour ', commWith
+#endif
+        print*, 'rank ', rank, ' communicating with right neighbour ', commWith
         do r=1, rowCount
             do c=1, leftThickness
                 do d=1, depthSize
@@ -231,7 +246,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
             end do
         end do
 #ifdef GMCF
-        !
+        call gmcfRequestData(rank, leftTag, rowCount * rightThickness * depthSize, commWith, PRE, 1)
 #else
         call MPI_IRecv(leftRecv, rightThickness*rowCount*depthSize, MPI_REAL, commWith, leftTag, &
                       communicator, requests(7), ierror)
@@ -242,7 +257,8 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
 #endif
     end if
 #ifdef GMCF
-        !
+    call sendHaloBoundaries(leftSend, rightSend, topSend, bottomSend, procPerRow)
+    call recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, procPerRow)
 #else
     do i=1,8
         if (requests(i) .ne. MPI_REQUEST_NULL) then
@@ -294,6 +310,9 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
         call calculateCornersReal(array(:,:,i), procPerRow, leftThickness, &
                               rightThickness, topThickness, bottomThickness)
     end do
+#endif
+#ifdef GMCF
+    call waitForHaloAcks(procPerRow)
 #endif
     deallocate(leftRecv)
     deallocate(leftSend)

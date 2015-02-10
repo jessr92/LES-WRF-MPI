@@ -298,7 +298,7 @@
 #endif
 
 #ifdef GMCF_API
-      call finalise_gmcf()
+      call finalise_gmcf(model_id)
 #else
 #ifdef MPI
       call finalise_mpi()
