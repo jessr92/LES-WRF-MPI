@@ -532,6 +532,93 @@ subroutine getGlobalMaxOfGMCF(model_id, value)
     end if
 end subroutine getGlobalMaxOfGMCF
 
+subroutine getGlobalMinOfGMCF(model_id, value)
+    implicit none
+    integer, intent(in) :: model_id
+    real(kind=4), intent(inout) :: value
+    real(kind=4), dimension(1) :: receiveBuffer, sendBuffer
+    integer :: i, has_packets, fifo_empty
+    type(gmcfPacket) :: packet
+    if (isMaster(model_id)) then
+        ! Request everybody's value
+        do i=2, mpi_size
+            call gmcfRequestData(model_id, globalMinTag, 1, i, PRE, 1)
+        end do
+        ! Wait for responses
+        do i=2, mpi_size
+            call gmcfWaitFor(model_id, RESPDATA, i, 1)
+        end do
+        ! Read in responses and find the min value
+        call gmcfHasPackets(model_id, RESPDATA, has_packets)
+        do while(has_packets == 1)
+            call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
+            if (packet%data_id .ne. globalMinTag) then
+                print*, 'Received unexpected packet'
+            else
+                call gmcfRead1DFloatArray(receiveBuffer, shape(receiveBuffer), packet)
+                if (receiveBuffer(1) .lt. value) then
+                    value = receiveBuffer(1)
+                end if
+            end if
+            call gmcfHasPackets(model_id, RESPDATA, has_packets)
+        end do
+        ! Wait for everybody to request the global sum
+        sendBuffer(1) = value
+        do i=2, mpi_size
+            call gmcfWaitFor(model_id, REQDATA, i, 1)
+        end do
+        ! Send the global sum
+        do while(has_packets == 1)
+            call gmcfShiftPending(model_id, REQDATA, packet, fifo_empty)
+            if (packet%data_id .ne. globalMinTag) then
+                print*, 'Received unexpected packet'
+            else
+                call gmcfSend1DFloatArray(model_id, sendBuffer, shape(sendBuffer), globalMinTag, packet%source, PRE, 1)
+            end if
+            call gmcfHasPackets(model_id, REQDATA, has_packets)
+        end do
+        ! Wait for acks
+        do i=2,mpi_size
+            call gmcfWaitFor(model_id, ACKDATA, i, 1)
+        end do
+        ! Deal with the acks
+        do while(has_packets == 1)
+            call gmcfShiftPending(model_id, ACKDATA, packet, fifo_empty)
+            call gmcfHasPackets(model_id, ACKDATA, has_packets)
+        end do
+    else
+        sendBuffer(1) = value
+        ! Wait for master to ask for my value
+        call gmcfWaitFor(model_id, REQDATA, 1, 1)
+        ! Send my value
+        do while(has_packets == 1)
+            call gmcfShiftPending(model_id, REQDATA, packet, fifo_empty)
+            if (packet%data_id .ne. globalMinTag) then
+                print*, 'Received unexpected packet'
+            else
+                call gmcfSend1DFloatArray(model_id, sendBuffer, shape(sendBuffer), globalMinTag, packet%source, PRE, 1)
+            end if
+            call gmcfHasPackets(model_id, REQDATA, has_packets)
+        end do
+        ! Request global value
+        call gmcfRequestData(model_id, globalMinTag, 1, 1, PRE, 1)
+        ! Wait for response
+        call gmcfWaitFor(model_id, RESPDATA, 1, 1)
+        ! Read in response
+        do while(has_packets == 1)
+            call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
+            if (packet%data_id .ne. globalMinTag) then
+                print*, 'Received unexpected packet'
+            else
+                call gmcfRead1DFloatArray(receiveBuffer, shape(receiveBuffer),packet)
+            end if
+            call gmcfHasPackets(model_id, RESPDATA, has_packets)
+        end do
+        ! Copy received value into appropriate place
+        value = receiveBuffer(1)
+    end if
+end subroutine getGlobalMinOfGMCF
+
 logical function isMaster(model_id)
     implicit none
     integer, intent(in) :: model_id
