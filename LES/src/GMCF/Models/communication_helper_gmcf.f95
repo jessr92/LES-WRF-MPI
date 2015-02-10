@@ -164,10 +164,10 @@ subroutine sendLeftSideflow(leftSend, model_id, procPerRow)
     end do
 end subroutine sendLeftSideflow
 
-subroutine recvLeftSideflow(leftRecv, model_id, procPerRow, procPerCol)
+subroutine recvLeftSideflow(leftRecv, model_id, procPerRow)
     implicit none
     real(kind=4), dimension(:,:), intent(out) :: leftRecv
-    integer, intent(in) :: model_id, procPerRow, procPerCol
+    integer, intent(in) :: model_id, procPerRow
     integer :: has_packets, fifo_empty
     type(gmcfPacket) :: packet
     call gmcfWaitFor(model_id, REQDATA, model_id - procPerRow + 1, 1)
@@ -220,10 +220,10 @@ subroutine sendRightSideflow(rightSend, model_id, procPerRow)
     end do
 end subroutine sendRightSideflow
 
-subroutine recvRightSideflow(rightRecv, model_id, procPerRow, procPerCol)
+subroutine recvRightSideflow(rightRecv, model_id, procPerRow)
     implicit none
     real(kind=4), dimension(:,:), intent(out) :: rightRecv
-    integer, intent(in) :: model_id, procPerRow, procPerCol
+    integer, intent(in) :: model_id, procPerRow
     integer :: has_packets, fifo_empty
     type(gmcfPacket) :: packet
     call gmcfWaitFor(model_id, REQDATA, model_id + procPerRow - 1, 1)
@@ -255,6 +255,110 @@ subroutine waitForRightSideflowAcks(model_id, procPerRow)
         call gmcfHasPackets(model_id, RESPDATA, has_packets)
     end do
 end subroutine waitForRightSideflowAcks
+
+subroutine sendExactCorners(topLeftSend, topRightSend, bottomLeftSend, bottomRightSend, model_id, procPerRow, procPerCol)
+    implicit none
+    real(kind=4), dimension(:,:), intent(in) :: topLeftSend, topRightSend, bottomLeftSend, bottomRightSend
+    integer, intent(in) :: model_id, procPerRow, procPerCol
+    integer :: has_packets, fifo_empty
+    type(gmcfPacket) :: packet
+    if (.not. isTopRow(model_id, procPerRow) .and. .not. isLeftmostColumn(model_id, procPerRow)) then
+        call gmcfWaitFor(model_id, REQDATA, model_id - procPerRow - 1, 1)
+    end if
+    if (.not. isTopRow(model_id, procPerRow) .and. .not. isRightmostColumn(model_id, procPerRow)) then
+        call gmcfWaitFor(model_id, REQDATA, model_id - procPerRow + 1, 1)
+    end if
+    if (.not. isBottomRow(model_id, procPerRow, procPerCol) .and. .not. isLeftmostColumn(model_id, procPerRow)) then
+        call gmcfWaitFor(model_id, REQDATA, model_id + procPerRow - 1, 1)
+    end if
+    if (.not. isBottomRow(model_id, procPerRow, procPerCol) .and. .not. isRightmostColumn(model_id, procPerRow)) then
+        call gmcfWaitFor(model_id, REQDATA, model_id + procPerRow + 1, 1)
+    end if
+    call gmcfHasPackets(model_id, REQDATA, has_packets)
+    do while (has_packets == 1)
+        call gmcfShiftPending(model_id, REQDATA, packet, fifo_empty)
+        select case (packet%data_id)
+            case (topLeftTag)
+                call gmcfSend2DFloatArray(model_id, topLeftSend, shape(topLeftSend), topLeftTag, packet%source, PRE, 1)
+            case (topRightTag)
+                call gmcfSend2DFloatArray(model_id, topRightSend, shape(topRightSend), topRightTag, packet%source, PRE, 1)
+            case (bottomLeftTag)
+                call gmcfSend2DFloatArray(model_id, bottomLeftSend, shape(bottomLeftSend), bottomLeftTag, packet%source, PRE, 1)
+            case (bottomRightTag)
+                call gmcfSend2DFloatArray(model_id, bottomRightSend, shape(bottomRightSend), bottomRightTag, packet%source, PRE, 1)
+            case default
+                print*, 'Model_id  ', model_id, ' received an unexpected REQDATA.'
+        end select
+        call gmcfHasPackets(model_id, REQDATA, has_packets)
+    end do
+end subroutine sendExactCorners
+
+subroutine recvExactCorners(topLeftRecv, topRightRecv, bottomLeftRecv, bottomRightRecv, model_id, procPerRow, procPerCol)
+    implicit none
+    real(kind=4), dimension(:,:), intent(in) :: topLeftRecv, topRightRecv, bottomLeftRecv, bottomRightRecv
+    integer, intent(in) :: model_id, procPerRow, procPerCol
+    integer :: has_packets, fifo_empty
+    type(gmcfPacket) :: packet
+    if (.not. isTopRow(model_id, procPerRow) .and. .not. isLeftmostColumn(model_id, procPerRow)) then
+        call gmcfWaitFor(model_id, RESPDATA, model_id - procPerRow - 1, 1)
+    end if
+    if (.not. isTopRow(model_id, procPerRow) .and. .not. isRightmostColumn(model_id, procPerRow)) then
+        call gmcfWaitFor(model_id, RESPDATA, model_id - procPerRow + 1, 1)
+    end if
+    if (.not. isBottomRow(model_id, procPerRow, procPerCol) .and. .not. isLeftmostColumn(model_id, procPerRow)) then
+        call gmcfWaitFor(model_id, RESPDATA, model_id + procPerRow - 1, 1)
+    end if
+    if (.not. isBottomRow(model_id, procPerRow, procPerCol) .and. .not. isRightmostColumn(model_id, procPerRow)) then
+        call gmcfWaitFor(model_id, RESPDATA, model_id + procPerRow + 1, 1)
+    end if
+    call gmcfHasPackets(model_id, RESPDATA, has_packets)
+    do while (has_packets == 1)
+        call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
+        select case (packet%data_id)
+            case (topLeftTag)
+                call gmcfRead2DFloatArray(topLeftRecv, shape(topLeftRecv), packet)
+            case (topRightTag)
+                call gmcfRead2DFloatArray(topRightRecv, shape(topRightRecv), packet)
+            case (bottomLeftTag)
+                call gmcfRead2DFloatArray(bottomLeftRecv, shape(bottomLeftRecv), packet)
+            case (bottomRightTag)
+                call gmcfRead2DFloatArray(bottomRightRecv, shape(bottomRightRecv), packet)
+            case default
+                print*, 'Model_id  ', model_id, ' received an unexpected REQDATA.'
+        end select
+        call gmcfHasPackets(model_id, RESPDATA, has_packets)
+    end do
+end subroutine recvExactCorners
+
+subroutine waitForExactCornersAcks(model_id, procPerRow, procPerCol)
+    implicit none
+    integer, intent(in) :: model_id, procPerRow, procPerCol
+    integer :: has_packets, fifo_empty
+    type(gmcfPacket) :: packet
+    if (.not. isTopRow(model_id, procPerRow) .and. .not. isLeftmostColumn(model_id, procPerRow)) then
+        call gmcfWaitFor(model_id, ACKDATA, model_id - procPerRow - 1, 1)
+    end if
+    if (.not. isTopRow(model_id, procPerRow) .and. .not. isRightmostColumn(model_id, procPerRow)) then
+        call gmcfWaitFor(model_id, ACKDATA, model_id - procPerRow + 1, 1)
+    end if
+    if (.not. isBottomRow(model_id, procPerRow, procPerCol) .and. .not. isLeftmostColumn(model_id, procPerRow)) then
+        call gmcfWaitFor(model_id, ACKDATA, model_id + procPerRow - 1, 1)
+    end if
+    if (.not. isBottomRow(model_id, procPerRow, procPerCol) .and. .not. isRightmostColumn(model_id, procPerRow)) then
+        call gmcfWaitFor(model_id, ACKDATA, model_id + procPerRow + 1, 1)
+    end if
+    call gmcfHasPackets(model_id, ACKDATA, has_packets)
+    do while (has_packets == 1)
+        call gmcfShiftPending(model_id, ACKDATA, packet, fifo_empty)
+        if (packet%source .ne. model_id - procPerRow - 1 .and. &
+              packet%source .ne. model_id - procPerRow + 1 .and. &
+              packet%source .ne. model_id + procPerRow - 1 .and. &
+              packet%source .ne. model_id + procPerRow + 1) then
+            print*, 'Model_id  ', model_id, ' received an unexpected ACKDATA.'
+        end if
+        call gmcfHasPackets(model_id, ACKDATA, has_packets)
+    end do
+end subroutine waitForExactCornersAcks
 
 logical function isMaster(model_id)
     implicit none
