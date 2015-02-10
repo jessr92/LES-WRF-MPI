@@ -144,6 +144,118 @@ subroutine waitForHaloAcks(model_id, procPerRow, procPerCol)
     end do
 end subroutine waitForHaloAcks
 
+subroutine sendLeftSideflow(leftSend, model_id, procPerRow)
+    implicit none
+    real(kind=4), dimension(:,:), intent(in) :: leftSend
+    integer, intent(in) :: model_id, procPerRow
+    integer :: has_packets, fifo_empty
+    type(gmcfPacket) :: packet
+    call gmcfWaitFor(model_id, REQDATA, model_id + procPerRow - 1, 1)
+    call gmcfHasPackets(model_id, REQDATA, has_packets)
+    do while (has_packets == 1)
+        call gmcfShiftPending(model_id, REQDATA, packet, fifo_empty)
+        select case (packet%data_id)
+            case (leftSideTag)
+                call gmcfSend2DFloatArray(model_id, leftSend, shape(leftSend), leftSideTag, packet%source, PRE, 1)
+            case default
+                print*, 'Model_id  ', model_id, ' received an unexpected REQDATA.'
+        end select
+        call gmcfHasPackets(model_id, REQDATA, has_packets)
+    end do
+end subroutine sendLeftSideflow
+
+subroutine recvLeftSideflow(leftRecv, model_id, procPerRow, procPerCol)
+    implicit none
+    real(kind=4), dimension(:,:), intent(out) :: leftRecv
+    integer, intent(in) :: model_id, procPerRow, procPerCol
+    integer :: has_packets, fifo_empty
+    type(gmcfPacket) :: packet
+    call gmcfWaitFor(model_id, REQDATA, model_id - procPerRow + 1, 1)
+    call gmcfHasPackets(model_id, RESPDATA, has_packets)
+    do while (has_packets == 1)
+        call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
+        select case (packet%data_id)
+            case (leftSideTag)
+                call gmcfRead2DFloatArray(leftRecv, shape(leftRecv), packet)
+            case default
+                print*, 'Model_id  ', model_id, ' received an unexpected RESPDATA.'
+        end select
+        call gmcfHasPackets(model_id, RESPDATA, has_packets)
+    end do
+end subroutine recvLeftSideflow
+
+subroutine waitForLeftSideflowAcks(model_id, procPerRow)
+    implicit none
+    integer, intent(in) :: model_id, procPerRow
+    integer :: has_packets, fifo_empty
+    type(gmcfPacket) :: packet
+    call gmcfWaitFor(model_id, ACKDATA, model_id + procPerRow - 1, 1)
+    call gmcfHasPackets(model_id, ACKDATA, has_packets)
+    do while (has_packets == 1)
+        call gmcfShiftPending(model_id, ACKDATA, packet, fifo_empty)
+        if (packet%source .ne. model_id + procPerRow - 1) then
+            print*, 'Model_id  ', model_id, ' received an unexpected ACKDATA.'
+        end if
+        call gmcfHasPackets(model_id, RESPDATA, has_packets)
+    end do
+end subroutine waitForLeftSideflowAcks
+
+subroutine sendRightSideflow(rightSend, model_id, procPerRow)
+    implicit none
+    real(kind=4), dimension(:,:), intent(in) :: rightSend
+    integer, intent(in) :: model_id, procPerRow
+    integer :: has_packets, fifo_empty
+    type(gmcfPacket) :: packet
+    call gmcfWaitFor(model_id, REQDATA, model_id - procPerRow + 1, 1)
+    call gmcfHasPackets(model_id, REQDATA, has_packets)
+    do while (has_packets == 1)
+        call gmcfShiftPending(model_id, REQDATA, packet, fifo_empty)
+        select case (packet%data_id)
+            case (rightSideTag)
+                call gmcfSend2DFloatArray(model_id, rightSend, shape(rightSend), rightSideTag, packet%source, PRE, 1)
+            case default
+                print*, 'Model_id  ', model_id, ' received an unexpected REQDATA.'
+        end select
+        call gmcfHasPackets(model_id, REQDATA, has_packets)
+    end do
+end subroutine sendRightSideflow
+
+subroutine recvRightSideflow(rightRecv, model_id, procPerRow, procPerCol)
+    implicit none
+    real(kind=4), dimension(:,:), intent(out) :: rightRecv
+    integer, intent(in) :: model_id, procPerRow, procPerCol
+    integer :: has_packets, fifo_empty
+    type(gmcfPacket) :: packet
+    call gmcfWaitFor(model_id, REQDATA, model_id + procPerRow - 1, 1)
+    call gmcfHasPackets(model_id, RESPDATA, has_packets)
+    do while (has_packets == 1)
+        call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
+        select case (packet%data_id)
+            case (rightSideTag)
+                call gmcfRead2DFloatArray(rightRecv, shape(rightRecv), packet)
+            case default
+                print*, 'Model_id  ', model_id, ' received an unexpected RESPDATA.'
+        end select
+        call gmcfHasPackets(model_id, RESPDATA, has_packets)
+    end do
+end subroutine recvRightSideflow
+
+subroutine waitForRightSideflowAcks(model_id, procPerRow)
+    implicit none
+    integer, intent(in) :: model_id, procPerRow
+    integer :: has_packets, fifo_empty
+    type(gmcfPacket) :: packet
+    call gmcfWaitFor(model_id, ACKDATA, model_id - procPerRow + 1, 1)
+    call gmcfHasPackets(model_id, ACKDATA, has_packets)
+    do while (has_packets == 1)
+        call gmcfShiftPending(model_id, ACKDATA, packet, fifo_empty)
+        if (packet%source .ne. model_id + procPerRow - 1) then
+            print*, 'Model_id  ', model_id, ' received an unexpected ACKDATA.'
+        end if
+        call gmcfHasPackets(model_id, RESPDATA, has_packets)
+    end do
+end subroutine waitForRightSideflowAcks
+
 logical function isMaster(model_id)
     implicit none
     integer, intent(in) :: model_id
