@@ -3,7 +3,7 @@ use communication_common
 use gmcfAPI
 implicit none
 
-integer :: mpi_size ! Names for compatability with existing MPI code
+integer :: mpi_size ! Names for compatibility with existing MPI code
 
 contains
 
@@ -258,7 +258,7 @@ end subroutine waitForRightSideflowAcks
 
 subroutine sendExactCorners(topLeftSend, topRightSend, bottomLeftSend, bottomRightSend, model_id, procPerRow, procPerCol)
     implicit none
-    real(kind=4), dimension(:,:), intent(in) :: topLeftSend, topRightSend, bottomLeftSend, bottomRightSend
+    real(kind=4), dimension(:,:,:), intent(in) :: topLeftSend, topRightSend, bottomLeftSend, bottomRightSend
     integer, intent(in) :: model_id, procPerRow, procPerCol
     integer :: has_packets, fifo_empty
     type(gmcfPacket) :: packet
@@ -279,13 +279,13 @@ subroutine sendExactCorners(topLeftSend, topRightSend, bottomLeftSend, bottomRig
         call gmcfShiftPending(model_id, REQDATA, packet, fifo_empty)
         select case (packet%data_id)
             case (topLeftTag)
-                call gmcfSend2DFloatArray(model_id, topLeftSend, shape(topLeftSend), topLeftTag, packet%source, PRE, 1)
+                call gmcfSend3DFloatArray(model_id, topLeftSend, shape(topLeftSend), topLeftTag, packet%source, PRE, 1)
             case (topRightTag)
-                call gmcfSend2DFloatArray(model_id, topRightSend, shape(topRightSend), topRightTag, packet%source, PRE, 1)
+                call gmcfSend3DFloatArray(model_id, topRightSend, shape(topRightSend), topRightTag, packet%source, PRE, 1)
             case (bottomLeftTag)
-                call gmcfSend2DFloatArray(model_id, bottomLeftSend, shape(bottomLeftSend), bottomLeftTag, packet%source, PRE, 1)
+                call gmcfSend3DFloatArray(model_id, bottomLeftSend, shape(bottomLeftSend), bottomLeftTag, packet%source, PRE, 1)
             case (bottomRightTag)
-                call gmcfSend2DFloatArray(model_id, bottomRightSend, shape(bottomRightSend), bottomRightTag, packet%source, PRE, 1)
+                call gmcfSend3DFloatArray(model_id, bottomRightSend, shape(bottomRightSend), bottomRightTag, packet%source, PRE, 1)
             case default
                 print*, 'Model_id  ', model_id, ' received an unexpected REQDATA.'
         end select
@@ -295,7 +295,7 @@ end subroutine sendExactCorners
 
 subroutine recvExactCorners(topLeftRecv, topRightRecv, bottomLeftRecv, bottomRightRecv, model_id, procPerRow, procPerCol)
     implicit none
-    real(kind=4), dimension(:,:), intent(in) :: topLeftRecv, topRightRecv, bottomLeftRecv, bottomRightRecv
+    real(kind=4), dimension(:,:,:), intent(in) :: topLeftRecv, topRightRecv, bottomLeftRecv, bottomRightRecv
     integer, intent(in) :: model_id, procPerRow, procPerCol
     integer :: has_packets, fifo_empty
     type(gmcfPacket) :: packet
@@ -316,13 +316,13 @@ subroutine recvExactCorners(topLeftRecv, topRightRecv, bottomLeftRecv, bottomRig
         call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
         select case (packet%data_id)
             case (topLeftTag)
-                call gmcfRead2DFloatArray(topLeftRecv, shape(topLeftRecv), packet)
+                call gmcfRead3DFloatArray(topLeftRecv, shape(topLeftRecv), packet)
             case (topRightTag)
-                call gmcfRead2DFloatArray(topRightRecv, shape(topRightRecv), packet)
+                call gmcfRead3DFloatArray(topRightRecv, shape(topRightRecv), packet)
             case (bottomLeftTag)
-                call gmcfRead2DFloatArray(bottomLeftRecv, shape(bottomLeftRecv), packet)
+                call gmcfRead3DFloatArray(bottomLeftRecv, shape(bottomLeftRecv), packet)
             case (bottomRightTag)
-                call gmcfRead2DFloatArray(bottomRightRecv, shape(bottomRightRecv), packet)
+                call gmcfRead3DFloatArray(bottomRightRecv, shape(bottomRightRecv), packet)
             case default
                 print*, 'Model_id  ', model_id, ' received an unexpected REQDATA.'
         end select
