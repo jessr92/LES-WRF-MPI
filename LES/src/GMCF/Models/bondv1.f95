@@ -129,7 +129,7 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
             w(im+1,j,k) = w(im+1,j,k)-dt*uout *(w(im+1,j,k)-w(im,j,k))/dxs(im)
         end do
     end do
-#if !defined(MPI) || !defined(GMCF) || (PROC_PER_ROW==1)
+#if !defined(MPI) && !defined(GMCF) || (PROC_PER_ROW==1)
 ! --side flow condition; periodic
     do k = 0,km+1
         do i = 0,im+1

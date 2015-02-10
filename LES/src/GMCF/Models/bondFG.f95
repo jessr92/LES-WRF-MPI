@@ -24,7 +24,7 @@ subroutine bondfg(km,jm,f,im,g,h)
     end if
 #endif
 ! --sideflow condition
-#if !defined(MPI) || !defined(GMCF) || (PROC_PER_ROW==1)
+#if !defined(MPI) && !defined(GMCF) || (PROC_PER_ROW==1)
     do k = 1,km
         do i = 1,im
             g(i, 0,k) = g(i,jm  ,k) ! GR: Why only right->left? What about left->right?

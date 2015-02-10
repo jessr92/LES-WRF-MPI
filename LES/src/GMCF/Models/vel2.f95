@@ -153,7 +153,7 @@ contains
 #if defined(MPI) || defined(GMCF)
     end if
 #endif
-#if !defined(MPI) || !defined(GMCF) || (PROC_PER_ROW==1)
+#if !defined(MPI) && !defined(GMCF) || (PROC_PER_ROW==1)
       do k = 1,km
       do i = 1,im
         nou2(i,0,k) = nou2(i,jm,k)
@@ -185,7 +185,7 @@ contains
 #if defined(MPI) || defined(GMCF)
     end if
 #endif
-#if !defined(MPI) || !defined(GMCF) || (PROC_PER_ROW==1)
+#if !defined(MPI) && !defined(GMCF) || (PROC_PER_ROW==1)
       do k = 1,km
       do i = 1,im
         nou5(i,0,k) = nou5(i,jm,k)
@@ -217,7 +217,7 @@ contains
 #if defined(MPI) || defined(GMCF)
     end if
 #endif
-#if !defined(MPI) || !defined(GMCF) || (PROC_PER_ROW==1)
+#if !defined(MPI) && !defined(GMCF) || (PROC_PER_ROW==1)
       do k = 1,km-1
       do i = 1,im
         nou8(i,0,k) = nou8(i,jm,k)
@@ -249,7 +249,7 @@ contains
 #if defined(MPI) || defined(GMCF)
     end if
 #endif
-#if !defined(MPI) || !defined(GMCF) || (PROC_PER_ROW==1)
+#if !defined(MPI) && !defined(GMCF) || (PROC_PER_ROW==1)
       do k = 1,km+1
       do i = 1,im+1
         diu4(i,0,k) = diu4(i,jm,k)

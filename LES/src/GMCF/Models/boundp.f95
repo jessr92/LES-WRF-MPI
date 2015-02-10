@@ -39,7 +39,7 @@ subroutine boundp1(km,jm,p,im)
     integer, intent(In) :: jm
     integer, intent(In) :: km
     real(kind=4), dimension(0:ip+2,0:jp+2,0:kp+1) , intent(InOut) :: p
-#if !defined(MPI) || !defined(GMCF) || (PROC_PER_ROW==1)
+#if !defined(MPI) && !defined(GMCF) || (PROC_PER_ROW==1)
     integer :: i, j, k
 #else
     integer :: j, k
@@ -68,7 +68,7 @@ subroutine boundp1(km,jm,p,im)
     end if
 #endif
 ! --side flow exchanges
-#if !defined(MPI) || !defined(GMCF) || (PROC_PER_ROW==1)
+#if !defined(MPI) && !defined(GMCF) || (PROC_PER_ROW==1)
     do k = 0,km+1
         do i = 0,im+1
             p(i,   0,k) = p(i,jm,k) ! right to left

@@ -158,7 +158,7 @@ contains
         end do
 ! 
 #ifndef NO_IO
-#if !defined(MPI) || !defined(GMCF)
+#if !defined(MPI) && !defined(GMCF)
         open(unit=10,file=data10,form='unformatted',status='unknown')
           write(10) n,time
           write(10) (((aveu(i,j,k),i=1,im),j=1,jm),k=1,km)
