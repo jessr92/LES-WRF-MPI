@@ -426,6 +426,13 @@ subroutine getGlobalSumOfGMCF(model_id, value)
             end if
             call gmcfHasPackets(model_id, REQDATA, has_packets)
         end do
+        ! Wait for ack
+        call gmcfWaitFor(model_id, ACKDATA, 1, 1)
+        ! Deal with ack
+        do while(has_packets == 1)
+            call gmcfShiftPending(model_id, ACKDATA, packet, fifo_empty)
+            call gmcfHasPackets(model_id, ACKDATA, has_packets)
+        end do
         ! Request global value
         call gmcfRequestData(model_id, globalSumTag, 1, 1, PRE, 1)
         ! Wait for response
@@ -513,6 +520,13 @@ subroutine getGlobalMaxOfGMCF(model_id, value)
             end if
             call gmcfHasPackets(model_id, REQDATA, has_packets)
         end do
+        ! Wait for ack
+        call gmcfWaitFor(model_id, ACKDATA, 1, 1)
+        ! Deal with ack
+        do while(has_packets == 1)
+            call gmcfShiftPending(model_id, ACKDATA, packet, fifo_empty)
+            call gmcfHasPackets(model_id, ACKDATA, has_packets)
+        end do
         ! Request global value
         call gmcfRequestData(model_id, globalMaxTag, 1, 1, PRE, 1)
         ! Wait for response
@@ -599,6 +613,13 @@ subroutine getGlobalMinOfGMCF(model_id, value)
                 call gmcfSend1DFloatArray(model_id, sendBuffer, shape(sendBuffer), globalMinTag, packet%source, PRE, 1)
             end if
             call gmcfHasPackets(model_id, REQDATA, has_packets)
+        end do
+        ! Wait for ack
+        call gmcfWaitFor(model_id, ACKDATA, 1, 1)
+        ! Deal with ack
+        do while(has_packets == 1)
+            call gmcfShiftPending(model_id, ACKDATA, packet, fifo_empty)
+            call gmcfHasPackets(model_id, ACKDATA, has_packets)
         end do
         ! Request global value
         call gmcfRequestData(model_id, globalMinTag, 1, 1, PRE, 1)
