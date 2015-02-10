@@ -17,7 +17,7 @@ subroutine getGlobalSumOf(value)
     print*, 'Rank: ', rank, ' before sum: ', value
 #endif
 #ifdef GMCF
-    !
+    call getGlobalSumOfGMCF(rank, value)
 #else
     call MPI_AllReduce(MPI_IN_PLACE, value, 1, MPI_REAL, MPI_SUM, communicator, ierror)
 #endif
@@ -36,7 +36,7 @@ subroutine getGlobalMaxOf(value)
     print*, 'Rank: ', rank, ' before max: ', value
 #endif
 #ifdef GMCF
-    !
+    call getGlobalMaxOfGMCF(rank, value)
 #else
     call MPI_AllReduce(MPI_IN_PLACE, value, 1, MPI_REAL, MPI_MAX, communicator, ierror)
 #endif
@@ -55,7 +55,7 @@ subroutine getGlobalMinOf(value)
     print*, 'Rank: ', rank, ' before min: ', value
 #endif
 #ifdef GMCF
-    !
+    call getGlobalMinOfGMCF(rank, value)
 #else
     call MPI_AllReduce(MPI_IN_PLACE, value, 1, MPI_REAL, MPI_MIN, communicator, ierror)
 #endif
