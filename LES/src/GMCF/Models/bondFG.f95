@@ -12,7 +12,7 @@ subroutine bondfg(km,jm,f,im,g,h)
     integer :: i, j, k
 ! 
 ! --inflow condition
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     if (isTopRow(procPerRow)) then
 #endif
         do k = 1,km
@@ -20,11 +20,11 @@ subroutine bondfg(km,jm,f,im,g,h)
                 f( 0,j,k) = f(1  ,j,k)
             end do
         end do
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     end if
 #endif
 ! --sideflow condition
-#if !defined(MPI) || (PROC_PER_ROW==1)
+#if !defined(MPI) || !defined(GMCF) || (PROC_PER_ROW==1)
     do k = 1,km
         do i = 1,im
             g(i, 0,k) = g(i,jm  ,k) ! GR: Why only right->left? What about left->right?
@@ -40,7 +40,7 @@ subroutine bondfg(km,jm,f,im,g,h)
             h(i,j,km) = 0.0
         end do
     end do
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
 ! --halo exchanges
     call exchangeRealHalos(f, procPerRow, neighbours, 1, 0, 1, 0)
     call exchangeRealHalos(g, procPerRow, neighbours, 1, 0, 1, 0)

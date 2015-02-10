@@ -16,7 +16,7 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
     real(kind=4) :: u_val
     integer :: i, j, k
     real(kind=4) :: aaa, bbb, uout
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     integer :: a
 #endif
 ! 
@@ -25,7 +25,7 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
 ! 
 !      Setup for initial wind profile
 ! 
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     if (isTopRow(procPerRow)) then
 #endif
         do i = 0,1
@@ -49,14 +49,14 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
                 end do
             end do
         end do
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     end if
 #endif
 
 #if ICAL == 0
     !if(ical == 0.and.n == 1) then
     if(n == 1) then
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
         ! GR: Actually make this distributed rather than this awful mess
         do a=1, procPerCol
             do k = 1,km
@@ -100,7 +100,7 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
             bbb = amin1(bbb,u(im,j,k))
         end do
     end do
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     call getGlobalMaxOf(aaa)
     call getGlobalMinOf(bbb)
 #endif
@@ -129,7 +129,7 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
             w(im+1,j,k) = w(im+1,j,k)-dt*uout *(w(im+1,j,k)-w(im,j,k))/dxs(im)
         end do
     end do
-#if !defined(MPI) || (PROC_PER_ROW==1)
+#if !defined(MPI) || !defined(GMCF) || (PROC_PER_ROW==1)
 ! --side flow condition; periodic
     do k = 0,km+1
         do i = 0,im+1
@@ -162,7 +162,7 @@ subroutine bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
 #endif
 
 ! =================================
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
 ! --halo exchanges
     call exchangeRealHalos(u, procPerRow, neighbours, 2, 1, 1, 1)
     call exchangeRealHalos(v, procPerRow, neighbours, 2, 1, 1, 1)

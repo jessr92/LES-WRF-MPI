@@ -19,7 +19,7 @@ module module_LES_write_netcdf
   integer, parameter :: NDIMS = 4
   integer, parameter :: NTIMESTEPS=20 ! FIXME: should be taken from global macro
   ! For p only: 0:ip+2,0:jp+2,0:kp+1
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     integer, parameter :: NLVLS_P_UV = kp+2
     integer, parameter :: NLATS_P_UVW = (jp*procPerCol)+3
     integer, parameter :: NLONS_P = (ip*procPerRow)+3
@@ -27,7 +27,7 @@ module module_LES_write_netcdf
   integer, parameter :: NLVLS_P_UV = kp+2, NLATS_P_UVW = jp+3, NLONS_P = ip+3
 #endif
   ! For u,v
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     integer, parameter :: NLONS_UVW = (ip*procPerRow)+2
 #else
   integer, parameter :: NLONS_UVW = ip+2
@@ -35,7 +35,7 @@ module module_LES_write_netcdf
   ! For w
   integer, parameter :: NLVLS_W = kp+3 ! GR: fine as is for MPI since depth (kp) isn't split up
   ! For usum/vsum/wsum
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
   integer, parameter :: NLVLS_UVWSUM = kp+1
   integer, parameter :: NLATS_UVWSUM = (jp*procPerCol)+1
   integer, parameter :: NLONS_UVWSUM = (ip*procPerRow)+1
@@ -120,7 +120,7 @@ module module_LES_write_netcdf
 subroutine init_netcdf_file()       
       ! Loop indices
       integer :: lat, lon,t
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     if (isMaster()) then
 #endif
      ! Create the file.
@@ -335,7 +335,7 @@ print*,'Create count*/start'
 
 
 !      print *, 'ncid init: ',ncid,'pres_varid: ',pres_varid
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     end if
 #endif
 end subroutine init_netcdf_file
@@ -349,7 +349,7 @@ subroutine write_to_netcdf_file(p,u,v,w,usum,vsum,wsum,n)
     real(kind=4), dimension(0:ip,0:jp,0:kp) , intent(In) :: vsum
     real(kind=4), dimension(0:ip,0:jp,0:kp) , intent(In) :: wsum
     integer, intent(In) :: n
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     real(kind=4), dimension(0:(ip*procPerCol)+2,0:(jp*procPerRow)+2,0:kp+1) :: pTot
     real(kind=4), dimension(0:(ip*procPerCol)+1,-1:(jp*procPerRow)+1,0:kp+1) :: uTot
     real(kind=4), dimension(0:(ip*procPerCol)+1,-1:(jp*procPerRow)+1,0:kp+1) :: vTot
@@ -365,7 +365,7 @@ subroutine write_to_netcdf_file(p,u,v,w,usum,vsum,wsum,n)
     call collect3DReal4Array(vsum, vsumTot, 1, 0, 1, 0, ip, jp, kp, procPerRow)
     call collect3DReal4Array(wsum, wsumTot, 1, 0, 1, 0, ip, jp, kp, procPerRow)
 #endif
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     if (isMaster()) then
         ! Write varTot rather than var to the netCDF files
         ! The start and count arrays will tell the netCDF library where to
@@ -418,7 +418,7 @@ subroutine write_to_netcdf_file(p,u,v,w,usum,vsum,wsum,n)
 end subroutine write_to_netcdf_file
 
 subroutine close_netcdf_file()
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     if (isMaster()) then
 #endif    
   ! Close the file. This causes netCDF to flush all buffers and make
@@ -447,7 +447,7 @@ subroutine close_netcdf_file()
 #ifdef VERBOSE
         print *,"*** SUCCESS writing file ", FILE_NAME_UVWSUM
 #endif
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     end if
 #endif
 end subroutine close_netcdf_file

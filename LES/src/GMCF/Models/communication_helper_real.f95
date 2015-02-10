@@ -474,7 +474,7 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, &
         allocate(leftRecv(rowCount, depthSize))
         commWith = rank + procPerRow - 1
 #ifdef GMCF
-        ! GMCF_MPI_WaitSOMETHING only? No receive?
+        !
 #else
         call MPI_Recv(leftRecv, rowCount*depthSize, MPI_REAL, commWith, rightSideTag, &
                       communicator, status, ierror)
@@ -495,7 +495,7 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, &
             end do
         end do
 #ifdef GMCF
-        call GMCF_MPI_ISend2DRealArray(rank, rightSend, rightSideTag, commWith, 0) ! GMCF doesn't support this
+        !
 #else
         call MPI_Send(rightSend, rowCount*depthSize, MPI_REAL, commWith, rightSideTag, &
                       communicator, ierror)
@@ -526,7 +526,7 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, &
             end do
         end do
 #ifdef GMCF
-        call GMCF_MPI_ISend2DRealArray(rank, leftSend, leftSideTag, commWith, 0) ! GMCF doesn't support this
+        !
 #else
         call MPI_Send(leftSend, rowCount*depthSize, MPI_REAL, commWith, leftSideTag, &
                       communicator, ierror)
@@ -537,7 +537,7 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, &
         allocate(rightRecv(rowCount, depthSize))
         commWith = rank - procPerRow + 1
 #ifdef GMCF
-        ! GMCF_MPI_WaitSOMETHING only? No receive?
+        !
 #else
         call MPI_Recv(rightRecv, rowCount*depthSize, MPI_REAL, commWith, leftSideTag, &
                       communicator, status, ierror)
@@ -576,7 +576,7 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
                 end do
             end do
 #ifdef GMCF
-            call GMCF_MPI_ISend2DRealArray(rank, sendBuffer, zbmTag, i, 0) ! GMCF doesn't support this
+            !
 #else
             call MPI_Send(sendBuffer, (ip*jp), MPI_REAL, i, zbmTag, &
                           communicator, ierror)
@@ -586,7 +586,7 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
     else
         ! Receive appropriate 2D section from master
 #ifdef GMCF
-        ! GMCF_MPI_WaitSOMETHING only? No receive?
+        !
 #else
         call MPI_Recv(recvBuffer, (ip*jp), MPI_REAL, 0, zbmTag, communicator, &
                       status, ierror)
@@ -633,7 +633,7 @@ subroutine distribute1DRealRowWiseArray(arrayToBeSent, receivingArray, leftBound
                 sendBuffer(currentI-startI+1) = arrayToBeSent(currentI)
             end do
 #ifdef GMCF
-            call GMCF_MPI_ISend1DRealArray(rank, sendBuffer, dxTag, i, 0)
+            !
 #else
             call MPI_Send(sendBuffer, receivingSize, MPI_Real, i, dxTag, communicator, &
                           ierror)
@@ -644,7 +644,7 @@ subroutine distribute1DRealRowWiseArray(arrayToBeSent, receivingArray, leftBound
     else
         ! Receive receivingSize reals
 #ifdef GMCF
-        ! GMCF_MPI_WaitSOMETHING only? No receive?
+        !
 #else
         call MPI_Recv(receivingArray, receivingSize, MPI_REAL, 0, dxTag, communicator, &
                       status, ierror)
@@ -683,7 +683,7 @@ subroutine distribute1DRealColumnWiseArray(arrayToBeSent, receivingArray, leftBo
                 sendBuffer(currentI-startI+1) = arrayToBeSent(currentI)
             end do
 #ifdef GMCF
-            call GMCF_MPI_ISend1DRealArray(rank, sendBuffer, dyTag, i, 0)
+            !
 #else
             call MPI_Send(sendBuffer, receivingSize, MPI_Real, i, dyTag, communicator, &
                           ierror)
@@ -694,7 +694,7 @@ subroutine distribute1DRealColumnWiseArray(arrayToBeSent, receivingArray, leftBo
     else
         ! Receive receivingSize reals
 #ifdef GMCF
-        ! GMCF_WaitSOMETHING only? No receive?
+        !
 #else
         call MPI_Recv(receivingArray, receivingSize, MPI_REAL, 0, dyTag, communicator, &
                       status, ierror)

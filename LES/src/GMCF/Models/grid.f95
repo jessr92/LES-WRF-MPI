@@ -13,7 +13,7 @@ contains
         real(kind=4), dimension(-1:kp+2) , intent(Out) :: dzn
         real(kind=4), dimension(-1:kp+2) , intent(Out) :: dzs
         real(kind=4), dimension(kp+2) , intent(Out) :: z2
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
         real(kind=4), dimension(-1:(ip*procPerCol)+1) :: dx1Tot
         real(kind=4), dimension(0:(jp*procPerRow)+1) :: dy1Tot
         real(kind=4), dimension(0:ip*procPerCol) :: dxlTot
@@ -25,7 +25,7 @@ contains
 ! --dx set; streamwise direction
 ! WV: so -1 and ip+1 are not set!!! I changed it analogous to dy1
 !      do i = 0,ip
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     if (isMaster()) then
         do i=-1,(ip*procPerCol)+1
             dx1Tot(i) = 20.
@@ -38,7 +38,7 @@ contains
       end do
 #endif
 
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     if (isMaster()) then
         dxlTot(0) = 0.
         do i = 1, ip*procPerCol
@@ -56,7 +56,7 @@ contains
 ! --dy set; spanwise direction
 !WV: let's set the *whole* array to this value!
       !do j = 0,jp
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     if (isMaster()) then
         do j=0,(jp*procPerRow)+1
             dy1Tot(j) = 20.
@@ -69,7 +69,7 @@ contains
       end do
 #endif
 
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     if (isMaster()) then
         dylTot(0) = 0.
         do j=1,(jp*procPerRow)

@@ -12,47 +12,47 @@ subroutine boundsm(km,jm,sm,im)
     integer :: i, j, k
 ! 
 ! =================================
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     if (isTopRow(procPerRow) .or. isBottomRow(procPerRow)) then
 #endif
         do k = 0,km+1
             do j = -1,jm+1
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
                 if (isTopRow(procPerRow)) then
 #endif
                     sm(   0,j,k) = sm(1 ,j,k) ! GR: Why not sm(-1,,) = sm(0,,)?
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
                 else
 #endif
                     sm(im+1,j,k) = sm(im,j,k)
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
                 end if
 #endif
             end do
         end do
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     end if
 #endif
 ! --side flow condition
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     if (isLeftmostColumn(procPerRow) .or. isRightmostColumn(procPerRow)) then
 #endif
         do k = 0,km+1
             do i = 0,im+1
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
                 if (isRightmostColumn(procPerRow)) then
 #endif
                     sm(i,jm+1,k) = sm(i,jm  ,k)
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
                 else
 #endif
                     sm(i,0,k) = sm(i,1   ,k) ! GR: Why not sm(,-1,) = sm(,0,)?
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
                 end if
 #endif
             end do
         end do
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     end if
 #endif
 ! --underground condition
@@ -62,7 +62,7 @@ subroutine boundsm(km,jm,sm,im)
             sm(i,j,km+1) = sm(i,j,km)
         end do
     end do
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
 ! --halo exchanges
     call exchangeRealHalos(sm, procPerRow, neighbours, 2, 1, 2, 1)
 #else

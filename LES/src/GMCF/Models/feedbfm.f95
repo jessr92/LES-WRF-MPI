@@ -29,7 +29,7 @@ subroutine feedbfm(km,jm,im,amask1,bmask1,cmask1,dmask1,zbm,z2,dzn)
             end do
         end do
     end do
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     if (isMaster()) then
 #endif
         !      print *, 'open GIS/Tokyo_20mgrid.txt'
@@ -41,7 +41,7 @@ subroutine feedbfm(km,jm,im,amask1,bmask1,cmask1,dmask1,zbm,z2,dzn)
             end do
         end do
         close(70)
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     end if
     call distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
 #endif
@@ -70,7 +70,7 @@ subroutine feedbfm(km,jm,im,amask1,bmask1,cmask1,dmask1,zbm,z2,dzn)
             end do
         end do
     end do
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     call exchangeRealHalos(amask1, procPerRow, neighbours, 1, 1, 1, 1)
     call exchangeRealHalos(bmask1, procPerRow, neighbours, 1, 1, 2, 1)
     call exchangeRealHalos(cmask1, procPerRow, neighbours, 2, 1, 1, 1)

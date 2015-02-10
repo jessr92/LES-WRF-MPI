@@ -140,7 +140,7 @@ contains
       end do
       end do
 ! ====================================
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     if (isBottomRow(procPerRow)) then
 #endif
       do k = 1,km
@@ -150,10 +150,10 @@ contains
         cov1(im+1,j,k) = cov1(im,j,k)
       end do
       end do
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     end if
 #endif
-#if !defined(MPI) || (PROC_PER_ROW==1)
+#if !defined(MPI) || !defined(GMCF) || (PROC_PER_ROW==1)
       do k = 1,km
       do i = 1,im
         nou2(i,0,k) = nou2(i,jm,k)
@@ -172,7 +172,7 @@ contains
     call sideflowLeftRight(diu2, procPerRow, 2, jp+2, 1, 2, 1, 2)
     call sideflowLeftRight(cov2, procPerRow, 2, jp+2, 1, 2, 1, 2)
 #endif
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     if (isBottomRow(procPerRow)) then
 #endif
       do k = 1,km
@@ -182,10 +182,10 @@ contains
         cov4(im+1,j,k) = cov4(im,j,k)
       end do
       end do
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     end if
 #endif
-#if !defined(MPI) || (PROC_PER_ROW==1)
+#if !defined(MPI) || !defined(GMCF) || (PROC_PER_ROW==1)
       do k = 1,km
       do i = 1,im
         nou5(i,0,k) = nou5(i,jm,k)
@@ -204,7 +204,7 @@ contains
     call sideflowLeftRight(diu5, procPerRow, 3, jp+3, 2, 2, 1, 2)
     call sideflowLeftRight(cov5, procPerRow, 3, jp+3, 2, 2, 1, 2)
 #endif
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     if (isBottomRow(procPerRow)) then
 #endif
       do k = 1,km-1
@@ -214,10 +214,10 @@ contains
         cov7(im+1,j,k) = cov7(im,j,k)
       end do
       end do
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     end if
 #endif
-#if !defined(MPI) || (PROC_PER_ROW==1)
+#if !defined(MPI) || !defined(GMCF) || (PROC_PER_ROW==1)
       do k = 1,km-1
       do i = 1,im
         nou8(i,0,k) = nou8(i,jm,k)
@@ -237,7 +237,7 @@ contains
     call sideflowLeftRight(cov8, procPerRow, 2, jp+2, 1, 2, 1, 3)
 #endif
 ! --les
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     if (isBottomRow(procPerRow)) then
 #endif
       do k = 1,km+1
@@ -246,10 +246,10 @@ contains
         diu3(im+1,j,k) = diu3(im,j,k)
       end do
       end do
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     end if
 #endif
-#if !defined(MPI) || (PROC_PER_ROW==1)
+#if !defined(MPI) || !defined(GMCF) || (PROC_PER_ROW==1)
       do k = 1,km+1
       do i = 1,im+1
         diu4(i,0,k) = diu4(i,jm,k)
@@ -261,7 +261,7 @@ contains
     call sideflowRightLeft(diu6, procPerRow, jp+1, 1, 1, 1, 1, 1)
 #endif
 
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     call exchangeRealHalos(nou1, procPerRow, neighbours, 1, 2, 2, 2)
     call exchangeRealHalos(diu1, procPerRow, neighbours, 1, 2, 2, 2)
     call exchangeRealHalos(cov1, procPerRow, neighbours, 1, 2, 2, 2)

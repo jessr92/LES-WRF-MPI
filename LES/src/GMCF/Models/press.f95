@@ -70,7 +70,7 @@ subroutine press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn
             end do
         end do
     end do
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     call getGlobalSumOf(rhsav)
     call getGlobalSumOf(area)
 #endif
@@ -113,7 +113,7 @@ subroutine press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn
         end if
 #endif      
 #endif
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
         call getGlobalSumOf(sor)
 #endif
         if (sor < pjuge) then
@@ -132,7 +132,7 @@ subroutine press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn
         end do
     end do
 ! 
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     call getGlobalSumOf(pav)
     call getGlobalSumOf(pco)
 #endif

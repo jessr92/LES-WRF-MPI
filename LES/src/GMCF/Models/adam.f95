@@ -20,7 +20,7 @@ contains
 ! 
 !
 #ifndef NO_IO
-#ifndef MPI
+#if !defined(MPI) || !defined(GMCF)
       if (mod(n,1000) == 0.or.n == nmax) then
        open(unit=21,file=data21,form='unformatted',status='unknown')
        write(21) (((fold(i,j,k),i=1,im),j=1,jm),k=1,km)
