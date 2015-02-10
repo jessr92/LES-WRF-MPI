@@ -29,6 +29,11 @@
         use module_adam 
 #endif        
         use common_sn 
+#ifdef GMCF
+    integer(8) , intent(In) :: sys
+    integer(8) , intent(In) :: tile
+    integer , intent(In) :: model_id
+#endif
         real(kind=4) :: alpha
         real(kind=4), dimension(0:ip+1,0:jp+1,0:kp+1)  :: amask1
         real(kind=4), dimension(ip,jp,kp)  :: avel
@@ -159,10 +164,10 @@
 ! -----------------------------------------------------------------------
 !
 #ifdef GMCF
-print*, 'Hello from model ', model_id
-#else
+        print*, 'Hello from model ', model_id
+        call initialise_gmcf(sys, tile, model_id, procPerRow, procPerCol)
+#endif
 #ifdef MPI
-! GR: MPI Start
       call initialise_mpi()
       if (mpi_size .ne. procPerRow * procPerCol) then
           print*, 'Needed ', (procPerRow * procPerCol), ' processes, got ', mpi_size
@@ -171,15 +176,7 @@ print*, 'Hello from model ', model_id
       call setupCartesianVirtualTopology(dimensions, dimensionSizes, & 
                                          periodicDimensions, coordinates, &
                                          neighbours, reorder)
-#ifdef GR_DEBUG
-    print*, 'GR: rank ', rank, ' ', cartRank, ' row ', coordinates(1), &
-            ' col ', coordinates(2)
-    print*, 'GR: rank ', rank, ' left neighbour ', neighbours(leftNeighbour), &
-            ' right neighbour ', neighbours(rightNeighbour)
-    print*, 'GR: rank ', rank, ' top neighbour ', neighbours(topNeighbour),  &
-            ' bottom neighbour ', neighbours(bottomNeighbour)
-#endif 
-#endif
+
 #endif
 #ifdef USE_NETCDF_OUTPUT
     call init_netcdf_file()
@@ -301,7 +298,7 @@ print*, 'Hello from model ', model_id
 #endif
 
 #ifdef GMCF_API
-      ! Not sure
+      call finalise_gmcf()
 #else
 #ifdef MPI
       call finalise_mpi()

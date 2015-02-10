@@ -1,5 +1,5 @@
 module params_common_sn
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
     use communication_helper
     integer, parameter :: procPerRow = PROC_PER_ROW, procPerCol = PROC_PER_COL, dimensions = 2
     integer :: dimensionSizes(dimensions)
@@ -17,7 +17,7 @@ module params_common_sn
     !integer, parameter :: ipmax = 254, jpmax = 253
 #endif
 #ifndef TEST_SMALL_DOMAIN
-#ifdef MPI
+#if defined(MPI) || defined(GMCF)
 #ifdef EXPANDING_AREA
     integer, parameter :: ip = 150
     integer, parameter :: jp = 150

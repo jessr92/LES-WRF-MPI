@@ -1,5 +1,10 @@
 module communication_helper_integer
-use communication_helper_base
+#ifdef MPI
+use communication_helper_mpi
+#endif
+#ifdef GMCF
+use communication_helper_gmcf
+#endif
 implicit none
 
 ! May not be kept as up to date as communication_helper_real since communication_helper_integer is

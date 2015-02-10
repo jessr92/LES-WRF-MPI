@@ -1,18 +1,10 @@
-module communication_helper_base
+module communication_helper_mpi
 use communication_common
-#ifdef GMCF_API
-use gmcf_mpi_equivalent
-#else
 use mpi
-#endif
-use fortran_helper
 implicit none
 
-#ifdef GMCF_API
-#else
 integer(kind=4) :: rank, cartRank, mpi_size, ierror, status(MPI_STATUS_SIZE)
 integer :: communicator, cartTopComm
-#endif
 
 contains
 

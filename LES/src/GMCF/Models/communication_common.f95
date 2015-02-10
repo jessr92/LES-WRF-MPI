@@ -1,4 +1,5 @@
 module communication_common
+use fortran_helper
 integer, parameter :: topTag = 1, bottomTag = 2, leftTag = 3, rightTag = 4
 integer, parameter :: zbmTag = 5
 integer, parameter :: leftSideTag = 6, rightSideTag = 7
