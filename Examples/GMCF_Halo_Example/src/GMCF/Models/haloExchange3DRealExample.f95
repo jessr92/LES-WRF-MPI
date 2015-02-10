@@ -11,7 +11,7 @@ subroutine program_haloexchange3drealexample(sys, tile, model_id) ! This replace
     integer, parameter :: colCount = columns / procPerRow
     integer :: leftThickness, rightThickness, topThickness, bottomThickness
     real(kind=4), dimension(:,:,:), allocatable :: array
-    integer :: i
+    integer :: i, pthreadid, test_model_id
     
     leftThickness = 3
     rightThickness = 2
@@ -21,6 +21,10 @@ subroutine program_haloexchange3drealexample(sys, tile, model_id) ! This replace
                    colCount + leftThickness + rightThickness, &
                    depthSize))
     call gmcfInitCoupler(sys, tile, model_id)
+    call gmcfGetPThreadID(pthreadid)
+    print*, 'Model_id ', model_id, ' pthreadid ', pthreadid
+    call gmcfGetModelId(test_model_id)
+    print*, 'Passed in model_id', model_id, ' Obtained model_id ', test_model_id
     call initArray(array, model_id, topThickness, bottomThickness, leftThickness, rightThickness)
     call exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
                                 rightThickness, topThickness, &
