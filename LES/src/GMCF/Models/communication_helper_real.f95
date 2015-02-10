@@ -152,7 +152,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
     commWith = neighbours(topNeighbour)
     if (commWith .ne. -1) then
 #endif
-        print*, 'rank ', rank, ' communicating with top neighbour ', commWith
+        !print*, 'rank ', rank, ' communicating with top neighbour ', commWith
         do r=1, bottomThickness
             do c=1, colCount
                 do d=1, depthSize
@@ -179,7 +179,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
     commWith = neighbours(bottomNeighbour)
     if (commWith .ne. -1) then
 #endif
-        print*, 'rank ', rank, ' communicating with bottom neighbour ', commWith
+        !print*, 'rank ', rank, ' communicating with bottom neighbour ', commWith
         do r=1, topThickness
             do c=1, colCount
                 do d=1, depthSize
@@ -208,7 +208,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
     commWith = neighbours(leftNeighbour)
     if (commWith .ne. -1) then
 #endif
-        print*, 'rank ', rank, ' communicating with left neighbour ', commWith
+        !print*, 'rank ', rank, ' communicating with left neighbour ', commWith
         do r=1, rowCount
             do c=1, rightThickness
                 do d=1, depthSize
@@ -235,7 +235,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
     commWith = neighbours(rightNeighbour)
     if (commWith .ne. -1) then
 #endif
-        print*, 'rank ', rank, ' communicating with right neighbour ', commWith
+        !print*, 'rank ', rank, ' communicating with right neighbour ', commWith
         do r=1, rowCount
             do c=1, leftThickness
                 do d=1, depthSize
@@ -345,7 +345,11 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
         requests(i) = MPI_REQUEST_NULL
     end do
 #endif
+#ifdef GMCF
+    if (.not. isTopRow(rank, procPerRow) .and. .not. isLeftmostColumn(rank, procPerRow)) then
+#else
     if (.not. isTopRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
+#endif
         commWith = rank - procPerRow - 1
         !print*, 'Rank ', rank, ' has a top left neighbour with rank ', commWith
         do r=1,bottomThickness
@@ -355,6 +359,9 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
                 end do
             end do
         end do
+#ifdef GMCF
+        call gmcfRequestData(rank, bottomRightTag, topThickness*leftThickness*depthSize, commWith, PRE, 1)
+#endif
 #ifdef MPI
         call MPI_ISend(topLeftSend, bottomThickness*rightThickness*depthSize, MPI_REAL, &
                        commWith, topLeftTag, communicator, requests(1), ierror)
@@ -364,7 +371,11 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
         call checkMPIError()
 #endif
     end if
+#ifdef GMCF
+    if (.not. isTopRow(rank, procPerRow) .and. .not. isRightmostColumn(rank, procPerRow)) then
+#else
     if (.not. isTopRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
+#endif
         commWith = rank - procPerRow + 1
         !print*, 'Rank ', rank, ' has a top right neighbour with rank ', commWith
         do r=1, bottomThickness
@@ -374,6 +385,9 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
                 end do
             end do
         end do
+#ifdef GMCF
+        call gmcfRequestData(rank, bottomLeftTag, topThickness*rightThickness*depthSize, commWith, PRE, 1)
+#endif
 #ifdef MPI
         call MPI_ISend(topRightSend, bottomThickness*leftThickness*depthSize, MPI_REAL, &
                        commWith, topRightTag, communicator, requests(3), ierror)
@@ -383,7 +397,11 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
         call checkMPIError()
 #endif
     end if
+#ifdef GMCF
+    if (.not. isBottomRow(rank, procPerRow) .and. .not. isLeftmostColumn(rank, procPerRow)) then
+#else
     if (.not. isBottomRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
+#endif
         commWith = rank + procPerRow - 1
         !print*, 'Rank ', rank, ' has a bottom left neighbour with rank ', commWith
         do r=1, topThickness
@@ -394,6 +412,9 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
                 end do
             end do
         end do
+#ifdef GMCF
+        call gmcfRequestData(rank, topRightTag, bottomThickness*leftThickness*depthSize, commWith, PRE, 1)
+#endif
 #ifdef MPI
         call MPI_ISend(bottomLeftSend, topThickness*rightThickness*depthSize, MPI_REAL, &
                       commWith, bottomLeftTag, communicator, requests(5), ierror)
@@ -403,7 +424,11 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
         call checkMPIError()
 #endif
     end if
+#ifdef GMCF
+    if (.not. isBottomRow(rank, procPerRow) .and. .not. isRightmostColumn(rank, procPerRow)) then
+#else
     if (.not. isBottomRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
+#endif
         commWith = rank + procPerRow + 1
         !print*, 'Rank ', rank, ' has a bottom right neighbour with rank ', commWith
         do r=1,topThickness
@@ -414,6 +439,9 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
                 end do
             end do
         end do
+#ifdef GMCF
+        call gmcfRequestData(rank, topLeftTag, bottomThickness*rightThickness*depthSize, commWith, PRE, 1)
+#endif
 #ifdef MPI
         call MPI_ISend(bottomRightSend, topThickness*leftThickness*depthSize, MPI_REAL, &
                        commWith, bottomRightTag, communicator, requests(7), ierror)
@@ -423,6 +451,10 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
         call checkMPIError()
 #endif
     end if
+#ifdef GMCF
+    call sendExactCorners(topLeftSend, topRightSend, bottomLeftSend, bottomRightSend, rank, procPerRow, procPerCol)
+    call recvExactCorners(topLeftRecv, topRightRecv, bottomLeftRecv, bottomRightRecv, rank, procPerRow, procPerCol)
+#endif
 #ifdef MPI
     do i=1,8
         if (requests(i) .ne. MPI_REQUEST_NULL) then
@@ -467,6 +499,9 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
             end do
         end do
     end if
+#ifdef GMCF
+    call waitForExactCornersAcks(rank, procPerRow, procPerCol)
+#endif
     deallocate(topLeftRecv)
     deallocate(topLeftSend)
     deallocate(topRightRecv)
@@ -493,7 +528,8 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, &
         allocate(leftRecv(rowCount, depthSize))
         commWith = rank + procPerRow - 1
 #ifdef GMCF
-        !
+        call gmcfRequestData(rank, rightSideTag, rowCount*depthSize, commWith, PRE, 1)
+        call recvRightSideflow(rightRecv, model_id, procPerRow)
 #else
         call MPI_Recv(leftRecv, rowCount*depthSize, MPI_REAL, commWith, rightSideTag, &
                       communicator, status, ierror)
@@ -514,7 +550,8 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, &
             end do
         end do
 #ifdef GMCF
-        !
+        call sendRightSideflow(rightSend, model_id, procPerRow)
+        call waitForRightSideflowAcks(model_id, procPerRow)
 #else
         call MPI_Send(rightSend, rowCount*depthSize, MPI_REAL, commWith, rightSideTag, &
                       communicator, ierror)
@@ -545,7 +582,8 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, &
             end do
         end do
 #ifdef GMCF
-        !
+        call sendLeftSideflow(leftSend, model_id, procPerRow)
+        call waitForLeftSideflowAcks(model_id, procPerRow)
 #else
         call MPI_Send(leftSend, rowCount*depthSize, MPI_REAL, commWith, leftSideTag, &
                       communicator, ierror)
@@ -556,7 +594,8 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, &
         allocate(rightRecv(rowCount, depthSize))
         commWith = rank - procPerRow + 1
 #ifdef GMCF
-        !
+        call gmcfRequestData(rank, leftSideTag, rowCount*depthSize, commWith, PRE, 1)
+        call recvRightSideflow(leftRecv, model_id, procPerRow)
 #else
         call MPI_Recv(rightRecv, rowCount*depthSize, MPI_REAL, commWith, leftSideTag, &
                       communicator, status, ierror)
