@@ -22,26 +22,27 @@ subroutine finalise_gmcf(model_id)
     call gmcfFinished(model_id)
 end subroutine finalise_gmcf
 
-subroutine sendHaloBoundaries(leftSend, rightSend, topSend, bottomSend, model_id, procPerRow, procPerCol)
+subroutine sendHaloBoundaries(leftSend, rightSend, topSend, bottomSend, procPerRow)
     implicit none
     real(kind=4), dimension(:,:,:), intent(in) :: leftSend, rightSend, topSend, bottomSend
-    integer, intent(in) :: model_id, procPerRow, procPerCol
-    integer :: has_packets, fifo_empty
+    integer, intent(in) :: procPerRow
+    integer :: model_id, has_packets, fifo_empty
     type(gmcfPacket) :: packet
+    call gmcfGetModelId(model_id)
     !print*, 'Model_id ', model_id, ' is waiting for halo boundary requests'
-    if (.not. isTopRow(model_id, procPerRow)) then
+    if (.not. isTopRow(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id - procPerRow
         call gmcfWaitFor(model_id, REQDATA, model_id - procPerRow, 1)
     end if
-    if (.not. isBottomRow(model_id, procPerRow, procPerCol)) then
+    if (.not. isBottomRow(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id + procPerRow
         call gmcfWaitFor(model_id, REQDATA, model_id + procPerRow, 1)
     end if
-    if (.not. isLeftmostColumn(model_id, procPerRow)) then
+    if (.not. isLeftmostColumn(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id - 1
         call gmcfWaitFor(model_id, REQDATA, model_id - 1, 1)
     end if
-    if (.not. isRightmostColumn(model_id, procPerRow)) then
+    if (.not. isRightmostColumn(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id + 1
         call gmcfWaitFor(model_id, REQDATA, model_id + 1, 1)
     end if
@@ -66,26 +67,27 @@ subroutine sendHaloBoundaries(leftSend, rightSend, topSend, bottomSend, model_id
     !print*, 'Model_id ', model_id, ' has responded to halo boundary requests'
 end subroutine sendHaloBoundaries
 
-subroutine recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, model_id, procPerRow, procPerCol)
+subroutine recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, procPerRow)
     implicit none
     real(kind=4), dimension(:,:,:), intent(out) :: leftRecv, rightRecv, topRecv, bottomRecv
-    integer, intent(in) :: model_id, procPerRow, procPerCol
-    integer :: has_packets, fifo_empty
+    integer, intent(in) :: procPerRow
+    integer :: model_id, has_packets, fifo_empty
     type(gmcfPacket) :: packet
+    call gmcfGetModelId(model_id)
     !print*, 'Model_id ', model_id, ' is waiting for halo boundaries'
-    if (.not. isTopRow(model_id, procPerRow)) then
+    if (.not. isTopRow(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id - procPerRow
         call gmcfWaitFor(model_id, RESPDATA, model_id - procPerRow, 1)
     end if
-    if (.not. isBottomRow(model_id, procPerRow, procPerCol)) then
+    if (.not. isBottomRow(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id + procPerRow
         call gmcfWaitFor(model_id, RESPDATA, model_id + procPerRow, 1)
     end if
-    if (.not. isLeftmostColumn(model_id, procPerRow)) then
+    if (.not. isLeftmostColumn(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id - 1
         call gmcfWaitFor(model_id, RESPDATA, model_id - 1, 1)
     end if
-    if (.not. isRightmostColumn(model_id, procPerRow)) then
+    if (.not. isRightmostColumn(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id + 1
         call gmcfWaitFor(model_id, RESPDATA, model_id + 1, 1)
     end if
@@ -110,24 +112,25 @@ subroutine recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, model_id
     !print*, 'Model_id ', model_id, ' has received halo boundaries'
 end subroutine recvHaloBoundaries
 
-subroutine waitForHaloAcks(model_id, procPerRow, procPerCol)
+subroutine waitForHaloAcks(procPerRow)
     implicit none
-    integer, intent(in) :: model_id, procPerRow, procPerCol
-    integer :: has_packets, fifo_empty
+    integer, intent(in) :: procPerRow
+    integer :: model_id, has_packets, fifo_empty
     type(gmcfPacket) :: packet
-    if (.not. isTopRow(model_id, procPerRow)) then
+    call gmcfGetModelId(model_id)
+    if (.not. isTopRow(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id - procPerRow
         call gmcfWaitFor(model_id, ACKDATA, model_id - procPerRow, 1)
     end if
-    if (.not. isBottomRow(model_id, procPerRow, procPerCol)) then
+    if (.not. isBottomRow(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id + procPerRow
         call gmcfWaitFor(model_id, ACKDATA, model_id + procPerRow, 1)
     end if
-    if (.not. isLeftmostColumn(model_id, procPerRow)) then
+    if (.not. isLeftmostColumn(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id - 1
         call gmcfWaitFor(model_id, ACKDATA, model_id - 1, 1)
     end if
-    if (.not. isRightmostColumn(model_id, procPerRow)) then
+    if (.not. isRightmostColumn(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id + 1
         call gmcfWaitFor(model_id, ACKDATA, model_id + 1, 1)
     end if
@@ -144,12 +147,13 @@ subroutine waitForHaloAcks(model_id, procPerRow, procPerCol)
     end do
 end subroutine waitForHaloAcks
 
-subroutine sendLeftSideflow(leftSend, model_id, procPerRow)
+subroutine sendLeftSideflow(leftSend, procPerRow)
     implicit none
     real(kind=4), dimension(:,:), intent(in) :: leftSend
-    integer, intent(in) :: model_id, procPerRow
-    integer :: has_packets, fifo_empty
+    integer, intent(in) :: procPerRow
+    integer :: model_id, has_packets, fifo_empty
     type(gmcfPacket) :: packet
+    call gmcfGetModelId(model_id)
     call gmcfWaitFor(model_id, REQDATA, model_id + procPerRow - 1, 1)
     call gmcfHasPackets(model_id, REQDATA, has_packets)
     do while (has_packets == 1)
@@ -164,12 +168,13 @@ subroutine sendLeftSideflow(leftSend, model_id, procPerRow)
     end do
 end subroutine sendLeftSideflow
 
-subroutine recvLeftSideflow(leftRecv, model_id, procPerRow)
+subroutine recvLeftSideflow(leftRecv, procPerRow)
     implicit none
     real(kind=4), dimension(:,:), intent(out) :: leftRecv
-    integer, intent(in) :: model_id, procPerRow
-    integer :: has_packets, fifo_empty
+    integer, intent(in) :: procPerRow
+    integer :: model_id, has_packets, fifo_empty
     type(gmcfPacket) :: packet
+    call gmcfGetModelId(model_id)
     call gmcfWaitFor(model_id, REQDATA, model_id - procPerRow + 1, 1)
     call gmcfHasPackets(model_id, RESPDATA, has_packets)
     do while (has_packets == 1)
@@ -184,11 +189,12 @@ subroutine recvLeftSideflow(leftRecv, model_id, procPerRow)
     end do
 end subroutine recvLeftSideflow
 
-subroutine waitForLeftSideflowAcks(model_id, procPerRow)
+subroutine waitForLeftSideflowAcks(procPerRow)
     implicit none
-    integer, intent(in) :: model_id, procPerRow
-    integer :: has_packets, fifo_empty
+    integer, intent(in) :: procPerRow
+    integer :: model_id, has_packets, fifo_empty
     type(gmcfPacket) :: packet
+    call gmcfGetModelId(model_id)
     call gmcfWaitFor(model_id, ACKDATA, model_id + procPerRow - 1, 1)
     call gmcfHasPackets(model_id, ACKDATA, has_packets)
     do while (has_packets == 1)
@@ -200,12 +206,13 @@ subroutine waitForLeftSideflowAcks(model_id, procPerRow)
     end do
 end subroutine waitForLeftSideflowAcks
 
-subroutine sendRightSideflow(rightSend, model_id, procPerRow)
+subroutine sendRightSideflow(rightSend, procPerRow)
     implicit none
     real(kind=4), dimension(:,:), intent(in) :: rightSend
-    integer, intent(in) :: model_id, procPerRow
-    integer :: has_packets, fifo_empty
+    integer, intent(in) :: procPerRow
+    integer :: model_id, has_packets, fifo_empty
     type(gmcfPacket) :: packet
+    call gmcfGetModelId(model_id)
     call gmcfWaitFor(model_id, REQDATA, model_id - procPerRow + 1, 1)
     call gmcfHasPackets(model_id, REQDATA, has_packets)
     do while (has_packets == 1)
@@ -220,12 +227,13 @@ subroutine sendRightSideflow(rightSend, model_id, procPerRow)
     end do
 end subroutine sendRightSideflow
 
-subroutine recvRightSideflow(rightRecv, model_id, procPerRow)
+subroutine recvRightSideflow(rightRecv, procPerRow)
     implicit none
     real(kind=4), dimension(:,:), intent(out) :: rightRecv
-    integer, intent(in) :: model_id, procPerRow
-    integer :: has_packets, fifo_empty
+    integer, intent(in) :: procPerRow
+    integer :: model_id, has_packets, fifo_empty
     type(gmcfPacket) :: packet
+    call gmcfGetModelId(model_id)
     call gmcfWaitFor(model_id, REQDATA, model_id + procPerRow - 1, 1)
     call gmcfHasPackets(model_id, RESPDATA, has_packets)
     do while (has_packets == 1)
@@ -240,11 +248,12 @@ subroutine recvRightSideflow(rightRecv, model_id, procPerRow)
     end do
 end subroutine recvRightSideflow
 
-subroutine waitForRightSideflowAcks(model_id, procPerRow)
+subroutine waitForRightSideflowAcks(procPerRow)
     implicit none
-    integer, intent(in) :: model_id, procPerRow
-    integer :: has_packets, fifo_empty
+    integer, intent(in) :: procPerRow
+    integer :: model_id, has_packets, fifo_empty
     type(gmcfPacket) :: packet
+    call gmcfGetModelId(model_id)
     call gmcfWaitFor(model_id, ACKDATA, model_id - procPerRow + 1, 1)
     call gmcfHasPackets(model_id, ACKDATA, has_packets)
     do while (has_packets == 1)
@@ -256,22 +265,23 @@ subroutine waitForRightSideflowAcks(model_id, procPerRow)
     end do
 end subroutine waitForRightSideflowAcks
 
-subroutine sendExactCorners(topLeftSend, topRightSend, bottomLeftSend, bottomRightSend, model_id, procPerRow, procPerCol)
+subroutine sendExactCorners(topLeftSend, topRightSend, bottomLeftSend, bottomRightSend, procPerRow)
     implicit none
     real(kind=4), dimension(:,:,:), intent(in) :: topLeftSend, topRightSend, bottomLeftSend, bottomRightSend
-    integer, intent(in) :: model_id, procPerRow, procPerCol
-    integer :: has_packets, fifo_empty
+    integer, intent(in) :: procPerRow
+    integer :: model_id, has_packets, fifo_empty
     type(gmcfPacket) :: packet
-    if (.not. isTopRow(model_id, procPerRow) .and. .not. isLeftmostColumn(model_id, procPerRow)) then
+    call gmcfGetModelId(model_id)
+    if (.not. isTopRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, REQDATA, model_id - procPerRow - 1, 1)
     end if
-    if (.not. isTopRow(model_id, procPerRow) .and. .not. isRightmostColumn(model_id, procPerRow)) then
+    if (.not. isTopRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, REQDATA, model_id - procPerRow + 1, 1)
     end if
-    if (.not. isBottomRow(model_id, procPerRow, procPerCol) .and. .not. isLeftmostColumn(model_id, procPerRow)) then
+    if (.not. isBottomRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, REQDATA, model_id + procPerRow - 1, 1)
     end if
-    if (.not. isBottomRow(model_id, procPerRow, procPerCol) .and. .not. isRightmostColumn(model_id, procPerRow)) then
+    if (.not. isBottomRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, REQDATA, model_id + procPerRow + 1, 1)
     end if
     call gmcfHasPackets(model_id, REQDATA, has_packets)
@@ -293,22 +303,23 @@ subroutine sendExactCorners(topLeftSend, topRightSend, bottomLeftSend, bottomRig
     end do
 end subroutine sendExactCorners
 
-subroutine recvExactCorners(topLeftRecv, topRightRecv, bottomLeftRecv, bottomRightRecv, model_id, procPerRow, procPerCol)
+subroutine recvExactCorners(topLeftRecv, topRightRecv, bottomLeftRecv, bottomRightRecv, procPerRow)
     implicit none
     real(kind=4), dimension(:,:,:), intent(in) :: topLeftRecv, topRightRecv, bottomLeftRecv, bottomRightRecv
-    integer, intent(in) :: model_id, procPerRow, procPerCol
-    integer :: has_packets, fifo_empty
+    integer, intent(in) :: procPerRow
+    integer :: model_id, has_packets, fifo_empty
     type(gmcfPacket) :: packet
-    if (.not. isTopRow(model_id, procPerRow) .and. .not. isLeftmostColumn(model_id, procPerRow)) then
+    call gmcfGetModelId(model_id)
+    if (.not. isTopRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, RESPDATA, model_id - procPerRow - 1, 1)
     end if
-    if (.not. isTopRow(model_id, procPerRow) .and. .not. isRightmostColumn(model_id, procPerRow)) then
+    if (.not. isTopRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, RESPDATA, model_id - procPerRow + 1, 1)
     end if
-    if (.not. isBottomRow(model_id, procPerRow, procPerCol) .and. .not. isLeftmostColumn(model_id, procPerRow)) then
+    if (.not. isBottomRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, RESPDATA, model_id + procPerRow - 1, 1)
     end if
-    if (.not. isBottomRow(model_id, procPerRow, procPerCol) .and. .not. isRightmostColumn(model_id, procPerRow)) then
+    if (.not. isBottomRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, RESPDATA, model_id + procPerRow + 1, 1)
     end if
     call gmcfHasPackets(model_id, RESPDATA, has_packets)
@@ -330,21 +341,22 @@ subroutine recvExactCorners(topLeftRecv, topRightRecv, bottomLeftRecv, bottomRig
     end do
 end subroutine recvExactCorners
 
-subroutine waitForExactCornersAcks(model_id, procPerRow, procPerCol)
+subroutine waitForExactCornersAcks(procPerRow)
     implicit none
-    integer, intent(in) :: model_id, procPerRow, procPerCol
-    integer :: has_packets, fifo_empty
+    integer, intent(in) :: procPerRow
+    integer :: model_id, has_packets, fifo_empty
     type(gmcfPacket) :: packet
-    if (.not. isTopRow(model_id, procPerRow) .and. .not. isLeftmostColumn(model_id, procPerRow)) then
+    call gmcfGetModelId(model_id)
+    if (.not. isTopRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, ACKDATA, model_id - procPerRow - 1, 1)
     end if
-    if (.not. isTopRow(model_id, procPerRow) .and. .not. isRightmostColumn(model_id, procPerRow)) then
+    if (.not. isTopRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, ACKDATA, model_id - procPerRow + 1, 1)
     end if
-    if (.not. isBottomRow(model_id, procPerRow, procPerCol) .and. .not. isLeftmostColumn(model_id, procPerRow)) then
+    if (.not. isBottomRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, ACKDATA, model_id + procPerRow - 1, 1)
     end if
-    if (.not. isBottomRow(model_id, procPerRow, procPerCol) .and. .not. isRightmostColumn(model_id, procPerRow)) then
+    if (.not. isBottomRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, ACKDATA, model_id + procPerRow + 1, 1)
     end if
     call gmcfHasPackets(model_id, ACKDATA, has_packets)
@@ -360,24 +372,27 @@ subroutine waitForExactCornersAcks(model_id, procPerRow, procPerCol)
     end do
 end subroutine waitForExactCornersAcks
 
-subroutine getGlobalSumOfGMCF(model_id, value)
+subroutine getGlobalSumOfGMCF(value)
     implicit none
-    integer, intent(in) :: model_id
     real(kind=4), intent(inout) :: value
+    integer :: model_id
+    call gmcfGetModelId(model_id)
     call getGlobalOp(model_id, value, globalSumTag)
 end subroutine getGlobalSumOfGMCF
 
-subroutine getGlobalMaxOfGMCF(model_id, value)
+subroutine getGlobalMaxOfGMCF(value)
     implicit none
-    integer, intent(in) :: model_id
     real(kind=4), intent(inout) :: value
+    integer :: model_id
+    call gmcfGetModelId(model_id)
     call getGlobalOp(model_id, value, globalMaxTag)
 end subroutine getGlobalMaxOfGMCF
 
-subroutine getGlobalMinOfGMCF(model_id, value)
+subroutine getGlobalMinOfGMCF(value)
     implicit none
-    integer, intent(in) :: model_id
     real(kind=4), intent(inout) :: value
+    integer :: model_id
+    call gmcfGetModelId(model_id)
     call getGlobalOp(model_id, value, globalMinTag)
 end subroutine getGlobalMinOfGMCF
 
@@ -388,7 +403,7 @@ subroutine getGlobalOp(model_id, value, tag)
     real(kind=4), dimension(1) :: receiveBuffer, sendBuffer
     integer :: i, has_packets, fifo_empty
     type(gmcfPacket) :: packet
-    if (isMaster(model_id)) then
+    if (isMaster()) then
         ! Request everybody's value
         do i=2, mpi_size
             call gmcfRequestData(model_id, tag, 1, i, PRE, 1)
@@ -478,35 +493,42 @@ subroutine getGlobalOp(model_id, value, tag)
     end if
 end subroutine getGlobalOp
 
-logical function isMaster(model_id)
+logical function isMaster()
     implicit none
-    integer, intent(in) :: model_id
+    integer :: model_id
+    call gmcfGetModelId(model_id)
     isMaster = model_id .eq. 1
 end function isMaster
 
-logical function isTopRow(model_id, procPerRow)
+logical function isTopRow(procPerRow)
     implicit none
-    integer, intent(in) :: model_id, procPerRow
+    integer, intent(in) :: procPerRow
+    integer :: model_id
+    call gmcfGetModelId(model_id)
     isTopRow = model_id .le. procPerRow
 end function isTopRow
 
-logical function isBottomRow(model_id, procPerRow, procPerCol)
+logical function isBottomRow(procPerRow)
     implicit none
-    integer, intent(in) :: model_id, procPerRow, procPerCol
-    integer :: instanceCount
-    instanceCount = procPerRow * procPerCol
-    isBottomRow = model_id .gt. (instanceCount - procPerRow)
+    integer, intent(in) :: procPerRow
+    integer :: model_id
+    call gmcfGetModelId(model_id)
+    isBottomRow = model_id .gt. (mpi_size - procPerRow)
 end function isBottomRow
 
-logical function isLeftmostColumn(model_id, procPerRow)
+logical function isLeftmostColumn(procPerRow)
     implicit none
-    integer, intent(in) :: model_id, procPerRow
+    integer, intent(in) :: procPerRow
+    integer :: model_id
+    call gmcfGetModelId(model_id)
     isLeftmostColumn = modulo(model_id - 1, procPerRow) .eq. 0
 end function isLeftmostColumn
 
-logical function isRightmostColumn(model_id, procPerRow)
+logical function isRightmostColumn(procPerRow)
     implicit none
-    integer, intent(in) :: model_id, procPerRow
+    integer, intent(in) :: procPerRow
+    integer :: model_id
+    call gmcfGetModelId(model_id)
     isRightmostColumn = modulo(model_id - 1, procPerRow) .eq. (procPerRow - 1)
 end function isRightmostColumn
 
