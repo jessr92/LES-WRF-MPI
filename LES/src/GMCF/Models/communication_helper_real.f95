@@ -13,11 +13,15 @@ contains
 subroutine getGlobalSumOf(value)
     implicit none
     real(kind=4), intent(inout) :: value
+#ifdef GMCF
+    integer :: rank
+    call gmcfGetModelId(rank)
+#endif
 #ifdef GR_DEBUG
     print*, 'Rank: ', rank, ' before sum: ', value
 #endif
 #ifdef GMCF
-    call getGlobalSumOfGMCF(rank, value)
+    call getGlobalSumOfGMCF(value)
 #else
     call MPI_AllReduce(MPI_IN_PLACE, value, 1, MPI_REAL, MPI_SUM, communicator, ierror)
 #endif
@@ -32,11 +36,15 @@ end subroutine getGlobalSumOf
 subroutine getGlobalMaxOf(value)
     implicit none
     real(kind=4), intent(inout) :: value
+#ifdef GMCF
+    integer :: rank
+    call gmcfGetModelId(rank)
+#endif
 #ifdef GR_DEBUG
     print*, 'Rank: ', rank, ' before max: ', value
 #endif
 #ifdef GMCF
-    call getGlobalMaxOfGMCF(rank, value)
+    call getGlobalMaxOfGMCF(value)
 #else
     call MPI_AllReduce(MPI_IN_PLACE, value, 1, MPI_REAL, MPI_MAX, communicator, ierror)
 #endif
@@ -51,11 +59,15 @@ end subroutine getGlobalMaxOf
 subroutine getGlobalMinOf(value)
     implicit none
     real(kind=4), intent(inout) :: value
+#ifdef GMCF
+    integer :: rank
+    call gmcfGetModelId(rank)
+#endif
 #ifdef GR_DEBUG
     print*, 'Rank: ', rank, ' before min: ', value
 #endif
 #ifdef GMCF
-    call getGlobalMinOfGMCF(rank, value)
+    call getGlobalMinOfGMCF(value)
 #else
     call MPI_AllReduce(MPI_IN_PLACE, value, 1, MPI_REAL, MPI_MIN, communicator, ierror)
 #endif
@@ -116,11 +128,18 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
     integer, dimension(:), intent(in) :: neighbours
     integer, intent(in) :: procPerRow, leftThickness, rightThickness, topThickness, bottomThickness
     integer :: i, commWith, r, c, d, rowCount, colCount, depthSize
+#ifdef GMCF
+    integer :: rank
+#endif
 #ifdef MPI
     integer :: requests(8)
 #endif
     real(kind=4), dimension(:,:,:), allocatable :: leftRecv, leftSend, rightSend, rightRecv
     real(kind=4), dimension(:,:,:), allocatable :: topRecv, topSend, bottomSend, bottomRecv
+#ifdef GMCF
+    call gmcfGetModelId(rank)
+#endif
+
 #ifdef MPI
     if (size(neighbours, 1) .lt. 4) then
         print*, "Error: cannot have a 4-way halo exchange with less than 4 neighbours"
@@ -331,6 +350,10 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
     real(kind=4), dimension(:,:,:), allocatable :: topLeftRecv, topRightRecv, bottomLeftRecv, bottomRightRecv
     real(kind=4), dimension(:,:,:), allocatable :: topLeftSend, topRightSend, bottomLeftSend, bottomRightSend
     integer :: depthSize, requests(8), i, commWith, r, c, d
+#ifdef GMCF
+    integer :: rank
+    call gmcfGetModelId(rank)
+#endif
     depthSize = size(array, 3)
     allocate(topLeftRecv(bottomThickness, rightThickness, depthSize))
     allocate(topLeftSend(bottomThickness, rightThickness, depthSize))
@@ -345,11 +368,7 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
         requests(i) = MPI_REQUEST_NULL
     end do
 #endif
-#ifdef GMCF
-    if (.not. isTopRow(rank, procPerRow) .and. .not. isLeftmostColumn(rank, procPerRow)) then
-#else
     if (.not. isTopRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
-#endif
         commWith = rank - procPerRow - 1
         !print*, 'Rank ', rank, ' has a top left neighbour with rank ', commWith
         do r=1,bottomThickness
@@ -371,11 +390,7 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
         call checkMPIError()
 #endif
     end if
-#ifdef GMCF
-    if (.not. isTopRow(rank, procPerRow) .and. .not. isRightmostColumn(rank, procPerRow)) then
-#else
     if (.not. isTopRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
-#endif
         commWith = rank - procPerRow + 1
         !print*, 'Rank ', rank, ' has a top right neighbour with rank ', commWith
         do r=1, bottomThickness
@@ -397,11 +412,7 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
         call checkMPIError()
 #endif
     end if
-#ifdef GMCF
-    if (.not. isBottomRow(rank, procPerRow) .and. .not. isLeftmostColumn(rank, procPerRow)) then
-#else
     if (.not. isBottomRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
-#endif
         commWith = rank + procPerRow - 1
         !print*, 'Rank ', rank, ' has a bottom left neighbour with rank ', commWith
         do r=1, topThickness
@@ -424,11 +435,7 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
         call checkMPIError()
 #endif
     end if
-#ifdef GMCF
-    if (.not. isBottomRow(rank, procPerRow) .and. .not. isRightmostColumn(rank, procPerRow)) then
-#else
     if (.not. isBottomRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
-#endif
         commWith = rank + procPerRow + 1
         !print*, 'Rank ', rank, ' has a bottom right neighbour with rank ', commWith
         do r=1,topThickness
@@ -452,8 +459,8 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
 #endif
     end if
 #ifdef GMCF
-    call sendExactCorners(topLeftSend, topRightSend, bottomLeftSend, bottomRightSend, rank, procPerRow, procPerCol)
-    call recvExactCorners(topLeftRecv, topRightRecv, bottomLeftRecv, bottomRightRecv, rank, procPerRow, procPerCol)
+    call sendExactCorners(topLeftSend, topRightSend, bottomLeftSend, bottomRightSend, procPerRow)
+    call recvExactCorners(topLeftRecv, topRightRecv, bottomLeftRecv, bottomRightRecv, procPerRow)
 #endif
 #ifdef MPI
     do i=1,8
@@ -500,7 +507,7 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
         end do
     end if
 #ifdef GMCF
-    call waitForExactCornersAcks(rank, procPerRow, procPerCol)
+    call waitForExactCornersAcks(procPerRow)
 #endif
     deallocate(topLeftRecv)
     deallocate(topLeftSend)
@@ -519,6 +526,10 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, &
     real(kind=4), dimension(:,:,:), intent(inout) :: array
     real(kind=4), dimension(:,:), allocatable :: leftRecv, rightSend
     integer :: r, d, commWith, rowCount, depthSize, ignoreFirstK, ignoreLastK
+#ifdef GMCF
+    integer :: rank
+    call gmcfGetModelId(rank)
+#endif
 #ifdef GR_DEBUG
     !print*, 'GR: rank ', rank, ' is starting sideflowRightLeft'
 #endif
@@ -529,7 +540,7 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, &
         commWith = rank + procPerRow - 1
 #ifdef GMCF
         call gmcfRequestData(rank, rightSideTag, rowCount*depthSize, commWith, PRE, 1)
-        call recvRightSideflow(rightRecv, model_id, procPerRow)
+        call recvRightSideflow(leftRecv, procPerRow)
 #else
         call MPI_Recv(leftRecv, rowCount*depthSize, MPI_REAL, commWith, rightSideTag, &
                       communicator, status, ierror)
@@ -550,8 +561,8 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, &
             end do
         end do
 #ifdef GMCF
-        call sendRightSideflow(rightSend, model_id, procPerRow)
-        call waitForRightSideflowAcks(model_id, procPerRow)
+        call sendRightSideflow(rightSend, procPerRow)
+        call waitForRightSideflowAcks(procPerRow)
 #else
         call MPI_Send(rightSend, rowCount*depthSize, MPI_REAL, commWith, rightSideTag, &
                       communicator, ierror)
@@ -568,6 +579,10 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, &
     real(kind=4), dimension(:,:,:), intent(inout) :: array
     real(kind=4), dimension(:,:), allocatable :: leftSend, rightRecv
     integer :: r, d, commWith, rowCount, depthSize, ignoreFirstK, ignoreLastK
+#ifdef GMCF
+    integer :: rank
+    call gmcfGetModelId(rank)
+#endif
 #ifdef GR_DEBUG
     !print*, 'GR: rank ', rank, ' is starting sideflowLeftRight'
 #endif
@@ -582,8 +597,8 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, &
             end do
         end do
 #ifdef GMCF
-        call sendLeftSideflow(leftSend, model_id, procPerRow)
-        call waitForLeftSideflowAcks(model_id, procPerRow)
+        call sendLeftSideflow(leftSend, procPerRow)
+        call waitForLeftSideflowAcks(procPerRow)
 #else
         call MPI_Send(leftSend, rowCount*depthSize, MPI_REAL, commWith, leftSideTag, &
                       communicator, ierror)
@@ -595,7 +610,7 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, &
         commWith = rank - procPerRow + 1
 #ifdef GMCF
         call gmcfRequestData(rank, leftSideTag, rowCount*depthSize, commWith, PRE, 1)
-        call recvRightSideflow(leftRecv, model_id, procPerRow)
+        call recvRightSideflow(rightRecv, procPerRow)
 #else
         call MPI_Recv(rightRecv, rowCount*depthSize, MPI_REAL, commWith, leftSideTag, &
                       communicator, status, ierror)
@@ -616,6 +631,10 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
     real(kind=4), dimension(-1:ipmax+1,-1:jpmax+1) , intent(InOut) :: zbm
     integer :: startRow, startCol, i, r, c
     real(kind=4), dimension(ip, jp) :: sendBuffer, recvBuffer
+#ifdef GMCF
+    integer :: rank
+    call gmcfGetModelId(rank)
+#endif
 #ifdef GR_DEBUG
     !print*, 'GR: rank ', rank, ' is starting distributeZBM'
 #endif
@@ -668,6 +687,10 @@ subroutine distribute1DRealRowWiseArray(arrayToBeSent, receivingArray, leftBound
     real(kind=4), dimension(:), allocatable :: sendBuffer
     integer, intent(in) :: leftBoundary, rightBoundary, procPerRow
     integer :: totalSize, receivingSize, i, startI, endI, currentI
+#ifdef GMCF
+    integer :: rank
+    call gmcfGetModelId(rank)
+#endif
     totalSize = size(arrayToBeSent, 1)
     receivingSize = size(receivingArray, 1)
     if (isMaster()) then
@@ -718,6 +741,10 @@ subroutine distribute1DRealColumnWiseArray(arrayToBeSent, receivingArray, leftBo
     real(kind=4), dimension(:), allocatable :: sendBuffer
     integer, intent(in) :: leftBoundary, rightBoundary, procPerRow
     integer :: totalSize, receivingSize, i, startI, endI, currentI
+#ifdef GMCF
+    integer :: rank
+    call gmcfGetModelId(rank)
+#endif
     totalSize = size(arrayToBeSent, 1)
     receivingSize = size(receivingArray, 1)
     if (isMaster()) then
@@ -770,6 +797,10 @@ subroutine collect3DReal4Array(array, arrayTot, leftBoundary, rightBoundary, &
     integer, intent(in) :: ip, jp, kp, procPerRow
     integer :: i, startRow, startCol, r, c, d, bufferSize
     real(kind=4), dimension(:,:,:), allocatable :: recvBuffer
+#ifdef GMCF
+    integer :: rank
+    call gmcfGetModelId(rank)
+#endif
     bufferSize = size(array, 1) * size(array, 2) * size(array, 3)
     if (isMaster()) then
         allocate(recvBuffer(size(array, 1), size(array, 2), size(array, 3)))
