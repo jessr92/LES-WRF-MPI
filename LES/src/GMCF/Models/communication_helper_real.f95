@@ -731,7 +731,8 @@ subroutine distribute1DRealRowWiseArray(arrayToBeSent, receivingArray, leftBound
     integer, intent(in) :: leftBoundary, rightBoundary, procPerRow
     integer :: totalSize, receivingSize, i, startI, endI, currentI
 #ifdef GMCF
-    integer :: rank
+    integer :: rank, fifo_empty, has_packets
+    type(gmcfPacket) :: packet
     call gmcfGetModelId(rank)
 #endif
     totalSize = size(arrayToBeSent, 1)
@@ -746,7 +747,11 @@ subroutine distribute1DRealRowWiseArray(arrayToBeSent, receivingArray, leftBound
 #endif
         ! Master needs to memory copy its required portion
         receivingArray = arrayToBeSent(1:receivingSize+1)
+#ifdef GMCF
+        do i=2, mpi_size
+#else
         do i=1, mpi_size-1
+#endif
             ! MPI_Send
             startI = 1 + ((i / procPerRow) * (receivingSize - leftBoundary - rightBoundary))
             endI = startI + receivingSize - 1
@@ -757,7 +762,27 @@ subroutine distribute1DRealRowWiseArray(arrayToBeSent, receivingArray, leftBound
                 sendBuffer(currentI-startI+1) = arrayToBeSent(currentI)
             end do
 #ifdef GMCF
-            !
+            call gmcfWaitFor(rank, REQDATA, i, 1)
+            call gmcfHasPackets(rank, REQDATA, has_packets)
+            do while(has_packets == 1)
+                call gmcfShiftPending(rank, REQDATA, packet, fifo_empty)
+                if (packet%source .eq. i) then
+                    call gmcfSend1DFloatArray(rank, sendBuffer, shape(sendBuffer), dxTag, i, PRE, 1)
+                    exit
+                else
+                    call gmcfPushPending(rank, packet) ! Too early
+                end if
+                call gmcfHasPackets(rank, REQDATA, has_packets)
+            end do
+            call gmcfWaitFor(rank, ACKDATA, i, 1)
+            call gmcfHasPackets(rank, ACKDATA, has_packets)
+            do while(has_packets == 1)
+                call gmcfShiftPEnding(rank, ACKDATA, packet, fifo_empty)
+                if (packet%source .ne. i) then
+                    print*, 'Model_id ', rank, ' received an unexpected ack in distribute real row wise'
+                end if
+                call gmcfHasPackets(rank, ACKDATA, has_packets)
+            end do
 #else
             call MPI_Send(sendBuffer, receivingSize, MPI_Real, i, dxTag, communicator, &
                           ierror)
@@ -768,7 +793,18 @@ subroutine distribute1DRealRowWiseArray(arrayToBeSent, receivingArray, leftBound
     else
         ! Receive receivingSize reals
 #ifdef GMCF
-        !
+        call gmcfRequestData(rank, dxTag, receivingSize, 1, PRE, 1)
+        call gmcfWaitFor(rank, RESPDATA, 1, 1)
+        call gmcfHasPackets(rank, RESPDATA, has_packets)
+        do while(has_packets == 1)
+            call gmcfShiftPending(rank, RESPDATA, packet, fifo_empty)
+            if (packet%data_id .ne. dxTag) then
+                print*, 'Received unexpected packet'
+            else
+                call gmcfRead1DFloatArray(receivingArray, shape(receivingArray),packet)
+            end if
+            call gmcfHasPackets(rank, RESPDATA, has_packets)
+        end do
 #else
         call MPI_Recv(receivingArray, receivingSize, MPI_REAL, 0, dxTag, communicator, &
                       status, ierror)
@@ -785,7 +821,8 @@ subroutine distribute1DRealColumnWiseArray(arrayToBeSent, receivingArray, leftBo
     integer, intent(in) :: leftBoundary, rightBoundary, procPerRow
     integer :: totalSize, receivingSize, i, startI, endI, currentI
 #ifdef GMCF
-    integer :: rank
+    integer :: rank, fifo_empty, has_packets
+    type(gmcfPacket) :: packet
     call gmcfGetModelId(rank)
 #endif
     totalSize = size(arrayToBeSent, 1)
@@ -800,7 +837,11 @@ subroutine distribute1DRealColumnWiseArray(arrayToBeSent, receivingArray, leftBo
 #endif
         ! Master needs to memory copy its required portion
         receivingArray = arrayToBeSent(1:receivingSize+1)
+#ifdef GMCF
+        do i=2, mpi_size
+#else
         do i=1, mpi_size-1
+#endif
             ! MPI_Send
             startI = 1 + (modulo(i, procPerRow) * (receivingSize - leftBoundary - rightBoundary))
             endI = startI + receivingSize - 1
@@ -811,7 +852,27 @@ subroutine distribute1DRealColumnWiseArray(arrayToBeSent, receivingArray, leftBo
                 sendBuffer(currentI-startI+1) = arrayToBeSent(currentI)
             end do
 #ifdef GMCF
-            !
+            call gmcfWaitFor(rank, REQDATA, i, 1)
+            call gmcfHasPackets(rank, REQDATA, has_packets)
+            do while(has_packets == 1)
+                call gmcfShiftPending(rank, REQDATA, packet, fifo_empty)
+                if (packet%source .eq. i) then
+                    call gmcfSend1DFloatArray(rank, sendBuffer, shape(sendBuffer), dyTag, i, PRE, 1)
+                    exit
+                else
+                    call gmcfPushPending(rank, packet) ! Too early
+                end if
+                call gmcfHasPackets(rank, REQDATA, has_packets)
+            end do
+            call gmcfWaitFor(rank, ACKDATA, i, 1)
+            call gmcfHasPackets(rank, ACKDATA, has_packets)
+            do while(has_packets == 1)
+                call gmcfShiftPEnding(rank, ACKDATA, packet, fifo_empty)
+                if (packet%source .ne. i) then
+                    print*, 'Model_id ', rank, ' received an unexpected ack in distribute real row wise'
+                end if
+                call gmcfHasPackets(rank, ACKDATA, has_packets)
+            end do
 #else
             call MPI_Send(sendBuffer, receivingSize, MPI_Real, i, dyTag, communicator, &
                           ierror)
@@ -822,7 +883,18 @@ subroutine distribute1DRealColumnWiseArray(arrayToBeSent, receivingArray, leftBo
     else
         ! Receive receivingSize reals
 #ifdef GMCF
-        !
+        call gmcfRequestData(rank, dyTag, receivingSize, 1, PRE, 1)
+        call gmcfWaitFor(rank, RESPDATA, 1, 1)
+        call gmcfHasPackets(rank, RESPDATA, has_packets)
+        do while(has_packets == 1)
+            call gmcfShiftPending(rank, RESPDATA, packet, fifo_empty)
+            if (packet%data_id .ne. dyTag) then
+                print*, 'Received unexpected packet'
+            else
+                call gmcfRead1DFloatArray(receivingArray, shape(receivingArray),packet)
+            end if
+            call gmcfHasPackets(rank, RESPDATA, has_packets)
+        end do
 #else
         call MPI_Recv(receivingArray, receivingSize, MPI_REAL, 0, dyTag, communicator, &
                       status, ierror)
