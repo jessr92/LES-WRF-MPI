@@ -561,13 +561,13 @@ end function isRightmostColumn
 integer function topLeftRowValue(process, procPerRow, rowCount)
     implicit none
     integer, intent(in) :: process, procPerRow, rowCount
-    topLeftRowValue = process / procPerRow * rowCount
+    topLeftRowValue = (process - 1) / procPerRow * rowCount
 end function topLeftRowValue
 
 integer function topLeftColValue(process, procPerRow, colCount)
     implicit none
     integer, intent(in) :: process, procPerRow, colCount
-    topLeftColValue = modulo(process, procPerRow) * colCount
+    topLeftColValue = modulo(process - 1, procPerRow) * colCount
 end function topLeftColValue
 
 end module communication_helper_gmcf

@@ -632,15 +632,20 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
     integer :: startRow, startCol, i, r, c
     real(kind=4), dimension(ip, jp) :: sendBuffer, recvBuffer
 #ifdef GMCF
-    integer :: rank
+    integer :: rank, fifo_empty, has_packets
+    type(gmcfPacket) :: packet
     call gmcfGetModelId(rank)
 #endif
 #ifdef GR_DEBUG
-    !print*, 'GR: rank ', rank, ' is starting distributeZBM'
+    print*, 'GR: rank ', rank, ' is starting distributeZBM'
 #endif
     if (isMaster()) then
         ! Send appropriate 2D section to the other ranks
+#ifdef GMCF
+        do i = 2, mpi_size
+#else
         do i = 1, mpi_size - 1
+#endif
             startRow = topLeftRowValue(i, procPerRow, ip)
             startCol = topLeftColValue(i, procPerRow, jp)
 #ifdef GR_DEBUG
@@ -653,7 +658,31 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
                 end do
             end do
 #ifdef GMCF
-            !
+            call gmcfWaitFor(rank, REQDATA, i, 1)
+            print*, 'Model_id ', rank, ' has received zbm request from ', i
+            call gmcfHasPackets(rank, REQDATA, has_packets)
+            do while(has_packets == 1)
+                call gmcfShiftPending(rank, REQDATA, packet, fifo_empty)
+                if (packet%source .eq. i) then
+                    call gmcfSend2DFloatArray(rank, sendBuffer, shape(sendBuffer), zbmTag, i, PRE, 1)
+                    exit
+                else
+                    call gmcfPushPending(rank, packet) ! Too early
+                end if
+                call gmcfHasPackets(rank, REQDATA, has_packets)
+            end do
+            print*, 'Model_id ', rank, ' has sent zbm response to ', i
+            call gmcfWaitFor(rank, ACKDATA, i, 1)
+            print*, 'Model_id ', rank, ' has received zbm ack from ', i
+            call gmcfHasPackets(rank, ACKDATA, has_packets)
+            do while(has_packets == 1)
+                call gmcfShiftPending(rank, ACKDATA, packet, fifo_empty)
+                if (packet%source .ne. i) then
+                    print*, 'Model_id ', rank, ' received an unexpected ack in zbm distribution'
+                end if
+                call gmcfHasPackets(rank, ACKDATA, has_packets)
+            end do
+            print*, 'Model_id ', rank, ' has dealt with zbm ack from ', i
 #else
             call MPI_Send(sendBuffer, (ip*jp), MPI_REAL, i, zbmTag, &
                           communicator, ierror)
@@ -663,7 +692,21 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
     else
         ! Receive appropriate 2D section from master
 #ifdef GMCF
-        !
+        call gmcfRequestData(rank, zbmTag, ip*jp, 1, PRE, 1)
+        print*, 'Model_id ', rank, ' has requested zbm from 1'
+        call gmcfWaitFor(rank, RESPDATA, 1, 1)
+        print*, 'Model_id ', rank, ' has received zbm response from 1'
+        call gmcfHasPackets(rank, RESPDATA, has_packets)
+        do while(has_packets == 1)
+            call gmcfShiftPending(rank, RESPDATA, packet, fifo_empty)
+            if (packet%data_id .ne. zbmTag) then
+                print*, 'Received unexpected packet'
+            else
+                call gmcfRead2DFloatArray(recvBuffer, shape(recvBuffer),packet)
+            end if
+            call gmcfHasPackets(rank, RESPDATA, has_packets)
+        end do
+        print*, 'Model_id ', rank, ' has read zbm response'
 #else
         call MPI_Recv(recvBuffer, (ip*jp), MPI_REAL, 0, zbmTag, communicator, &
                       status, ierror)
