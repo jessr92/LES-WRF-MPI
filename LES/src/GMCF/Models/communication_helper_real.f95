@@ -531,7 +531,7 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, &
     call gmcfGetModelId(rank)
 #endif
 #ifdef GR_DEBUG
-    !print*, 'GR: rank ', rank, ' is starting sideflowRightLeft'
+    print*, 'GR: rank ', rank, ' is starting sideflowRightLeft'
 #endif
     rowCount = size(array, 1) - topThickness - bottomThickness
     depthSize = size(array, 3) - ignoreFirstK - ignoreLastK
@@ -540,7 +540,7 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, &
         commWith = rank + procPerRow - 1
 #ifdef GMCF
         call gmcfRequestData(rank, rightSideTag, rowCount*depthSize, commWith, PRE, 1)
-        call recvRightSideflow(leftRecv, procPerRow)
+        call recvRightLeftSideflow(leftRecv, procPerRow)
 #else
         call MPI_Recv(leftRecv, rowCount*depthSize, MPI_REAL, commWith, rightSideTag, &
                       communicator, status, ierror)
@@ -561,8 +561,8 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, &
             end do
         end do
 #ifdef GMCF
-        call sendRightSideflow(rightSend, procPerRow)
-        call waitForRightSideflowAcks(procPerRow)
+        call sendRightLeftSideflow(rightSend, procPerRow)
+        call waitForRightLeftSideflowAcks(procPerRow)
 #else
         call MPI_Send(rightSend, rowCount*depthSize, MPI_REAL, commWith, rightSideTag, &
                       communicator, ierror)
@@ -570,6 +570,9 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, &
 #endif
         deallocate(rightSend)
     end if
+#ifdef GR_DEBUG
+    print*, 'GR: rank ', rank, ' has finished sideflowRightLeft'
+#endif
 end subroutine sideflowRightLeft
 
 subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, &
@@ -584,7 +587,7 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, &
     call gmcfGetModelId(rank)
 #endif
 #ifdef GR_DEBUG
-    !print*, 'GR: rank ', rank, ' is starting sideflowLeftRight'
+    print*, 'GR: rank ', rank, ' is starting sideflowLeftRight'
 #endif
     rowCount = size(array, 1) - topThickness - bottomThickness
     depthSize = size(array, 3) - ignoreFirstK - ignoreLastK
@@ -597,8 +600,8 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, &
             end do
         end do
 #ifdef GMCF
-        call sendLeftSideflow(leftSend, procPerRow)
-        call waitForLeftSideflowAcks(procPerRow)
+        call sendLeftRightSideflow(leftSend, procPerRow)
+        call waitForLeftRightSideflowAcks(procPerRow)
 #else
         call MPI_Send(leftSend, rowCount*depthSize, MPI_REAL, commWith, leftSideTag, &
                       communicator, ierror)
@@ -610,7 +613,7 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, &
         commWith = rank - procPerRow + 1
 #ifdef GMCF
         call gmcfRequestData(rank, leftSideTag, rowCount*depthSize, commWith, PRE, 1)
-        call recvLeftSideflow(rightRecv, procPerRow)
+        call recvLeftRightSideflow(rightRecv, procPerRow)
 #else
         call MPI_Recv(rightRecv, rowCount*depthSize, MPI_REAL, commWith, leftSideTag, &
                       communicator, status, ierror)
@@ -623,6 +626,10 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, &
         end do
         deallocate(rightRecv)
     end if
+#ifdef GR_DEBUG
+    print*, 'GR: rank ', rank, ' has finished sideflowLeftRight'
+#endif
+
 end subroutine sideflowLeftRight
 
 subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
