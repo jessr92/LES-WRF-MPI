@@ -141,7 +141,7 @@ subroutine waitForHaloAcks(procPerRow)
               packet%source .ne. model_id + procPerRow .and. &
               packet%source .ne. model_id - 1 .and. &
               packet%source .ne. model_id + 1) then
-            print*, 'Model_id  ', model_id, ' received an unexpected ACKDATA.'
+            print*, 'Model_id  ', model_id, ' received an unexpected ACKDATA for halo acks.'
         end if
         call gmcfHasPackets(model_id, RESPDATA, has_packets)
     end do
@@ -200,7 +200,7 @@ subroutine waitForLeftSideflowAcks(procPerRow)
     do while (has_packets == 1)
         call gmcfShiftPending(model_id, ACKDATA, packet, fifo_empty)
         if (packet%source .ne. model_id + procPerRow - 1) then
-            print*, 'Model_id  ', model_id, ' received an unexpected ACKDATA.'
+            print*, 'Model_id  ', model_id, ' received an unexpected ACKDATA for left sideflow acks.'
         end if
         call gmcfHasPackets(model_id, RESPDATA, has_packets)
     end do
@@ -259,7 +259,7 @@ subroutine waitForRightSideflowAcks(procPerRow)
     do while (has_packets == 1)
         call gmcfShiftPending(model_id, ACKDATA, packet, fifo_empty)
         if (packet%source .ne. model_id + procPerRow - 1) then
-            print*, 'Model_id  ', model_id, ' received an unexpected ACKDATA.'
+            print*, 'Model_id  ', model_id, ' received an unexpected ACKDATA for right sideflow acks.'
         end if
         call gmcfHasPackets(model_id, RESPDATA, has_packets)
     end do
@@ -366,7 +366,7 @@ subroutine waitForExactCornersAcks(procPerRow)
               packet%source .ne. model_id - procPerRow + 1 .and. &
               packet%source .ne. model_id + procPerRow - 1 .and. &
               packet%source .ne. model_id + procPerRow + 1) then
-            print*, 'Model_id  ', model_id, ' received an unexpected ACKDATA.'
+            print*, 'Model_id  ', model_id, ' received an unexpected ACKDATA for exact corner acks.'
         end if
         call gmcfHasPackets(model_id, ACKDATA, has_packets)
     end do
@@ -403,7 +403,7 @@ subroutine getGlobalOp(model_id, value, tag)
     real(kind=4), dimension(1) :: receiveBuffer, sendBuffer
     integer :: i, has_packets, fifo_empty
     type(gmcfPacket) :: packet
-    print*, 'Model_id ', model_id, ' beginning getGlobalOp'
+    print*, 'Model_id ', model_id, ' beginning getGlobalOp with tag ', tag
     if (isMaster()) then
         print*, 'Model_id ', model_id, ' is master'
         ! Request everybody's value
@@ -455,6 +455,7 @@ subroutine getGlobalOp(model_id, value, tag)
                 print*, 'Received unexpected packet'
             else
                 call gmcfSend1DFloatArray(model_id, sendBuffer, shape(sendBuffer), tag, packet%source, PRE, 1)
+                print*, 'Model_id ', model_id, ' sent result value to ', packet%source
             end if
             call gmcfHasPackets(model_id, REQDATA, has_packets)
         end do
@@ -462,6 +463,7 @@ subroutine getGlobalOp(model_id, value, tag)
         ! Wait for acks
         do i=2,mpi_size
             call gmcfWaitFor(model_id, ACKDATA, i, 1)
+            print*, 'Model_id ', model_id, ' received final ack from ', i
         end do
         print*, 'Model_id ', model_id, ' has receive all acks for new value'
         ! Deal with the acks
@@ -501,7 +503,7 @@ subroutine getGlobalOp(model_id, value, tag)
         ! Wait for response
         call gmcfWaitFor(model_id, RESPDATA, 1, 1)
         ! Read in response
-        call gmcfHasPackets(model_id, REQDATA, has_packets)
+        call gmcfHasPackets(model_id, RESPDATA, has_packets)
         do while(has_packets == 1)
             call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
             if (packet%data_id .ne. tag) then

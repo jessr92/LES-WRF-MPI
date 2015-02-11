@@ -610,7 +610,7 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, &
         commWith = rank - procPerRow + 1
 #ifdef GMCF
         call gmcfRequestData(rank, leftSideTag, rowCount*depthSize, commWith, PRE, 1)
-        call recvRightSideflow(rightRecv, procPerRow)
+        call recvLeftSideflow(rightRecv, procPerRow)
 #else
         call MPI_Recv(rightRecv, rowCount*depthSize, MPI_REAL, commWith, leftSideTag, &
                       communicator, status, ierror)
