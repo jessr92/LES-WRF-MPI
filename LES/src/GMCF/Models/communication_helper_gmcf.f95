@@ -161,9 +161,11 @@ subroutine sendLeftRightSideflow(leftSend, procPerRow)
         select case (packet%data_id)
             case (leftSideTag)
                 call gmcfSend2DFloatArray(model_id, leftSend, shape(leftSend), leftSideTag, packet%source, PRE, 1)
+                exit
             case default
-                print*, 'Model_id  ', model_id, ' received an unexpected REQDATA for lr sideflow, got one from ', &
-                 packet%source
+                !print*, 'Model_id  ', model_id, ' received an unexpected REQDATA for lr sideflow, got one from ', &
+                 !packet%source
+                call gmcfPushPending(model_id, packet)
         end select
         call gmcfHasPackets(model_id, REQDATA, has_packets)
     end do
@@ -222,9 +224,11 @@ subroutine sendRightLeftSideflow(rightSend, procPerRow)
         select case (packet%data_id)
             case (rightSideTag)
                 call gmcfSend2DFloatArray(model_id, rightSend, shape(rightSend), rightSideTag, packet%source, PRE, 1)
+                exit
             case default
-                print*, 'Model_id  ', model_id, ' received an unexpected REQDATA for rl sideflow, got one from ', &
-                packet%source
+                !print*, 'Model_id  ', model_id, ' received an unexpected REQDATA for rl sideflow, got one from ', &
+                !packet%source
+                call gmcfPushPending(model_id, packet)
         end select
         call gmcfHasPackets(model_id, REQDATA, has_packets)
     end do
