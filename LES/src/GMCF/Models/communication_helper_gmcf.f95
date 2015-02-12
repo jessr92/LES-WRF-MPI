@@ -29,24 +29,24 @@ subroutine sendHaloBoundaries(leftSend, rightSend, topSend, bottomSend, procPerR
     integer :: model_id, has_packets, fifo_empty
     type(gmcfPacket) :: packet
     call gmcfGetModelId(model_id)
-    print*, 'Model_id ', model_id, ' is waiting for halo boundary requests'
+    !print*, 'Model_id ', model_id, ' is waiting for halo boundary requests'
     if (.not. isTopRow(procPerRow)) then
-        print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id - procPerRow
+        !print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id - procPerRow
         call gmcfWaitFor(model_id, REQDATA, model_id - procPerRow, 1)
     end if
     if (.not. isBottomRow(procPerRow)) then
-        print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id + procPerRow
+        !print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id + procPerRow
         call gmcfWaitFor(model_id, REQDATA, model_id + procPerRow, 1)
     end if
     if (.not. isLeftmostColumn(procPerRow)) then
-        print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id - 1
+        !print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id - 1
         call gmcfWaitFor(model_id, REQDATA, model_id - 1, 1)
     end if
     if (.not. isRightmostColumn(procPerRow)) then
-        print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id + 1
+        !print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id + 1
         call gmcfWaitFor(model_id, REQDATA, model_id + 1, 1)
     end if
-    print*, 'Model_id ', model_id, ' has received halo boundary requests'
+    !print*, 'Model_id ', model_id, ' has received halo boundary requests'
     call gmcfHasPackets(model_id, REQDATA, has_packets)
     do while (has_packets == 1)
         call gmcfShiftPending(model_id, REQDATA, packet, fifo_empty)
@@ -64,7 +64,7 @@ subroutine sendHaloBoundaries(leftSend, rightSend, topSend, bottomSend, procPerR
         end select
         call gmcfHasPackets(model_id, REQDATA, has_packets)
     end do
-    print*, 'Model_id ', model_id, ' has responded to halo boundary requests'
+    !print*, 'Model_id ', model_id, ' has responded to halo boundary requests'
 end subroutine sendHaloBoundaries
 
 subroutine recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, procPerRow)
@@ -74,24 +74,24 @@ subroutine recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, procPerR
     integer :: model_id, has_packets, fifo_empty
     type(gmcfPacket) :: packet
     call gmcfGetModelId(model_id)
-    print*, 'Model_id ', model_id, ' is waiting for halo boundaries'
+    !print*, 'Model_id ', model_id, ' is waiting for halo boundaries'
     if (.not. isTopRow(procPerRow)) then
-        print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id - procPerRow
+        !print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id - procPerRow
         call gmcfWaitFor(model_id, RESPDATA, model_id - procPerRow, 1)
     end if
     if (.not. isBottomRow(procPerRow)) then
-        print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id + procPerRow
+        !print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id + procPerRow
         call gmcfWaitFor(model_id, RESPDATA, model_id + procPerRow, 1)
     end if
     if (.not. isLeftmostColumn(procPerRow)) then
-        print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id - 1
+        !print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id - 1
         call gmcfWaitFor(model_id, RESPDATA, model_id - 1, 1)
     end if
     if (.not. isRightmostColumn(procPerRow)) then
-        print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id + 1
+        !print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id + 1
         call gmcfWaitFor(model_id, RESPDATA, model_id + 1, 1)
     end if
-    print*, 'Model_id ', model_id, ' has finished waiting for halo boundaries'
+    !print*, 'Model_id ', model_id, ' has finished waiting for halo boundaries'
     call gmcfHasPackets(model_id, RESPDATA, has_packets)
     do while (has_packets == 1)
         call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
@@ -109,7 +109,7 @@ subroutine recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, procPerR
         end select
         call gmcfHasPackets(model_id, RESPDATA, has_packets)
     end do
-    print*, 'Model_id ', model_id, ' has received halo boundaries'
+    !print*, 'Model_id ', model_id, ' has received halo boundaries'
 end subroutine recvHaloBoundaries
 
 subroutine waitForHaloAcks(procPerRow)
@@ -119,19 +119,19 @@ subroutine waitForHaloAcks(procPerRow)
     type(gmcfPacket) :: packet
     call gmcfGetModelId(model_id)
     if (.not. isTopRow(procPerRow)) then
-        print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id - procPerRow
+        !print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id - procPerRow
         call gmcfWaitFor(model_id, ACKDATA, model_id - procPerRow, 1)
     end if
     if (.not. isBottomRow(procPerRow)) then
-        print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id + procPerRow
+        !print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id + procPerRow
         call gmcfWaitFor(model_id, ACKDATA, model_id + procPerRow, 1)
     end if
     if (.not. isLeftmostColumn(procPerRow)) then
-        print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id - 1
+        !print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id - 1
         call gmcfWaitFor(model_id, ACKDATA, model_id - 1, 1)
     end if
     if (.not. isRightmostColumn(procPerRow)) then
-        print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id + 1
+        !print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id + 1
         call gmcfWaitFor(model_id, ACKDATA, model_id + 1, 1)
     end if
     call gmcfHasPackets(model_id, ACKDATA, has_packets)
@@ -411,19 +411,19 @@ subroutine getGlobalOp(model_id, value, tag)
     real(kind=4), dimension(1) :: receiveBuffer, sendBuffer
     integer :: i, has_packets, fifo_empty
     type(gmcfPacket) :: packet
-    print*, 'Model_id ', model_id, ' beginning getGlobalOp with tag ', tag
+    !print*, 'Model_id ', model_id, ' beginning getGlobalOp with tag ', tag
     if (isMaster()) then
-        print*, 'Model_id ', model_id, ' is master'
+        !print*, 'Model_id ', model_id, ' is master'
         ! Request everybody's value
         do i=2, mpi_size
             call gmcfRequestData(model_id, tag, 1, i, PRE, 1)
         end do
-        print*, 'Model_id ', model_id, ' has requested every value'
+        !print*, 'Model_id ', model_id, ' has requested every value'
         ! Wait for responses
         do i=2, mpi_size
             call gmcfWaitFor(model_id, RESPDATA, i, 1)
         end do
-        print*, 'Model_id ', model_id, ' has received responses for every value'
+        !print*, 'Model_id ', model_id, ' has received responses for every value'
         ! Read in responses and find the min value
         call gmcfHasPackets(model_id, RESPDATA, has_packets)
         do while(has_packets == 1)
@@ -448,13 +448,13 @@ subroutine getGlobalOp(model_id, value, tag)
             end if
             call gmcfHasPackets(model_id, RESPDATA, has_packets)
         end do
-        print*, 'Model_id ', model_id, ' has every value and has done the op'
+        !print*, 'Model_id ', model_id, ' has every value and has done the op'
         ! Wait for everybody to request the global sum
         sendBuffer(1) = value
         do i=2, mpi_size
             call gmcfWaitFor(model_id, REQDATA, i, 1)
         end do
-        print*, 'Model_id ', model_id, ' has received all requests for new value'
+        !print*, 'Model_id ', model_id, ' has received all requests for new value'
         ! Send the global op result
         call gmcfHasPackets(model_id, REQDATA, has_packets)
         do while(has_packets == 1)
@@ -463,17 +463,17 @@ subroutine getGlobalOp(model_id, value, tag)
                 print*, 'Received unexpected packet'
             else
                 call gmcfSend1DFloatArray(model_id, sendBuffer, shape(sendBuffer), tag, packet%source, PRE, 1)
-                print*, 'Model_id ', model_id, ' sent result value to ', packet%source
+                !print*, 'Model_id ', model_id, ' sent result value to ', packet%source
             end if
             call gmcfHasPackets(model_id, REQDATA, has_packets)
         end do
-        print*, 'Model_id ', model_id, ' has sent everyone the new value'
+        !print*, 'Model_id ', model_id, ' has sent everyone the new value'
         ! Wait for acks
         do i=2,mpi_size
             call gmcfWaitFor(model_id, ACKDATA, i, 1)
-            print*, 'Model_id ', model_id, ' received final ack from ', i
+            !print*, 'Model_id ', model_id, ' received final ack from ', i
         end do
-        print*, 'Model_id ', model_id, ' has receive all acks for new value'
+        !print*, 'Model_id ', model_id, ' has receive all acks for new value'
         ! Deal with the acks
         call gmcfHasPackets(model_id, ACKDATA, has_packets)
         do while(has_packets == 1)
@@ -481,11 +481,11 @@ subroutine getGlobalOp(model_id, value, tag)
             call gmcfHasPackets(model_id, ACKDATA, has_packets)
         end do
     else
-        print*, 'Model_id ', model_id, ' is an else thread'
+        !print*, 'Model_id ', model_id, ' is an else thread'
         sendBuffer(1) = value
         ! Wait for master to ask for my value
         call gmcfWaitFor(model_id, REQDATA, 1, 1)
-        print*, 'Model_id ', model_id, ' has got masters REQDATA '
+        !print*, 'Model_id ', model_id, ' has got masters REQDATA '
         ! Send my value
         call gmcfHasPackets(model_id, REQDATA, has_packets)
         do while(has_packets == 1)
@@ -494,11 +494,11 @@ subroutine getGlobalOp(model_id, value, tag)
                 print*, 'Received unexpected packet'
             else
                 call gmcfSend1DFloatArray(model_id, sendBuffer, shape(sendBuffer), tag, packet%source, PRE, 1)
-                print*, 'value sent to ', packet%source
+                !print*, 'value sent to ', packet%source
             end if
             call gmcfHasPackets(model_id, REQDATA, has_packets)
         end do
-        print*, 'Model_id ', model_id, ' has sent their value'
+        !print*, 'Model_id ', model_id, ' has sent their value'
         call gmcfWaitFor(model_id, ACKDATA, 1, 1)
         ! Deal with the acks
         call gmcfHasPackets(model_id, ACKDATA, has_packets)
@@ -524,7 +524,7 @@ subroutine getGlobalOp(model_id, value, tag)
         ! Copy received value into appropriate place
         value = receiveBuffer(1)
     end if
-    print*, 'Model_id ', model_id, ' finished getGlobalOp'
+    !print*, 'Model_id ', model_id, ' finished getGlobalOp'
 end subroutine getGlobalOp
 
 logical function isMaster()
