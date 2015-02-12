@@ -531,7 +531,7 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, &
     call gmcfGetModelId(rank)
 #endif
 #ifdef GR_DEBUG
-    print*, 'GR: rank ', rank, ' is starting sideflowRightLeft'
+    !print*, 'GR: rank ', rank, ' is starting sideflowRightLeft'
 #endif
     rowCount = size(array, 1) - topThickness - bottomThickness
     depthSize = size(array, 3) - ignoreFirstK - ignoreLastK
@@ -571,7 +571,7 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, &
         deallocate(rightSend)
     end if
 #ifdef GR_DEBUG
-    print*, 'GR: rank ', rank, ' has finished sideflowRightLeft'
+    !print*, 'GR: rank ', rank, ' has finished sideflowRightLeft'
 #endif
 end subroutine sideflowRightLeft
 
@@ -587,7 +587,7 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, &
     call gmcfGetModelId(rank)
 #endif
 #ifdef GR_DEBUG
-    print*, 'GR: rank ', rank, ' is starting sideflowLeftRight'
+    !print*, 'GR: rank ', rank, ' is starting sideflowLeftRight'
 #endif
     rowCount = size(array, 1) - topThickness - bottomThickness
     depthSize = size(array, 3) - ignoreFirstK - ignoreLastK
@@ -627,7 +627,7 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, &
         deallocate(rightRecv)
     end if
 #ifdef GR_DEBUG
-    print*, 'GR: rank ', rank, ' has finished sideflowLeftRight'
+    !print*, 'GR: rank ', rank, ' has finished sideflowLeftRight'
 #endif
 
 end subroutine sideflowLeftRight
@@ -656,7 +656,7 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
             startRow = topLeftRowValue(i, procPerRow, ip)
             startCol = topLeftColValue(i, procPerRow, jp)
 #ifdef GR_DEBUG
-            print*, 'GR: Sending (', (startRow+1), '-', (startRow+ip), ',', &
+            print*, 'GR: zbm Sending (', (startRow+1), '-', (startRow+ip), ',', &
                      (startCol+1), '-', (startCol+jp), ') to rank ', i
 #endif
             do r=1, ip
@@ -664,6 +664,7 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
                     sendBuffer(r, c) = zbm(startRow + r, startCol + c)
                 end do
             end do
+            print*, 'GR: sendBuffer zbm sum: ', sum(sendBuffer)
 #ifdef GMCF
             call gmcfWaitFor(rank, REQDATA, i, 1)
             print*, 'Model_id ', rank, ' has received zbm request from ', i
@@ -719,6 +720,7 @@ subroutine distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
                       status, ierror)
         call checkMPIError()
 #endif
+        print*, 'GR: recvBuffer zbm sum: ', sum(recvBuffer)
         do r=1, ip
             do c=1, jp
                 zbm(r, c) = recvBuffer(r, c)
@@ -754,13 +756,18 @@ subroutine distribute1DRealRowWiseArray(arrayToBeSent, receivingArray, leftBound
 #endif
         ! Master needs to memory copy its required portion
         receivingArray = arrayToBeSent(1:receivingSize+1)
+        print*, 'GR: dx1 sum array slice: ', sum(receivingArray)
 #ifdef GMCF
         do i=2, mpi_size
 #else
         do i=1, mpi_size-1
 #endif
             ! MPI_Send
+#ifdef GMCF
+            startI = 1 + (((i-1) / procPerRow) * (receivingSize - leftBoundary - rightBoundary))
+#else
             startI = 1 + ((i / procPerRow) * (receivingSize - leftBoundary - rightBoundary))
+#endif
             endI = startI + receivingSize - 1
 #ifdef VERBOSE
             print*, ' Rank ', i, ' is getting values row wise, (', startI, ',', endI, ')'
@@ -769,6 +776,7 @@ subroutine distribute1DRealRowWiseArray(arrayToBeSent, receivingArray, leftBound
                 sendBuffer(currentI-startI+1) = arrayToBeSent(currentI)
             end do
 #ifdef GMCF
+            print*, 'GR: rank ', i, ' is getting a sum of: ', sum(sendBuffer)
             call gmcfWaitFor(rank, REQDATA, i, 1)
             call gmcfHasPackets(rank, REQDATA, has_packets)
             do while(has_packets == 1)
@@ -784,7 +792,7 @@ subroutine distribute1DRealRowWiseArray(arrayToBeSent, receivingArray, leftBound
             call gmcfWaitFor(rank, ACKDATA, i, 1)
             call gmcfHasPackets(rank, ACKDATA, has_packets)
             do while(has_packets == 1)
-                call gmcfShiftPEnding(rank, ACKDATA, packet, fifo_empty)
+                call gmcfShiftPending(rank, ACKDATA, packet, fifo_empty)
                 if (packet%source .ne. i) then
                     print*, 'Model_id ', rank, ' received an unexpected ack in distribute real row wise'
                 end if
@@ -818,6 +826,7 @@ subroutine distribute1DRealRowWiseArray(arrayToBeSent, receivingArray, leftBound
         call checkMPIError()
 #endif
     end if
+    print*, 'GR: rank ', rank, ' row wise sum ', sum(receivingArray)
 end subroutine distribute1DRealRowWiseArray
 
 subroutine distribute1DRealColumnWiseArray(arrayToBeSent, receivingArray, leftBoundary, rightBoundary, procPerRow)
@@ -850,7 +859,11 @@ subroutine distribute1DRealColumnWiseArray(arrayToBeSent, receivingArray, leftBo
         do i=1, mpi_size-1
 #endif
             ! MPI_Send
+#ifdef GMCF
+            startI = 1 + (modulo(i - 1, procPerRow) * (receivingSize - leftBoundary - rightBoundary))
+#else
             startI = 1 + (modulo(i, procPerRow) * (receivingSize - leftBoundary - rightBoundary))
+#endif
             endI = startI + receivingSize - 1
 #ifdef VERBOSE
             print*, ' Rank ', i, ' is getting values column wise, (', startI, ',', endI, ')'
