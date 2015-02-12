@@ -933,7 +933,8 @@ subroutine collect3DReal4Array(array, arrayTot, leftBoundary, rightBoundary, &
     integer :: i, startRow, startCol, r, c, d, bufferSize
     real(kind=4), dimension(:,:,:), allocatable :: recvBuffer
 #ifdef GMCF
-    integer :: rank
+    integer :: rank, has_packets, fifo_empty
+    type(gmcfPacket) :: packet
     call gmcfGetModelId(rank)
 #endif
     bufferSize = size(array, 1) * size(array, 2) * size(array, 3)
@@ -946,9 +947,29 @@ subroutine collect3DReal4Array(array, arrayTot, leftBoundary, rightBoundary, &
                 end do
             end do
         end do
-        do i=1, mpi_size - 1
+#ifdef GMCF
+        do i=2, mpi_size
+            startRow = (ip) * ((i-1) / procPerRow)
+            startCol = (jp) * (modulo(i-1, procPerRow))
+#else
+        do i=1, mpi_size-1
             startRow = (ip) * (i / procPerRow)
             startCol = (jp) * (modulo(i, procPerRow))
+#endif
+#ifdef GMCF
+            call gmcfRequestData(rank, collect3DReal4Tag, bufferSize, i, PRE, 1)
+            call gmcfWaitFor(rank, RESPDATA, i, 1)
+            call gmcfHasPackets(rank, RESPDATA, has_packets)
+            do while(has_packets == 1)
+                call gmcfShiftPending(rank, RESPDATA, packet, fifo_empty)
+                if (packet%source .ne. i) then
+                    print*, 'Rank ', rank, ' received an unexpected RESPDATA in collect array'
+                else
+                    call gmcfRead3DFloatArray(recvBuffer, shape(recvBuffer), packet)
+                end if
+                call gmcfHasPackets(rank, RESPDATA, has_packets)
+            end do
+#endif
 #ifdef MPI
             call MPI_Recv(recvBuffer, bufferSize, MPI_Real, i, collect3DReal4Tag, &
                           communicator, status, ierror)
@@ -964,6 +985,28 @@ subroutine collect3DReal4Array(array, arrayTot, leftBoundary, rightBoundary, &
         end do
         deallocate(recvBuffer)
     else
+#ifdef GMCF
+        call gmcfWaitFor(rank, REQDATA, 1, 1)
+        call gmcfHasPackets(rank, REQDATA, has_packets)
+        do while(has_packets == 1)
+            call gmcfShiftPending(rank, REQDATA, packet, fifo_empty)
+            if (packet%source .ne. 1) then
+                print*, 'Rank ', rank, ' received an unexpected REQDATA in collect array'
+            else
+                call gmcfSend3DFloatArray(rank, array, shape(array), collect3DReal4Tag, packet%source, PRE, 1)
+            end if
+            call gmcfHasPackets(rank, REQDATA, has_packets)
+       end do
+       call gmcfWaitFor(rank, ACKDATA, 1, 1)
+       call gmcfHasPackets(rank, ACKDATA, has_packets)
+       do while(has_packets == 1)
+           call gmcfShiftPending(rank, ACKDATA, packet, fifo_empty)
+           if (packet%source .ne. 1) then
+               print*, 'Rank ', rank, ' received an unexpected ACKDATA in collect array'
+           end if
+           call gmcfHasPackets(rank, ACKDATA, has_packets)
+       end do
+#endif
 #ifdef MPI
         call MPI_Send(array, bufferSize, MPI_Real, 0, collect3DReal4Tag, &
                       communicator, ierror)
