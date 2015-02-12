@@ -31,7 +31,9 @@ contains
             dx1Tot(i) = 20.
         end do
     end if
+    print*, 'GR: dx1 sum before distribute: ', sum(dx1)
     call distribute1DRealRowWiseArray(dx1Tot,dx1, 2, 1, procPerRow)
+    print*, 'GR: dx1 sum after distribute: ', sum(dx1)
 #else
       do i = -1,ip+1
        dx1(i) = 20.

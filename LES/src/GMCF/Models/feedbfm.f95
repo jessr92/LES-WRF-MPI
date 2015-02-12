@@ -43,7 +43,14 @@ subroutine feedbfm(km,jm,im,amask1,bmask1,cmask1,dmask1,zbm,z2,dzn)
         close(70)
 #if defined(MPI) || defined(GMCF)
     end if
+#ifdef GR_DEBUG
+    print*, 'GR: zbm sum before distribute: ', sum(zbm)
+#endif
     call distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
+#ifdef GR_DEBUG
+    print*, 'GR: zbm sum after distribute: ', sum(zbm)
+#endif
+
 #endif
 
 ! -----------------------------------------------------------------------
