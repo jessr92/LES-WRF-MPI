@@ -12,7 +12,7 @@ if len(sys.argv) != 2:
     print("Please run this script with a starting directory as a command line argument.")
 
 fileList = []
-rootDir = sys.argv[1] # For example, timingRuns/<hostname>
+rootDir = sys.argv[1] # For example, timingRuns/<hostname>/<mpi-configuration>
 originalRuntime = 0.0
 originalIFBF0Runtime = 0.0
 mpiRuns = {}
@@ -22,7 +22,7 @@ mpiExactCornerExpandingAreaRuns = {}
 
 for root, subFolders, files in os.walk(rootDir):
     for filename in files:
-        if filename.lower().endswith(".txt"):
+        if filename.lower().endswith("_summary.txt"):
             fileList.append(os.path.join(root, filename))
 
 for path in fileList:
@@ -37,14 +37,15 @@ for path in fileList:
         if re.match(" Total time:", line):
             floats = re.search("\d+.\d+", line)
             runtime = max(runtime, float(floats.group()))
+    runLog.close()
     # Found the runtime for the original code
-    if path.endswith("les_main.txt"):
+    if path.endswith("les_main_summary.txt"):
         if originalRuntime != 0.0:
             print("Error, two original runs found")
             sys.exit(-1)
         originalRuntime = runtime
     # Found the runtime for the original code but with IFBF=0
-    elif path.endswith("les_main_ifbf0.txt"):
+    elif path.endswith("les_main_ifbf0_summary.txt"):
         if originalIFBF0Runtime != 0.0:
             print("Error, two ifbf=0 runs found")
             sys.exit(-1)
