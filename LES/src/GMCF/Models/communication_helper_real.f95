@@ -114,7 +114,7 @@ subroutine calculateCornersReal(array, procPerRow, leftThickness, rightThickness
         ! There is a bottom right corner to specify
         do r=size(array,1)-bottomThickness+1,size(array,1)
             do c=size(array,2)-rightThickness+1,size(array,2)
-                array(r, c) = (array(r, c-1) + array(r-1, c) - array(r-1, c-1)) / 2.0
+                array(r, c) = (array(r, c-1) + array(r-1, c) + array(r-1, c-1)) / 3.0
             end do
        end do
     end if
