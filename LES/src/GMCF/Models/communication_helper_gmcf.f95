@@ -147,9 +147,9 @@ subroutine waitForHaloAcks(procPerRow)
     end do
 end subroutine waitForHaloAcks
 
-subroutine sendLeftRightSideflow(leftSend, procPerRow)
+subroutine sendLeftRightSideflow(leftRightSend, procPerRow)
     implicit none
-    real(kind=4), dimension(:,:), intent(in) :: leftSend
+    real(kind=4), dimension(:,:), intent(in) :: leftRightSend
     integer, intent(in) :: procPerRow
     integer :: model_id, has_packets, fifo_empty
     type(gmcfPacket) :: packet
@@ -160,7 +160,7 @@ subroutine sendLeftRightSideflow(leftSend, procPerRow)
         call gmcfShiftPending(model_id, REQDATA, packet, fifo_empty)
         select case (packet%data_id)
             case (leftSideTag)
-                call gmcfSend2DFloatArray(model_id, leftSend, shape(leftSend), leftSideTag, packet%source, PRE, 1)
+                call gmcfSend2DFloatArray(model_id, leftRightSend, shape(leftRightSend), leftSideTag, packet%source, PRE, 1)
                 exit
             case default
                 !print*, 'Model_id  ', model_id, ' received an unexpected REQDATA for lr sideflow, got one from ', &
@@ -171,9 +171,9 @@ subroutine sendLeftRightSideflow(leftSend, procPerRow)
     end do
 end subroutine sendLeftRightSideflow
 
-subroutine recvLeftRightSideflow(leftRecv, procPerRow)
+subroutine recvLeftRightSideflow(leftRightRecv, procPerRow)
     implicit none
-    real(kind=4), dimension(:,:), intent(out) :: leftRecv
+    real(kind=4), dimension(:,:), intent(out) :: leftRightRecv
     integer, intent(in) :: procPerRow
     integer :: model_id, has_packets, fifo_empty
     type(gmcfPacket) :: packet
@@ -184,7 +184,7 @@ subroutine recvLeftRightSideflow(leftRecv, procPerRow)
         call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
         select case (packet%data_id)
             case (leftSideTag)
-                call gmcfRead2DFloatArray(leftRecv, shape(leftRecv), packet)
+                call gmcfRead2DFloatArray(leftRightRecv, shape(leftRightRecv), packet)
             case default
                 print*, 'Model_id  ', model_id, ' received an unexpected RESPDATA for lr sideflow, got one from ', &
                 packet%source
@@ -210,9 +210,9 @@ subroutine waitForLeftRightSideflowAcks(procPerRow)
     end do
 end subroutine waitForLeftRightSideflowAcks
 
-subroutine sendRightLeftSideflow(rightSend, procPerRow)
+subroutine sendRightLeftSideflow(rightLeftSend, procPerRow)
     implicit none
-    real(kind=4), dimension(:,:), intent(in) :: rightSend
+    real(kind=4), dimension(:,:), intent(in) :: rightLeftSend
     integer, intent(in) :: procPerRow
     integer :: model_id, has_packets, fifo_empty
     type(gmcfPacket) :: packet
@@ -223,7 +223,7 @@ subroutine sendRightLeftSideflow(rightSend, procPerRow)
         call gmcfShiftPending(model_id, REQDATA, packet, fifo_empty)
         select case (packet%data_id)
             case (rightSideTag)
-                call gmcfSend2DFloatArray(model_id, rightSend, shape(rightSend), rightSideTag, packet%source, PRE, 1)
+                call gmcfSend2DFloatArray(model_id, rightLeftSend, shape(rightLeftSend), rightSideTag, packet%source, PRE, 1)
                 exit
             case default
                 !print*, 'Model_id  ', model_id, ' received an unexpected REQDATA for rl sideflow, got one from ', &
@@ -234,9 +234,9 @@ subroutine sendRightLeftSideflow(rightSend, procPerRow)
     end do
 end subroutine sendRightLeftSideflow
 
-subroutine recvRightLeftSideflow(rightRecv, procPerRow)
+subroutine recvRightLeftSideflow(rightLeftRecv, procPerRow)
     implicit none
-    real(kind=4), dimension(:,:), intent(out) :: rightRecv
+    real(kind=4), dimension(:,:), intent(out) :: rightLeftRecv
     integer, intent(in) :: procPerRow
     integer :: model_id, has_packets, fifo_empty
     type(gmcfPacket) :: packet
@@ -247,7 +247,7 @@ subroutine recvRightLeftSideflow(rightRecv, procPerRow)
         call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
         select case (packet%data_id)
             case (rightSideTag)
-                call gmcfRead2DFloatArray(rightRecv, shape(rightRecv), packet)
+                call gmcfRead2DFloatArray(rightLeftRecv, shape(rightLeftRecv), packet)
             case default
                 print*, 'Model_id  ', model_id, ' received an unexpected RESPDATA for rl sideflow, got one from ', &
                 packet%source
