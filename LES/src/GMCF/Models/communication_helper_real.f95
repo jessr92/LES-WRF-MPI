@@ -349,7 +349,10 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
     real(kind=4), dimension(:,:,:), intent(inout) :: array
     real(kind=4), dimension(:,:,:), allocatable :: topLeftRecv, topRightRecv, bottomLeftRecv, bottomRightRecv
     real(kind=4), dimension(:,:,:), allocatable :: topLeftSend, topRightSend, bottomLeftSend, bottomRightSend
-    integer :: depthSize, requests(8), i, commWith, r, c, d
+    integer :: depthSize, commWith, r, c, d
+#ifdef MPI
+    integer :: i, requests(8)
+#endif
 #ifdef GMCF
     integer :: rank
     call gmcfGetModelId(rank)
@@ -756,7 +759,6 @@ subroutine distribute1DRealRowWiseArray(arrayToBeSent, receivingArray, leftBound
 #endif
         ! Master needs to memory copy its required portion
         receivingArray = arrayToBeSent(1:receivingSize+1)
-        print*, 'GR: dx1 sum array slice: ', sum(receivingArray)
 #ifdef GMCF
         do i=2, mpi_size
 #else
@@ -837,8 +839,7 @@ subroutine distribute1DRealColumnWiseArray(arrayToBeSent, receivingArray, leftBo
     integer, intent(in) :: leftBoundary, rightBoundary, procPerRow
     integer :: totalSize, receivingSize, i, startI, endI, currentI
 #ifdef GMCF
-    integer :: rank, fifo_empty, has_packets
-    type(gmcfPacket) :: packet
+    integer :: rank
     call gmcfGetModelId(rank)
 #endif
     totalSize = size(arrayToBeSent, 1)
@@ -872,27 +873,7 @@ subroutine distribute1DRealColumnWiseArray(arrayToBeSent, receivingArray, leftBo
                 sendBuffer(currentI-startI+1) = arrayToBeSent(currentI)
             end do
 #ifdef GMCF
-            call gmcfWaitFor(rank, REQDATA, i, 1)
-            call gmcfHasPackets(rank, REQDATA, has_packets)
-            do while(has_packets == 1)
-                call gmcfShiftPending(rank, REQDATA, packet, fifo_empty)
-                if (packet%source .eq. i) then
-                    call gmcfSend1DFloatArray(rank, sendBuffer, shape(sendBuffer), dyTag, i, PRE, 1)
-                    exit
-                else
-                    call gmcfPushPending(rank, packet) ! Too early
-                end if
-                call gmcfHasPackets(rank, REQDATA, has_packets)
-            end do
-            call gmcfWaitFor(rank, ACKDATA, i, 1)
-            call gmcfHasPackets(rank, ACKDATA, has_packets)
-            do while(has_packets == 1)
-                call gmcfShiftPEnding(rank, ACKDATA, packet, fifo_empty)
-                if (packet%source .ne. i) then
-                    print*, 'Model_id ', rank, ' received an unexpected ack in distribute real row wise'
-                end if
-                call gmcfHasPackets(rank, ACKDATA, has_packets)
-            end do
+            call gmcfSend1DArray(sendBuffer, rank, i, dyTag)
 #else
             call MPI_Send(sendBuffer, receivingSize, MPI_Real, i, dyTag, communicator, &
                           ierror)
@@ -903,18 +884,7 @@ subroutine distribute1DRealColumnWiseArray(arrayToBeSent, receivingArray, leftBo
     else
         ! Receive receivingSize reals
 #ifdef GMCF
-        call gmcfRequestData(rank, dyTag, receivingSize, 1, PRE, 1)
-        call gmcfWaitFor(rank, RESPDATA, 1, 1)
-        call gmcfHasPackets(rank, RESPDATA, has_packets)
-        do while(has_packets == 1)
-            call gmcfShiftPending(rank, RESPDATA, packet, fifo_empty)
-            if (packet%data_id .ne. dyTag) then
-                print*, 'Received unexpected packet'
-            else
-                call gmcfRead1DFloatArray(receivingArray, shape(receivingArray),packet)
-            end if
-            call gmcfHasPackets(rank, RESPDATA, has_packets)
-        end do
+        call gmcfRecv1DArray(receivingArray, receivingSize, rank, dyTag)
 #else
         call MPI_Recv(receivingArray, receivingSize, MPI_REAL, 0, dyTag, communicator, &
                       status, ierror)
@@ -956,7 +926,7 @@ subroutine collect3DReal4Array(array, arrayTot, leftBoundary, rightBoundary, &
             startCol = (jp) * (modulo(i, procPerRow))
 #endif
 #ifdef GMCF
-            call recv3DReal4Array(array, bufferSize, rank, i, recvBuffer)
+            call recv3DReal4Array(rank, i, recvBuffer, bufferSize)
 #endif
 #ifdef MPI
             call MPI_Recv(recvBuffer, bufferSize, MPI_Real, i, collect3DReal4Tag, &
@@ -974,7 +944,7 @@ subroutine collect3DReal4Array(array, arrayTot, leftBoundary, rightBoundary, &
         deallocate(recvBuffer)
     else
 #ifdef GMCF
-        call send3DReal4Array(array, bufferSize, rank)
+        call send3DReal4Array(array, rank)
 #endif
 #ifdef MPI
         call MPI_Send(array, bufferSize, MPI_Real, 0, collect3DReal4Tag, &
