@@ -542,6 +542,51 @@ subroutine getGlobalOpNotMaster(model_id, value, tag)
     value = receiveBuffer(1)
 end subroutine getGlobalOpNotMaster
 
+subroutine recv3DReal4Array(array, bufferSize, rank, i, recvBuffer)
+    real(kind=4), dimension(:,:,:), intent(in) :: array
+    real(kind=4), dimension(:,:,:), intent(out) :: recvBuffer
+    integer :: rank, has_packets, fifo_empty, bufferSize, i
+    type(gmcfPacket) :: packet
+    call gmcfRequestData(rank, collect3DReal4Tag, bufferSize, i, PRE, 1)
+    call gmcfWaitFor(rank, RESPDATA, i, 1)
+    call gmcfHasPackets(rank, RESPDATA, has_packets)
+    do while(has_packets == 1)
+        call gmcfShiftPending(rank, RESPDATA, packet, fifo_empty)
+        if (packet%source .ne. i) then
+            print*, 'Rank ', rank, ' received an unexpected RESPDATA in collect array'
+        else
+            call gmcfRead3DFloatArray(recvBuffer, shape(recvBuffer), packet)
+        end if
+        call gmcfHasPackets(rank, RESPDATA, has_packets)
+    end do
+end subroutine recv3DReal4Array
+
+subroutine send3DReal4Array(array, bufferSize, rank)
+    real(kind=4), dimension(:,:,:), intent(in) :: array
+    integer :: rank, has_packets, fifo_empty, bufferSize
+    type(gmcfPacket) :: packet
+    call gmcfWaitFor(rank, REQDATA, 1, 1)
+    call gmcfHasPackets(rank, REQDATA, has_packets)
+    do while(has_packets == 1)
+        call gmcfShiftPending(rank, REQDATA, packet, fifo_empty)
+        if (packet%source .ne. 1) then
+            print*, 'Rank ', rank, ' received an unexpected REQDATA in collect array'
+        else
+            call gmcfSend3DFloatArray(rank, array, shape(array), collect3DReal4Tag, packet%source, PRE, 1)
+        end if
+        call gmcfHasPackets(rank, REQDATA, has_packets)
+   end do
+   call gmcfWaitFor(rank, ACKDATA, 1, 1)
+   call gmcfHasPackets(rank, ACKDATA, has_packets)
+   do while(has_packets == 1)
+       call gmcfShiftPending(rank, ACKDATA, packet, fifo_empty)
+       if (packet%source .ne. 1) then
+           print*, 'Rank ', rank, ' received an unexpected ACKDATA in collect array'
+       end if
+       call gmcfHasPackets(rank, ACKDATA, has_packets)
+   end do
+end subroutine send3DReal4Array
+
 logical function isMaster()
     implicit none
     integer :: model_id
