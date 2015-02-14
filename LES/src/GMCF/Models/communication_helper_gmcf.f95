@@ -631,6 +631,54 @@ subroutine gmcfRecv1DArray(receivingArray, receivingSize, rank, tag)
     end do
 end subroutine gmcfRecv1DArray
 
+subroutine gmcfSend2DArray(sendBuffer, rank, i, tag)
+    real(kind=4), dimension(:,:) :: sendBuffer
+    integer :: rank, i, tag, fifo_empty, has_packets
+    type(gmcfPacket) :: packet
+    call gmcfWaitFor(rank, REQDATA, i, 1)
+    call gmcfHasPackets(rank, REQDATA, has_packets)
+    do while(has_packets == 1)
+        call gmcfShiftPending(rank, REQDATA, packet, fifo_empty)
+        if (packet%source .eq. i) then
+            call gmcfSend2DFloatArray(rank, sendBuffer, shape(sendBuffer), tag, i, PRE, 1)
+            exit
+        else
+            call gmcfPushPending(rank, packet) ! Too early
+        end if
+        call gmcfHasPackets(rank, REQDATA, has_packets)
+    end do
+    call gmcfWaitFor(rank, ACKDATA, i, 1)
+    call gmcfHasPackets(rank, ACKDATA, has_packets)
+    do while(has_packets == 1)
+        call gmcfShiftPending(rank, ACKDATA, packet, fifo_empty)
+        if (packet%source .ne. i) then
+            print*, 'Model_id ', rank, ' received an unexpected ack in send 1d array'
+        end if
+        call gmcfHasPackets(rank, ACKDATA, has_packets)
+    end do
+end subroutine gmcfSend2DArray
+
+subroutine gmcfRecv2DArray(recvBuffer, receivingSize, rank, tag)
+    real(kind=4), dimension(:,:) :: recvBuffer
+    integer :: rank, tag, fifo_empty, has_packets, receivingSize
+    type(gmcfPacket) :: packet
+    call gmcfRequestData(rank, tag, receivingSize, 1, PRE, 1)
+    print*, 'Model_id ', rank, ' has requested zbm from 1'
+    call gmcfWaitFor(rank, RESPDATA, 1, 1)
+    print*, 'Model_id ', rank, ' has received zbm response from 1'
+    call gmcfHasPackets(rank, RESPDATA, has_packets)
+    do while(has_packets == 1)
+        call gmcfShiftPending(rank, RESPDATA, packet, fifo_empty)
+        if (packet%data_id .ne. zbmTag) then
+            print*, 'Received unexpected packet'
+        else
+            call gmcfRead2DFloatArray(recvBuffer, shape(recvBuffer),packet)
+        end if
+        call gmcfHasPackets(rank, RESPDATA, has_packets)
+    end do
+    print*, 'Model_id ', rank, ' has read zbm response'
+end subroutine gmcfRecv2DArray
+
 logical function isMaster()
     implicit none
     integer :: model_id
