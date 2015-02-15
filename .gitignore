@@ -60,3 +60,5 @@ timingRuns/
 *.pyc
 core
 gmcfCoupler
+
+timingRuns.tgz
