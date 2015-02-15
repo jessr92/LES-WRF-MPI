@@ -16,6 +16,17 @@ subroutine zero3DReal4Array(array)
     end do
 end subroutine zero3DReal4Array
 
+subroutine zero2DReal4Array(array)
+    implicit none
+    real(kind=4), dimension(:,:), intent(inout) :: array
+    integer :: i, j
+    do i=1, size(array,1)
+        do j=1, size(array,2)
+            array(i,j) = 0.0
+        end do
+    end do
+end subroutine zero2DReal4Array
+
 subroutine outputArray(array)
     implicit none
     integer, dimension(:,:), intent(in) :: array
