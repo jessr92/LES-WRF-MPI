@@ -30,8 +30,13 @@ subroutine feedbfm(km,jm,im,amask1,bmask1,cmask1,dmask1,zbm,z2,dzn)
         end do
     end do
 #if defined(MPI) || defined(GMCF)
+#ifdef GR_DEBUG
+call sleep(1)
+    print*, 'GR: zbm sum before master reads file: ', sum(zbm)
+#endif
     if (isMaster()) then
 #endif
+        print*, 'zbm sum - file getting read'
         !      print *, 'open GIS/Tokyo_20mgrid.txt'
         ! WV: the problem with this is that this input file expects the grid to be 150 x 150, because otherwise zbm segfaults!
         open(70,file='GIS/Tokyo_20mgrid.txt', form='formatted',status='unknown')
@@ -44,6 +49,7 @@ subroutine feedbfm(km,jm,im,amask1,bmask1,cmask1,dmask1,zbm,z2,dzn)
 #if defined(MPI) || defined(GMCF)
     end if
 #ifdef GR_DEBUG
+call sleep(1)
     print*, 'GR: zbm sum before distribute: ', sum(zbm)
 #endif
     call distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
