@@ -547,7 +547,9 @@ deallocate(dys)
 deallocate(dzn)
 deallocate(dzs)
 deallocate(f)
+#if ICAL==1
 deallocate(fghold)
+#endif
 deallocate(fold)
 deallocate(fx)
 deallocate(fy)
@@ -556,6 +558,9 @@ deallocate(g)
 deallocate(gold)
 deallocate(h)
 deallocate(hold)
+#ifndef _OPENCL_LES_WV
+deallocate(fghold)
+#endif
 deallocate(nou1)
 deallocate(nou2)
 deallocate(nou3)
