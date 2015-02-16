@@ -26,41 +26,50 @@ subroutine sendHaloBoundaries(leftSend, rightSend, topSend, bottomSend, procPerR
     implicit none
     real(kind=4), dimension(:,:,:), intent(in) :: leftSend, rightSend, topSend, bottomSend
     integer, intent(in) :: procPerRow
-    integer :: model_id, has_packets, fifo_empty
+    integer :: model_id, has_packets, fifo_empty, waitingFor
     type(gmcfPacket) :: packet
     call gmcfGetModelId(model_id)
+    waitingFor = 0
     !print*, 'Model_id ', model_id, ' is waiting for halo boundary requests'
     if (.not. isTopRow(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id - procPerRow
         call gmcfWaitFor(model_id, REQDATA, model_id - procPerRow, 1)
+        waitingFor = waitingFor + 1
     end if
     if (.not. isBottomRow(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id + procPerRow
         call gmcfWaitFor(model_id, REQDATA, model_id + procPerRow, 1)
+        waitingFor = waitingFor + 1
     end if
     if (.not. isLeftmostColumn(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id - 1
         call gmcfWaitFor(model_id, REQDATA, model_id - 1, 1)
+        waitingFor = waitingFor + 1
     end if
     if (.not. isRightmostColumn(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id + 1
         call gmcfWaitFor(model_id, REQDATA, model_id + 1, 1)
+        waitingFor = waitingFor + 1
     end if
     !print*, 'Model_id ', model_id, ' has received halo boundary requests'
     call gmcfHasPackets(model_id, REQDATA, has_packets)
-    do while (has_packets == 1)
+    do while (has_packets == 1 .and. waitingFor .gt. 0)
         call gmcfShiftPending(model_id, REQDATA, packet, fifo_empty)
         select case (packet%data_id)
             case (topTag)
                 call gmcfSend3DFloatArray(model_id, topSend, shape(topSend), topTag, packet%source, PRE, 1)
+                waitingFor = waitingFor - 1
             case (bottomTag)
                 call gmcfSend3DFloatArray(model_id, bottomSend, shape(bottomSend), bottomTag, packet%source, PRE, 1)
+                waitingFor = waitingFor - 1
             case (leftTag)
                 call gmcfSend3DFloatArray(model_id, leftSend, shape(leftSend), leftTag, packet%source, PRE, 1)
+                waitingFor = waitingFor - 1
             case (rightTag)
                 call gmcfSend3DFloatArray(model_id, rightSend, shape(rightSend), rightTag, packet%source, PRE, 1)
+                waitingFor = waitingFor - 1
             case default
-                print*, 'Model_id  ', model_id, ' received an unexpected REQDATA.'
+                call gmcfPushPending(model_id, packet)
         end select
         call gmcfHasPackets(model_id, REQDATA, has_packets)
     end do
@@ -277,35 +286,44 @@ subroutine sendExactCorners(topLeftSend, topRightSend, bottomLeftSend, bottomRig
     implicit none
     real(kind=4), dimension(:,:,:), intent(in) :: topLeftSend, topRightSend, bottomLeftSend, bottomRightSend
     integer, intent(in) :: procPerRow
-    integer :: model_id, has_packets, fifo_empty
+    integer :: model_id, has_packets, fifo_empty, waitingFor
     type(gmcfPacket) :: packet
     call gmcfGetModelId(model_id)
+    waitingFor = 0
     if (.not. isTopRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, REQDATA, model_id - procPerRow - 1, 1)
+        waitingFor = waitingFor + 1
     end if
     if (.not. isTopRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, REQDATA, model_id - procPerRow + 1, 1)
+        waitingFor = waitingFor + 1
     end if
     if (.not. isBottomRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, REQDATA, model_id + procPerRow - 1, 1)
+        waitingFor = waitingFor + 1
     end if
     if (.not. isBottomRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, REQDATA, model_id + procPerRow + 1, 1)
+        waitingFor = waitingFor + 1
     end if
     call gmcfHasPackets(model_id, REQDATA, has_packets)
-    do while (has_packets == 1)
+    do while (has_packets == 1 .and. waitingFor .gt. 0)
         call gmcfShiftPending(model_id, REQDATA, packet, fifo_empty)
         select case (packet%data_id)
             case (topLeftTag)
                 call gmcfSend3DFloatArray(model_id, topLeftSend, shape(topLeftSend), topLeftTag, packet%source, PRE, 1)
+                waitingFor = waitingFor - 1
             case (topRightTag)
                 call gmcfSend3DFloatArray(model_id, topRightSend, shape(topRightSend), topRightTag, packet%source, PRE, 1)
+                waitingFor = waitingFor - 1
             case (bottomLeftTag)
                 call gmcfSend3DFloatArray(model_id, bottomLeftSend, shape(bottomLeftSend), bottomLeftTag, packet%source, PRE, 1)
+                waitingFor = waitingFor - 1
             case (bottomRightTag)
                 call gmcfSend3DFloatArray(model_id, bottomRightSend, shape(bottomRightSend), bottomRightTag, packet%source, PRE, 1)
+                waitingFor = waitingFor - 1
             case default
-                print*, 'Model_id  ', model_id, ' received an unexpected REQDATA.'
+                call gmcfPushPending(model_id, packet)
         end select
         call gmcfHasPackets(model_id, REQDATA, has_packets)
     end do
@@ -343,7 +361,7 @@ subroutine recvExactCorners(topLeftRecv, topRightRecv, bottomLeftRecv, bottomRig
             case (bottomRightTag)
                 call gmcfRead3DFloatArray(bottomRightRecv, shape(bottomRightRecv), packet)
             case default
-                print*, 'Model_id  ', model_id, ' received an unexpected REQDATA.'
+                print*, 'Model_id  ', model_id, ' received an unexpected RESPDATA.'
         end select
         call gmcfHasPackets(model_id, RESPDATA, has_packets)
     end do
