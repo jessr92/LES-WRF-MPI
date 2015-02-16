@@ -30,10 +30,6 @@ subroutine feedbfm(km,jm,im,amask1,bmask1,cmask1,dmask1,zbm,z2,dzn)
         end do
     end do
 #if defined(MPI) || defined(GMCF)
-#ifdef GR_DEBUG
-call sleep(1)
-    print*, 'GR: zbm sum before master reads file: ', sum(zbm)
-#endif
     if (isMaster()) then
 #endif
         print*, 'zbm sum - file getting read'
@@ -48,15 +44,7 @@ call sleep(1)
         close(70)
 #if defined(MPI) || defined(GMCF)
     end if
-#ifdef GR_DEBUG
-call sleep(1)
-    print*, 'GR: zbm sum before distribute: ', sum(zbm)
-#endif
     call distributeZBM(zbm, ip, jp, ipmax, jpmax, procPerRow)
-#ifdef GR_DEBUG
-    print*, 'GR: zbm sum after distribute: ', sum(zbm)
-#endif
-
 #endif
 
 ! -----------------------------------------------------------------------
