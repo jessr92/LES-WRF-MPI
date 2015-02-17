@@ -562,7 +562,11 @@
 #ifdef TIMINGS
         call cpu_time(timestamp(7))
         do i=1, 7
+#ifdef GMCF
+            print '("Time for state ",i2," = ",f6.3," s")',i,(timestamp(i)-timestamp(i-1))/(procPerRow * procPerCol)
+#else
             print '("Time for state ",i2," = ",f6.3," s")',i,timestamp(i)-timestamp(i-1)
+#endif
         end do
 #endif
 
