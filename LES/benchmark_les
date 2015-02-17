@@ -30,3 +30,40 @@ do
         fi
     done
 done
+for procPerRow in $(seq $MAX_DIMENSION_PROCESSES)
+do
+    for procPerCol in $(seq $MAX_DIMENSION_PROCESSES)
+    do
+        PROCESSES=`expr $procPerCol \\* $procPerRow`
+        if [ $PROCESSES -le $HARDWARE_THREAD_COUNT ]; then
+            OUTPUT_FILE=$TIMING_DIRECTORY"/SharedMemoryExactCorners/les_main_gmcf_row"$procPerRow"_col"$procPerCol".txt"
+            ./build_les $procPerRow $procPerCol "D=TIMINGS exactCorners=1"
+            ./run_les > $OUTPUT_FILE
+        fi
+    done
+done
+for procPerRow in $(seq $MAX_DIMENSION_PROCESSES)
+do
+    for procPerCol in $(seq $MAX_DIMENSION_PROCESSES)
+    do
+        PROCESSES=`expr $procPerCol \\* $procPerRow`
+        if [ $PROCESSES -le $HARDWARE_THREAD_COUNT ]; then
+            OUTPUT_FILE=$TIMING_DIRECTORY"/SharedMemoryExpandingArea/les_main_gmcf_row"$procPerRow"_col"$procPerCol".txt"
+            ./build_les $procPerRow $procPerCol "D=TIMINGS expandingArea=1"
+            ./run_les > $OUTPUT_FILE
+        fi
+    done
+done
+for procPerRow in $(seq $MAX_DIMENSION_PROCESSES)
+do
+    for procPerCol in $(seq $MAX_DIMENSION_PROCESSES)
+    do
+        PROCESSES=`expr $procPerCol \\* $procPerRow`
+        if [ $PROCESSES -le $HARDWARE_THREAD_COUNT ]; then
+            OUTPUT_FILE=$TIMING_DIRECTORY"/SharedMemoryExactCornersExpandingArea/les_main_gmcf_row"$procPerRow"_col"$procPerCol".txt"
+            ./build_les $procPerRow $procPerCol "D=TIMINGS exactCorners=1 expandingArea=1"
+            ./run_les > $OUTPUT_FILE
+        fi
+    done
+done
+
