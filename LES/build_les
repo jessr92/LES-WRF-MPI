@@ -15,7 +15,7 @@ build.pl -Y src/GMCF/Task/"$MODEL_NAME".yml -L
 guillemot -Y src/GMCF/Task/"$MODEL_NAME".yml src/GMCF/Task/"$MODEL_NAME".td
 mv src/GMCF/Task/"$MODEL_NAME".tdc64 gmcf.tdc64
 cd src/GMCF/Models
-scons -f SConstruct ocl=0 mpi=0 gmcf=1 procPerRow="$PROC_PER_ROW" procPerCol="$PROC_PER_COL"
+scons -f SConstruct ocl=0 mpi=0 gmcf=1 procPerRow="$PROC_PER_ROW" procPerCol="$PROC_PER_COL" D=TIMINGS
 mv lib"$MODEL_NAME".a ../../../lib/lib"$MODEL_NAME".a
 cd ../../..
 scons -f "$GANNET_DIR"/t/ModelCoupling/SConstruct models="$MODEL_NAME",netcdff
