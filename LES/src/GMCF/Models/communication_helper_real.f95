@@ -322,6 +322,9 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
             end do
         end do
     end if
+#ifdef GMCF
+    call waitForHaloAcks(procPerRow)
+#endif
 #ifdef EXACT_CORNERS
     call exchangeRealCorners(array, procPerRow, leftThickness, rightThickness, topThickness, bottomThickness)
 #else
@@ -329,9 +332,6 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
         call calculateCornersReal(array(:,:,i), procPerRow, leftThickness, &
                               rightThickness, topThickness, bottomThickness)
     end do
-#endif
-#ifdef GMCF
-    call waitForHaloAcks(procPerRow)
 #endif
     deallocate(leftRecv)
     deallocate(leftSend)
