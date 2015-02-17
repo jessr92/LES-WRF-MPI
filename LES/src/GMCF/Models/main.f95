@@ -590,6 +590,8 @@
     call cpu_time(timestamp(9))
 #ifdef GMCF
     print *,"Total time:" ,(timestamp(9)-timestamp(8))/(procPerRow * procPerCol),"s for ",nmax-n0,"iterations"
+    call flush(6)
+    call sleep(5)
 #else
     print *,"Total time:" ,timestamp(9)-timestamp(8),"s for ",nmax-n0,"iterations"
 #endif

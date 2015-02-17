@@ -1,0 +1,32 @@
+#!/bin/bash
+HOSTNAME=$(hostname)
+TIMING_DIRECTORY="src/GMCF/Models/timingRuns/"$HOSTNAME"/gmcf"
+MAX_PER_DIMENSION=16
+mkdir -p $TIMING_DIRECTORY
+mkdir -p $TIMING_DIRECTORY"/SharedMemory"
+mkdir -p $TIMING_DIRECTORY"/SharedMemoryExpandingArea"
+mkdir -p $TIMING_DIRECTORY"/SharedMemoryExactCorners"
+mkdir -p $TIMING_DIRECTORY"/SharedMemoryExactCornersExpandingArea"
+HARDWARE_THREAD_COUNT=$(grep -c ^processor /proc/cpuinfo)
+# Max per dimension needs to be at least enough such that NxN will use all
+# available hardware threads on the shared memory system
+if [ `expr $MAX_PER_DIMENSION \\* $MAX_PER_DIMENSION` -lt $HARDWARE_THREAD_COUNT ]; then
+    MAX_PER_DIMENSION=$(echo "sqrt($HARDWARE_THREAD_COUNT)" | bc -l)
+    MAX_PER_DIMENSION=$(echo $(( `echo $MAX_PER_DIMENSION|cut -f1 -d"."` + 1 )))
+fi
+MAX_DIMENSION_PROCESSES=$HARDWARE_THREAD_COUNT
+if [ $MAX_DIMENSION_PROCESSES -gt $MAX_PER_DIMENSION ]; then
+    MAX_DIMENSION_PROCESSES=$MAX_PER_DIMENSION
+fi
+for procPerRow in $(seq $MAX_DIMENSION_PROCESSES)
+do
+    for procPerCol in $(seq $MAX_DIMENSION_PROCESSES)
+    do
+        PROCESSES=`expr $procPerCol \\* $procPerRow`
+        if [ $PROCESSES -le $HARDWARE_THREAD_COUNT ]; then
+            OUTPUT_FILE=$TIMING_DIRECTORY"/SharedMemory/les_main_gmcf_row"$procPerRow"_col"$procPerCol".txt"
+            ./build_les $procPerRow $procPerCol "D=TIMINGS"
+            ./run_les > $OUTPUT_FILE
+        fi
+    done
+done
