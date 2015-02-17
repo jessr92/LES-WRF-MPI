@@ -594,7 +594,7 @@
     print *,"Total time:" ,timestamp(9)-timestamp(8),"s for ",nmax-n0,"iterations"
 #endif
 #endif
-return
+
 #ifdef GMCF_API
       call finalise_gmcf(model_id)
 #else
