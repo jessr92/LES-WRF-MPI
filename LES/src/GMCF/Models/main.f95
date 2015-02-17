@@ -62,6 +62,10 @@
         real(kind=4) :: ro
         real(kind=4) :: time
         real(kind=4) :: vn
+#ifdef TIMINGS
+        integer :: clock_rate
+#endif
+
 #ifdef GMCF
     real(kind=4), dimension(:,:,:), allocatable :: amask1
     real(kind=4), dimension(:,:,:), allocatable :: avel
@@ -158,7 +162,7 @@
     real(kind=4), dimension(:), allocatable :: z2
     real(kind=4), dimension(:,:), allocatable :: zbm
 #ifdef TIMINGS
-    real(kind=4), dimension(:), allocatable :: timestamp
+    integer(kind=4), dimension(:), allocatable :: timestamp
 #endif
 #else
     real(kind=4), dimension(0:ip+1,0:jp+1,0:kp+1)  :: amask1
@@ -256,7 +260,7 @@
     real(kind=4), dimension(kp+2)  :: z2
     real(kind=4), dimension(-1:ipmax+1,-1:jpmax+1)  :: zbm
 #ifdef TIMINGS
-    real (kind=4), dimension(0:9) :: timestamp
+    integer (kind=4), dimension(0:9) :: timestamp
 #endif
 #endif
 
@@ -447,7 +451,7 @@
     call zero2DReal4Array(zbm)
 #ifdef TIMINGS
     allocate(timestamp((9)-(0)+1))
-    call zero1DReal4Array(timestamp)
+    !call zero1DReal4Array(timestamp)
 #endif
 #endif
 
@@ -509,7 +513,7 @@
 ! --main loop
 #ifdef TIMINGS
     nmax=201
-    call cpu_time(timestamp(8))
+    call system_clock(timestamp(8), clock_rate)
 #endif
       do n = n0,nmax
         time = float(n-1)*dt
@@ -526,47 +530,43 @@
         ! ========================================================================================================================================================
         ! ========================================================================================================================================================
 #ifdef TIMINGS
-        call cpu_time(timestamp(0))
+        call system_clock(timestamp(0), clock_rate)
 #endif
         call velnw(km,jm,im,p,ro,dxs,u,dt,f,dys,v,g,dzs,w,h)
 #ifdef TIMINGS
-        call cpu_time(timestamp(1))
+        call system_clock(timestamp(1), clock_rate)
 #endif
         call bondv1(jm,u,z2,dzn,v,w,km,n,im,dt,dxs)
 #ifdef TIMINGS
-        call cpu_time(timestamp(2))
+        call system_clock(timestamp(2), clock_rate)
 #endif
         call velfg(km,jm,im,dx1,cov1,cov2,cov3,dfu1,diu1,diu2,dy1,diu3,dzn,vn,f,cov4,cov5,cov6,dfv1, &
       diu4,diu5,diu6,g,cov7,cov8,cov9,dfw1,diu7,diu8,diu9,dzs,h,nou1,u,nou5,v,nou9,w,nou2,nou3, &
       nou4,nou6,nou7,nou8)
 #ifdef TIMINGS
-        call cpu_time(timestamp(3))
+        call system_clock(timestamp(3), clock_rate)
 #endif
 #if IFBF == 1
         call feedbf(km,jm,im,usum,u,bmask1,vsum,v,cmask1,wsum,w,dmask1,alpha,dt,beta,fx,fy,fz,f,g, &
       h)
 #endif
 #ifdef TIMINGS
-        call cpu_time(timestamp(4))
+        call system_clock(timestamp(4), clock_rate)
 #endif
         call les(km,delx1,dx1,dy1,dzn,jm,im,diu1,diu2,diu3,diu4,diu5,diu6,diu7,diu8,diu9,sm,f,g,h)
 #ifdef TIMINGS
-        call cpu_time(timestamp(5))
+        call system_clock(timestamp(5), clock_rate)
 #endif
         call adam(n,nmax,data21,fold,im,jm,km,gold,hold,fghold,f,g,h)
 #ifdef TIMINGS
-        call cpu_time(timestamp(6))
+        call system_clock(timestamp(6), clock_rate)
 #endif
         call press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn3s,cn4l,cn4s,n, &
       nmax,data20,usum,vsum,wsum)
 #ifdef TIMINGS
-        call cpu_time(timestamp(7))
+        call system_clock(timestamp(7), clock_rate)
         do i=1, 7
-#ifdef GMCF
-            print '("Time for state ",i2," = ",f6.3," s")',i,(timestamp(i)-timestamp(i-1))/(procPerRow * procPerCol)
-#else
-            print '("Time for state ",i2," = ",f6.3," s")',i,timestamp(i)-timestamp(i-1)
-#endif
+            print '("Time for state ",i2," = ",f6.3," s")',i,(timestamp(i)-timestamp(i-1))/ real(clock_rate)
         end do
 #endif
 
@@ -587,14 +587,10 @@
     call close_netcdf_file()
 #endif
 #ifdef TIMINGS
-    call cpu_time(timestamp(9))
-#ifdef GMCF
-    print *,"Total time:" ,(timestamp(9)-timestamp(8))/(procPerRow * procPerCol),"s for ",nmax-n0,"iterations"
+    call system_clock(timestamp(9))
+    print *,"Total time:" ,(timestamp(9)-timestamp(8))/real(clock_rate),"s for ",nmax-n0,"iterations"
     call flush(6)
     call sleep(5)
-#else
-    print *,"Total time:" ,timestamp(9)-timestamp(8),"s for ",nmax-n0,"iterations"
-#endif
 #endif
 
 #ifdef GMCF_API
