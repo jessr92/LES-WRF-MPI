@@ -1,4 +1,5 @@
 #!/bin/bash
+source ~/.bashrc
 HOSTNAME=$(hostname)
 TIMING_DIRECTORY="src/GMCF/Models/timingRuns/"$HOSTNAME"/gmcf"
 MAX_PER_DIMENSION=16
