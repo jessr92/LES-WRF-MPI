@@ -1,6 +1,6 @@
 import os
 import re
-import sys
+from datetime import datetime
 
 fileList = []
 rootDir = "timingRuns/"
@@ -20,8 +20,11 @@ for path in fileList:
     runLog = open(path, "r")
     summaryLogPath = path[:-4] + "_summary.txt"
     if os.path.isfile(summaryLogPath):
-        print(summaryLogPath + " already exists")
-        continue
+        runLogModificationTime = datetime.fromtimestamp(os.path.getctime(path))
+        summaryLogModificationTime = datetime.fromtimestamp(os.path.getctime(path[:-4] + "_summary.txt"))
+        if runLogModificationTime < summaryLogModificationTime:
+            print(summaryLogPath + " already exists")
+            continue
     summaryLog = open(path[:-4] + "_summary.txt", "w")
     filename = path.split("/")[-1]
     for line in runLog:
