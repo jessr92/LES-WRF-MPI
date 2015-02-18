@@ -1,0 +1,22 @@
+#!/bin/bash
+. $GANNET_DIR/etc/gannetrc
+MODEL_NAME="message_rate"
+PROC_PER_ROW=2 # For the matrix generator, not used
+PROC_PER_COL=2 # For the matrix generator, not used
+INSTANCES=$(($PROC_PER_ROW * $PROC_PER_COL)) # Must be even
+mkdir -p src/GMCF/Models
+mkdir -p src/GMCF/Task
+mkdir -p gensrc/GMCF/Models
+mkdir -p lib
+python ../../GMCF_Utilities/connectvity_matrix_generator.py "$PROC_PER_ROW" "$PROC_PER_COL" > src/GMCF/Models/gmcfConfiguration.f95
+python ../../GMCF_Utilities/td_generator.py "$INSTANCES" "$MODEL_NAME" > src/GMCF/Task/"$MODEL_NAME".td
+python ../../GMCF_Utilities/yml_generator.py "$INSTANCES" "$MODEL_NAME" > src/GMCF/Task/"$MODEL_NAME".yml
+build.pl -Y src/GMCF/Task/"$MODEL_NAME".yml -L
+guillemot -Y src/GMCF/Task/"$MODEL_NAME".yml src/GMCF/Task/"$MODEL_NAME".td
+mv src/GMCF/Task/"$MODEL_NAME".tdc64 gmcf.tdc64
+cd src/GMCF/Models
+scons -f SConstruct."$MODEL_NAME"
+mv lib"$MODEL_NAME".a ../../../lib/lib"$MODEL_NAME".a
+cd ../../..
+scons -f "$GANNET_DIR"/t/ModelCoupling/SConstruct models="$MODEL_NAME"
+
