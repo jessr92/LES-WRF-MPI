@@ -589,8 +589,6 @@
 #ifdef TIMINGS
     call system_clock(timestamp(9))
     print *,"Total time:" ,(timestamp(9)-timestamp(8))/real(clock_rate),"s for ",nmax-n0,"iterations"
-    call flush(6)
-    call sleep(5)
 #endif
 
 #ifdef GMCF_API
