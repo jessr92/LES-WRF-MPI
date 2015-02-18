@@ -203,7 +203,7 @@ subroutine press(km,jm,im,rhs,u,dx1,v,dy1,w,dzn,f,g,h,dt,cn1,cn2l,p,cn2s,cn3l,cn
         call write_to_netcdf_file(p,u,v,w,usum,vsum,wsum,nn)
 #endif
 #ifndef NO_IO
-#if !defined(MPI) || !defined(GMCF)
+#if !defined(MPI) && !defined(GMCF)
         open(unit=20,file=data20,form='unformatted',status='unknown')
         write(20) (((u(i,j,k),i=1,im),j=1,jm),k=1,km)
         write(20) (((v(i,j,k),i=1,im),j=1,jm),k=1,km)
