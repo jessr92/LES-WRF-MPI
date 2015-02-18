@@ -13,7 +13,7 @@ subroutine program_message_rate(sys, tile, model_id) ! This replaces 'program ma
     call gmcfInitCoupler(sys, tile, model_id)
     call system_clock(clock_start, clock_rate)
     if (mod(model_id, 2) .eq. 0) then
-        buffer(1) = 1
+        buffer = 1
         do i=1,iterations
             call gmcfWaitFor(model_id, REQDATA, model_id - 1, 1)
             call gmcfHasPackets(model_id, REQDATA, has_packets)
