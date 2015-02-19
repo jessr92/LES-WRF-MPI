@@ -57,7 +57,7 @@ subroutine program_message_rate(sys, tile, model_id) ! This replaces 'program ma
     end if
     call system_clock(clock_end, clock_rate)
     call gmcfFinished(model_id)
-    if (mod(model_id, 2) .eq. 0) then
+    if (mod(model_id, 2) .eq. 1) then
         total_time = (clock_end - clock_start)/real(clock_rate)
         messages_per_second = iterations / total_time
         throughput = (iterations * elements * 4) / total_time

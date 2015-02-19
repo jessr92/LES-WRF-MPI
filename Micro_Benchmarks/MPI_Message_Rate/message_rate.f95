@@ -30,7 +30,7 @@ endif
 call system_clock(clock_end, clock_rate)
 
 call MPI_Finalize(ierror)
-    if (mod(rank, 2) .eq. 0) then
+    if (mod(rank, 2) .eq. 1) then
         total_time = (clock_end - clock_start)/real(clock_rate)
         messages_per_second = iterations / total_time
         throughput = (iterations * elements * 4) / total_time
