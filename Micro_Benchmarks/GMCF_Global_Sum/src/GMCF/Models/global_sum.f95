@@ -50,10 +50,10 @@ subroutine getGlobalOpMaster(model_id, value, tag)
     real(kind=4), dimension(1) :: receiveBuffer, sendBuffer
     integer :: i, has_packets, fifo_empty
     type(gmcfPacket) :: packet
-    do i=2, (PROC_PER_ROW * PROC_PER_COL)
+    do i=2, INSTANCES
         call gmcfRequestData(model_id, tag, 1, i, PRE, 1)
     end do
-    do i=2, (PROC_PER_ROW * PROC_PER_COL)
+    do i=2, INSTANCES
         call gmcfWaitFor(model_id, RESPDATA, i, 1)
     end do
     call gmcfHasPackets(model_id, RESPDATA, has_packets)
@@ -72,7 +72,7 @@ subroutine getGlobalOpMaster(model_id, value, tag)
         call gmcfHasPackets(model_id, RESPDATA, has_packets)
     end do
     sendBuffer(1) = value
-    do i=2, (PROC_PER_ROW * PROC_PER_COL)
+    do i=2, INSTANCES
         call gmcfWaitFor(model_id, REQDATA, i, 1)
     end do
     call gmcfHasPackets(model_id, REQDATA, has_packets)
@@ -85,7 +85,7 @@ subroutine getGlobalOpMaster(model_id, value, tag)
         end if
         call gmcfHasPackets(model_id, REQDATA, has_packets)
     end do
-    do i=2,(PROC_PER_ROW * PROC_PER_COL)
+    do i=2,INSTANCES
         call gmcfWaitFor(model_id, ACKDATA, i, 1)
     end do
     call gmcfHasPackets(model_id, ACKDATA, has_packets)
