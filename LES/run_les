@@ -1,4 +1,5 @@
 #!/bin/bash
+source ~/.bashrc
 cp -r src/GMCF/Models/GIS .
 cp -r src/GMCF/Models/data .
 ./gmcfCoupler
