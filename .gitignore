@@ -63,4 +63,6 @@ gmcfCoupler
 
 timingRuns.tgz
 LES/data
+message_rate
+global_sum
 
