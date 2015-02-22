@@ -8,7 +8,7 @@ subroutine program_global_sum(sys, tile, model_id) ! This replaces 'program main
     integer :: clock_start, clock_end, clock_rate
     real(kind=4) :: total_time, messages_per_second
     real(kind=4) :: value
-    iterations = 10000
+    iterations = 30000
     call gmcfInitCoupler(sys, tile, model_id)
     call system_clock(clock_start, clock_rate)
     do i=1, iterations
@@ -51,9 +51,6 @@ subroutine getGlobalOpMaster(model_id, value, tag)
     integer :: i, has_packets, fifo_empty
     type(gmcfPacket) :: packet
     do i=2, INSTANCES
-        call gmcfRequestData(model_id, tag, 1, i, PRE, 1)
-    end do
-    do i=2, INSTANCES
         call gmcfWaitFor(model_id, RESPDATA, i, 1)
     end do
     call gmcfHasPackets(model_id, RESPDATA, has_packets)
@@ -73,17 +70,7 @@ subroutine getGlobalOpMaster(model_id, value, tag)
     end do
     sendBuffer(1) = value
     do i=2, INSTANCES
-        call gmcfWaitFor(model_id, REQDATA, i, 1)
-    end do
-    call gmcfHasPackets(model_id, REQDATA, has_packets)
-    do while(has_packets == 1)
-        call gmcfShiftPending(model_id, REQDATA, packet, fifo_empty)
-        if (packet%data_id .ne. tag) then
-            print*, 'Received unexpected packet'
-        else
-            call gmcfSend1DFloatArray(model_id, sendBuffer, shape(sendBuffer), tag, packet%source, PRE, 1)
-        end if
-        call gmcfHasPackets(model_id, REQDATA, has_packets)
+        call gmcfSend1DFloatArray(model_id, sendBuffer, shape(sendBuffer), tag, i, PRE, 1)
     end do
     do i=2,INSTANCES
         call gmcfWaitFor(model_id, ACKDATA, i, 1)
@@ -102,36 +89,15 @@ subroutine getGlobalOpNotMaster(model_id, value, tag)
     real(kind=4), dimension(1) :: receiveBuffer, sendBuffer
     integer :: has_packets, fifo_empty
     type(gmcfPacket) :: packet
-    !print*, 'Model_id ', model_id, ' is an else thread'
     sendBuffer(1) = value
-    ! Wait for master to ask for my value
-    call gmcfWaitFor(model_id, REQDATA, 1, 1)
-    !print*, 'Model_id ', model_id, ' has got masters REQDATA '
-    ! Send my value
-    call gmcfHasPackets(model_id, REQDATA, has_packets)
-    do while(has_packets == 1)
-        call gmcfShiftPending(model_id, REQDATA, packet, fifo_empty)
-        if (packet%data_id .ne. tag) then
-            print*, 'Received unexpected packet'
-        else
-            call gmcfSend1DFloatArray(model_id, sendBuffer, shape(sendBuffer), tag, packet%source, PRE, 1)
-            !print*, 'value sent to ', packet%source
-        end if
-        call gmcfHasPackets(model_id, REQDATA, has_packets)
-    end do
-    !print*, 'Model_id ', model_id, ' has sent their value'
+    call gmcfSend1DFloatArray(model_id, sendBuffer, shape(sendBuffer), tag, 1, PRE, 1)
     call gmcfWaitFor(model_id, ACKDATA, 1, 1)
-    ! Deal with the acks
     call gmcfHasPackets(model_id, ACKDATA, has_packets)
     do while(has_packets == 1)
         call gmcfShiftPending(model_id, ACKDATA, packet, fifo_empty)
         call gmcfHasPackets(model_id, ACKDATA, has_packets)
     end do        
-    ! Request global value
-    call gmcfRequestData(model_id, tag, 1, 1, PRE, 1)
-    ! Wait for response
     call gmcfWaitFor(model_id, RESPDATA, 1, 1)
-    ! Read in response
     call gmcfHasPackets(model_id, RESPDATA, has_packets)
     do while(has_packets == 1)
         call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
@@ -142,7 +108,6 @@ subroutine getGlobalOpNotMaster(model_id, value, tag)
         end if
         call gmcfHasPackets(model_id, RESPDATA, has_packets)
     end do
-    ! Copy received value into appropriate place
     value = receiveBuffer(1)
 end subroutine getGlobalOpNotMaster
 

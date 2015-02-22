@@ -15,7 +15,7 @@ build.pl -Y src/GMCF/Task/"$MODEL_NAME".yml -L
 guillemot -Y src/GMCF/Task/"$MODEL_NAME".yml src/GMCF/Task/"$MODEL_NAME".td
 mv src/GMCF/Task/"$MODEL_NAME".tdc64 gmcf.tdc64
 cd src/GMCF/Models
-scons -f SConstruct."$MODEL_NAME"
+scons -f SConstruct."$MODEL_NAME" instances="$INSTANCES"
 mv lib"$MODEL_NAME".a ../../../lib/lib"$MODEL_NAME".a
 cd ../../..
 scons -f "$GANNET_DIR"/t/ModelCoupling/SConstruct models="$MODEL_NAME"
