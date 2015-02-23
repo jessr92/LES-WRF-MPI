@@ -94,13 +94,13 @@ subroutine getGlobalOpNotMaster(model_id, value, tag)
     call gmcfWaitFor(model_id, ACKDATA, 1, 1)
     call gmcfHasPackets(model_id, ACKDATA, has_packets)
     do while(has_packets == 1)
-        call gmcfShiftPending(model_id, ACKDATA, packet, fifo_empty)
+        call gmcfShiftPending(model_id, 1, ACKDATA, packet, fifo_empty)
         call gmcfHasPackets(model_id, ACKDATA, has_packets)
     end do        
     call gmcfWaitFor(model_id, RESPDATA, 1, 1)
     call gmcfHasPackets(model_id, RESPDATA, has_packets)
     do while(has_packets == 1)
-        call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
+        call gmcfShiftPending(model_id, 1, RESPDATA, packet, fifo_empty)
         if (packet%data_id .ne. tag) then
             print*, 'Received unexpected packet'
         else

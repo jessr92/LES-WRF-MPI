@@ -20,7 +20,7 @@ subroutine program_message_rate(sys, tile, model_id) ! This replaces 'program ma
             call gmcfWaitFor(model_id, ACKDATA, model_id - 1 , 1)
             call gmcfHasPackets(model_id, ACKDATA, has_packets)
             do while(has_packets == 1)
-                call gmcfShiftPending(model_id, ACKDATA, packet, fifo_empty)
+                call gmcfShiftPending(model_id, model_id - 1, ACKDATA, packet, fifo_empty)
                 if (packet%source .ne. model_id - 1) then
                     print*, 'Erroneous ACKDATA'
                 end if
@@ -32,7 +32,7 @@ subroutine program_message_rate(sys, tile, model_id) ! This replaces 'program ma
             call gmcfWaitFor(model_id, RESPDATA, model_id + 1, 1)
             call gmcfHasPackets(model_id, RESPDATA, has_packets)
             do while(has_packets == 1)
-                call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
+                call gmcfShiftPending(model_id, model_id + 1, RESPDATA, packet, fifo_empty)
                 select case(packet%data_id)
                 case(1)
                     call gmcfRead1DFloatArray(buffer, shape(buffer), packet)
