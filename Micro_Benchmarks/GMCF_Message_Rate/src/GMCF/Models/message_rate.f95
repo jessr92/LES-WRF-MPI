@@ -16,18 +16,7 @@ subroutine program_message_rate(sys, tile, model_id) ! This replaces 'program ma
     if (mod(model_id, 2) .eq. 0) then
         buffer = 1
         do i=1,iterations
-            call gmcfWaitFor(model_id, REQDATA, model_id - 1, 1)
-            call gmcfHasPackets(model_id, REQDATA, has_packets)
-            do while(has_packets == 1)
-                call gmcfShiftPending(model_id, REQDATA, packet, fifo_empty)
-                select case(packet%data_id)
-                case(1)
-                    call gmcfSend1DFloatArray(model_id, buffer, shape(buffer), packet%data_id, packet%source, PRE, 1)
-                case default
-                    print*, 'Erroneous REQDATA'
-                end select
-                call gmcfHasPackets(model_id, REQDATA, has_packets)
-            end do
+            call gmcfSend1DFloatArray(model_id, buffer, shape(buffer), 1, model_id - 1, PRE, 1)
             call gmcfWaitFor(model_id, ACKDATA, model_id - 1 , 1)
             call gmcfHasPackets(model_id, ACKDATA, has_packets)
             do while(has_packets == 1)
@@ -40,7 +29,6 @@ subroutine program_message_rate(sys, tile, model_id) ! This replaces 'program ma
         end do
     else
         do i=1,iterations
-            call gmcfRequestData(model_id, 1, size(buffer), model_id + 1, PRE, 1)
             call gmcfWaitFor(model_id, RESPDATA, model_id + 1, 1)
             call gmcfHasPackets(model_id, RESPDATA, has_packets)
             do while(has_packets == 1)
