@@ -53,9 +53,8 @@ subroutine getGlobalOpMaster(model_id, value, tag)
     do i=2, INSTANCES
         call gmcfWaitFor(model_id, RESPDATA, i, 1)
     end do
-    call gmcfHasPackets(model_id, RESPDATA, has_packets)
-    do while(has_packets == 1)
-        call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
+    do i=2, INSTANCES
+        call gmcfShiftPending(model_id, i, RESPDATA, packet, fifo_empty)
         if (packet%data_id .ne. tag) then
             print*, 'Received unexpected packet'
         else
@@ -66,7 +65,6 @@ subroutine getGlobalOpMaster(model_id, value, tag)
                 print*, 'Unexpected global op'
             end if
         end if
-        call gmcfHasPackets(model_id, RESPDATA, has_packets)
     end do
     sendBuffer(1) = value
     do i=2, INSTANCES
@@ -75,10 +73,8 @@ subroutine getGlobalOpMaster(model_id, value, tag)
     do i=2,INSTANCES
         call gmcfWaitFor(model_id, ACKDATA, i, 1)
     end do
-    call gmcfHasPackets(model_id, ACKDATA, has_packets)
-    do while(has_packets == 1)
-        call gmcfShiftPending(model_id, ACKDATA, packet, fifo_empty)
-        call gmcfHasPackets(model_id, ACKDATA, has_packets)
+    do i=2,INSTANCES
+        call gmcfShiftPending(model_id, i, ACKDATA, packet, fifo_empty)
     end do
 end subroutine getGlobalOpMaster
 
