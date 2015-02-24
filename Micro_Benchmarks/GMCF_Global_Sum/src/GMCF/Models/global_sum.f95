@@ -53,10 +53,11 @@ subroutine getGlobalOpMaster(model_id, value, tag)
     do i=2, INSTANCES
         call gmcfWaitFor(model_id, RESPDATA, i, 1)
     end do
-    do i=2, INSTANCES
-        call gmcfShiftPending(model_id, i, RESPDATA, packet, fifo_empty)
+    call gmcfSetSize(model_id, RESPDATA, has_packets)
+    do while(has_packets .gt. 0)
+        call gmcfShiftPendingFromInclusionSet(model_id, RESPDATA, packet, fifo_empty)
         if (packet%data_id .ne. tag) then
-            print*, 'Received unexpected packet'
+            print*, 'Received unexpected packet from', packet%source, ' with id ', packet%data_id
         else
             call gmcfRead1DFloatArray(receiveBuffer, shape(receiveBuffer), packet)
             if (tag .eq. 1) then
@@ -65,6 +66,7 @@ subroutine getGlobalOpMaster(model_id, value, tag)
                 print*, 'Unexpected global op'
             end if
         end if
+        call gmcfSetSize(model_id, RESPDATA, has_packets)
     end do
     sendBuffer(1) = value
     do i=2, INSTANCES
@@ -73,8 +75,10 @@ subroutine getGlobalOpMaster(model_id, value, tag)
     do i=2,INSTANCES
         call gmcfWaitFor(model_id, ACKDATA, i, 1)
     end do
-    do i=2,INSTANCES
-        call gmcfShiftPending(model_id, i, ACKDATA, packet, fifo_empty)
+    call gmcfSetSize(model_id, ACKDATA, has_packets)
+    do while(has_packets .gt. 0)
+        call gmcfShiftPendingFromInclusionSet(model_id, ACKDATA, packet, fifo_empty)
+        call gmcfSetSize(model_id, ACKDATA, has_packets)
     end do
 end subroutine getGlobalOpMaster
 
@@ -89,20 +93,21 @@ subroutine getGlobalOpNotMaster(model_id, value, tag)
     call gmcfSend1DFloatArray(model_id, sendBuffer, shape(sendBuffer), tag, 1, PRE, 1)
     call gmcfWaitFor(model_id, ACKDATA, 1, 1)
     call gmcfHasPackets(model_id, ACKDATA, has_packets)
-    do while(has_packets == 1)
-        call gmcfShiftPending(model_id, 1, ACKDATA, packet, fifo_empty)
-        call gmcfHasPackets(model_id, ACKDATA, has_packets)
-    end do        
+    call gmcfSetSize(model_id, ACKDATA, has_packets)
+    do while(has_packets .gt. 0)
+        call gmcfShiftPendingFromInclusionSet(model_id, ACKDATA, packet, fifo_empty)
+        call gmcfSetSize(model_id, ACKDATA, has_packets)
+    end do
     call gmcfWaitFor(model_id, RESPDATA, 1, 1)
-    call gmcfHasPackets(model_id, RESPDATA, has_packets)
-    do while(has_packets == 1)
-        call gmcfShiftPending(model_id, 1, RESPDATA, packet, fifo_empty)
+    call gmcfSetSize(model_id, RESPDATA, has_packets)
+    do while(has_packets .gt. 0)
+        call gmcfShiftPendingFromInclusionSet(model_id, RESPDATA, packet, fifo_empty)
         if (packet%data_id .ne. tag) then
             print*, 'Received unexpected packet'
         else
             call gmcfRead1DFloatArray(receiveBuffer, shape(receiveBuffer),packet)
         end if
-        call gmcfHasPackets(model_id, RESPDATA, has_packets)
+        call gmcfSetSize(model_id, RESPDATA, has_packets)
     end do
     value = receiveBuffer(1)
 end subroutine getGlobalOpNotMaster
