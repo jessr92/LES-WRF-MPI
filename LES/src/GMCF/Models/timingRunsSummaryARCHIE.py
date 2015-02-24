@@ -40,7 +40,7 @@ for path in fileList:
             sys.exit(-1)
         originalRuntime = runtime
     # Found the runtime for the original code but with IFBF=0
-    elif path.endswith("les_main_ifbf0_summary.txt"):
+    elif path.endswith("les_main_IFBF0_summary.txt"):
         if originalIFBF0Runtime != 0.0:
             print("Error, two ifbf=0 runs found")
             sys.exit(-1)
