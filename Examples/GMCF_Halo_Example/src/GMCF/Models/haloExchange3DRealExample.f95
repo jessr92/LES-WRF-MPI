@@ -11,7 +11,8 @@ subroutine program_haloexchange3drealexample(sys, tile, model_id) ! This replace
     integer, parameter :: colCount = columns / procPerRow
     integer :: leftThickness, rightThickness, topThickness, bottomThickness
     real(kind=4), dimension(:,:,:), allocatable :: array
-    integer :: i, pthreadid, test_model_id
+    integer :: i, test_model_id
+    integer(kind=8) :: pthreadid
     
     leftThickness = 3
     rightThickness = 2
