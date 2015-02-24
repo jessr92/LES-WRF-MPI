@@ -157,7 +157,8 @@ subroutine recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, model_id
     implicit none
     real(kind=4), dimension(:,:,:), intent(out) :: leftRecv, rightRecv, topRecv, bottomRecv
     integer, intent(in) :: model_id, procPerRow, procPerCol
-    integer :: fifo_empty, neighbours(4), i, sender
+    integer :: fifo_empty, i, sender
+    integer, dimension(4) :: neighbours
     type(gmcfPacket) :: packet
     neighbours = -1
     if (.not. isTopRow(model_id, procPerRow)) then
@@ -200,8 +201,9 @@ end subroutine recvHaloBoundaries
 subroutine waitForHaloAcks(model_id, procPerRow, procPerCol)
     implicit none
     integer, intent(in) :: model_id, procPerRow, procPerCol
-    integer :: fifo_empty, neighbours(4), i, sender
+    integer :: fifo_empty, i, sender
     type(gmcfPacket) :: packet
+    integer, dimension(4) :: neighbours
     neighbours = -1
     if (.not. isTopRow(model_id, procPerRow)) then
         call gmcfWaitFor(model_id, ACKDATA, model_id - procPerRow, 1)
