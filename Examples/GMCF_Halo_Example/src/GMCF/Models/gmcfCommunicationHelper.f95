@@ -37,7 +37,6 @@ subroutine exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
                 end do
             end do
         end do
-        call gmcfRequestData(model_id, bottomTag, topThickness * colCount * depthSize, commWith, PRE, 1)
     end if
     ! Bottom edge to send, top edge to receive
     if (.not. isBottomRow(model_id, procPerRow, procPerCol)) then
@@ -52,7 +51,6 @@ subroutine exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
                 end do
             end do
         end do
-        call gmcfRequestData(model_id, topTag, bottomThickness * colCount * depthSize, commWith, PRE, 1)
     end if
     ! Left edge to send, right edge to receive
     if (.not. isLeftmostColumn(model_id, procPerRow)) then
@@ -65,7 +63,6 @@ subroutine exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
                 end do
             end do
         end do
-        call gmcfRequestData(model_id, rightTag, rowCount * leftThickness * depthSize, commWith, PRE, 1)
     end if
     ! Right edge to send, left edge to receive
     if (.not. isRightmostColumn(model_id, procPerRow)) then
@@ -80,7 +77,6 @@ subroutine exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
                 end do
             end do
         end do
-        call gmcfRequestData(model_id, leftTag, rowCount * rightThickness * depthSize, commWith, PRE, 1)
     end if
     call sendHaloBoundaries(leftSend, rightSend, topSend, bottomSend, model_id, procPerRow, procPerCol)
     call recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, model_id, procPerRow, procPerCol)
