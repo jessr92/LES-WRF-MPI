@@ -8,7 +8,7 @@ subroutine program_global_sum(sys, tile, model_id) ! This replaces 'program main
     integer :: clock_start, clock_end, clock_rate
     real(kind=4) :: total_time, messages_per_second
     real(kind=4) :: value
-    iterations = 30000
+    iterations = 1
     call gmcfInitCoupler(sys, tile, model_id)
     call system_clock(clock_start, clock_rate)
     do i=1, iterations
@@ -56,13 +56,18 @@ subroutine getGlobalOpMaster(model_id, value, tag)
     do i=2,INSTANCES
         print*, 'gmcfReadReg(sba_sys,', i, ',', tag, ', received)'
         call gmcfReadReg(sba_sys, i, tag, received)
-        print*, 'gmcfReadReg got value', received
+        print*, 'gmcfReadReg got value', received, ' from ', i
         if (tag .eq. 1) then
             value = value + received
         else
             print*, tag, ' is an invalid tag.'
         end if
     end do
+    print*, 'Global op result calculated'
+    ! Write global op result to register
+    call gmcfLockReg(model_id)
+    call gmcfWriteReg(sba_sys, model_id, tag, value)
+    call gmcfUnlockReg(model_id)
 end subroutine getGlobalOpMaster
 
 subroutine getGlobalOpNotMaster(model_id, value, tag)
@@ -72,6 +77,9 @@ subroutine getGlobalOpNotMaster(model_id, value, tag)
     call gmcfLockReg(model_id)
     call gmcfWriteReg(sba_sys, model_id, tag, value)
     call gmcfUnlockReg(model_id)
-
+    ! Get global op result
+    call gmcfAddOneToSet(model_id, REGREADY, 1)
+    call gmcfWaitForRegs(model_id)
+    call gmcfReadReg(sba_sys, 1, tag, value)
 end subroutine getGlobalOpNotMaster
 
