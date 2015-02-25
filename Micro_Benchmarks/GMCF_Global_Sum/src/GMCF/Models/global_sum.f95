@@ -52,6 +52,7 @@ subroutine getGlobalOpMaster(model_id, value, tag)
     type(gmcfPacket) :: packet
     do i=2, INSTANCES
         call gmcfWaitFor(model_id, RESPDATA, i, 1)
+        call gmcfAddToSet(model_id,RESPDATA,i,1)
     end do
     call gmcfSetSize(model_id, RESPDATA, has_packets)
     do while(has_packets .gt. 0)
@@ -66,6 +67,7 @@ subroutine getGlobalOpMaster(model_id, value, tag)
                 print*, 'Unexpected global op'
             end if
         end if
+        call gmcfRemoveFromSet(model_id,RESPDATA,packet%source)
         call gmcfSetSize(model_id, RESPDATA, has_packets)
     end do
     sendBuffer(1) = value
@@ -74,10 +76,12 @@ subroutine getGlobalOpMaster(model_id, value, tag)
     end do
     do i=2,INSTANCES
         call gmcfWaitFor(model_id, ACKDATA, i, 1)
+        call gmcfAddToSet(model_id,ACKDATA,i,1)
     end do
     call gmcfSetSize(model_id, ACKDATA, has_packets)
     do while(has_packets .gt. 0)
         call gmcfShiftPendingFromInclusionSet(model_id, ACKDATA, packet, fifo_empty)
+        call gmcfRemoveFromSet(model_id,ACKDATA,packet%source)
         call gmcfSetSize(model_id, ACKDATA, has_packets)
     end do
 end subroutine getGlobalOpMaster
@@ -92,13 +96,16 @@ subroutine getGlobalOpNotMaster(model_id, value, tag)
     sendBuffer(1) = value
     call gmcfSend1DFloatArray(model_id, sendBuffer, shape(sendBuffer), tag, 1, PRE, 1)
     call gmcfWaitFor(model_id, ACKDATA, 1, 1)
+    call gmcfAddToSet(model_id,ACKDATA, 1,1)
     call gmcfHasPackets(model_id, ACKDATA, has_packets)
     call gmcfSetSize(model_id, ACKDATA, has_packets)
     do while(has_packets .gt. 0)
         call gmcfShiftPendingFromInclusionSet(model_id, ACKDATA, packet, fifo_empty)
+        call gmcfRemoveFromSet(model_id,ACKDATA,packet%source)
         call gmcfSetSize(model_id, ACKDATA, has_packets)
     end do
     call gmcfWaitFor(model_id, RESPDATA, 1, 1)
+    call gmcfAddToSet(model_id,RESPDATA, 1,1)
     call gmcfSetSize(model_id, RESPDATA, has_packets)
     do while(has_packets .gt. 0)
         call gmcfShiftPendingFromInclusionSet(model_id, RESPDATA, packet, fifo_empty)
@@ -107,6 +114,7 @@ subroutine getGlobalOpNotMaster(model_id, value, tag)
         else
             call gmcfRead1DFloatArray(receiveBuffer, shape(receiveBuffer),packet)
         end if
+        call gmcfRemoveFromSet(model_id,RESPDATA,packet%source)
         call gmcfSetSize(model_id, RESPDATA, has_packets)
     end do
     value = receiveBuffer(1)
