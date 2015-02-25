@@ -37,6 +37,7 @@ subroutine exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
                 end do
             end do
         end do
+        call gmcfSend3DFloatArray(model_id, topSend, shape(topSend), topTag, commWith, PRE, 1)
     end if
     ! Bottom edge to send, top edge to receive
     if (.not. isBottomRow(model_id, procPerRow, procPerCol)) then
@@ -51,6 +52,7 @@ subroutine exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
                 end do
             end do
         end do
+        call gmcfSend3DFloatArray(model_id, bottomSend, shape(bottomSend), bottomTag, commWith, PRE, 1)
     end if
     ! Left edge to send, right edge to receive
     if (.not. isLeftmostColumn(model_id, procPerRow)) then
@@ -63,6 +65,7 @@ subroutine exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
                 end do
             end do
         end do
+        call gmcfSend3DFloatArray(model_id, leftSend, shape(leftSend), leftTag, commWith, PRE, 1)
     end if
     ! Right edge to send, left edge to receive
     if (.not. isRightmostColumn(model_id, procPerRow)) then
@@ -77,8 +80,8 @@ subroutine exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
                 end do
             end do
         end do
+        call gmcfSend3DFloatArray(model_id, rightSend, shape(rightSend), rightTag, commWith, PRE, 1)
     end if
-    call sendHaloBoundaries(leftSend, rightSend, topSend, bottomSend, model_id, procPerRow, procPerCol)
     call recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, model_id, procPerRow, procPerCol)
     if (.not. isTopRow(model_id, procPerRow)) then
         ! Top edge to send, bottom edge to receive
@@ -130,24 +133,6 @@ subroutine exchangeRealHalos(array, procPerRow, procPerCol, leftThickness, &
     deallocate(bottomSend)
     deallocate(bottomRecv)
 end subroutine exchangeRealHalos
-
-subroutine sendHaloBoundaries(leftSend, rightSend, topSend, bottomSend, model_id, procPerRow, procPerCol)
-    implicit none
-    real(kind=4), dimension(:,:,:), intent(in) :: leftSend, rightSend, topSend, bottomSend
-    integer, intent(in) :: model_id, procPerRow, procPerCol
-    if (.not. isTopRow(model_id, procPerRow)) then
-        call gmcfSend3DFloatArray(model_id, topSend, shape(topSend), topTag, model_id - procPerRow, PRE, 1)
-    end if
-    if (.not. isBottomRow(model_id, procPerRow, procPerCol)) then
-        call gmcfSend3DFloatArray(model_id, bottomSend, shape(bottomSend), bottomTag, model_id + procPerRow, PRE, 1)
-    end if
-    if (.not. isLeftmostColumn(model_id, procPerRow)) then
-        call gmcfSend3DFloatArray(model_id, leftSend, shape(leftSend), leftTag, model_id - 1, PRE, 1)
-    end if
-    if (.not. isRightmostColumn(model_id, procPerRow)) then
-        call gmcfSend3DFloatArray(model_id, rightSend, shape(rightSend), rightTag, model_id + 1, PRE, 1)
-    end if
-end subroutine sendHaloBoundaries
 
 subroutine recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, model_id, procPerRow, procPerCol)
     implicit none
