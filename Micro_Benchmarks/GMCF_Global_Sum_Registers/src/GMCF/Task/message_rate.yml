@@ -1,0 +1,24 @@
+System:
+    Version: 3.0
+    Libraries: [GMCF, CoreServices]
+    NServiceNodes: 5
+    ServiceNodes:
+        mn1: [ 1 , [GMCF.GMCF] ]
+        mn2: [ 2 , [GMCF.GMCF] ]
+        mn3: [ 3 , [GMCF.GMCF] ]
+        mn4: [ 4 , [GMCF.GMCF] ]
+        ctrl: [ 5, [CoreServices.BEGIN] ]
+    
+    Aliases:
+        begin: ctrl.CoreServices.BEGIN.begin
+        message_rate1: mn1.GMCF.GMCF.run_model1
+        message_rate2: mn2.GMCF.GMCF.run_model1
+        message_rate3: mn3.GMCF.GMCF.run_model1
+        message_rate4: mn4.GMCF.GMCF.run_model1
+    
+    ModelLibPaths: ['libmessage_rate.a']
+    
+    Models:
+        message_rate:
+            ModelId: 1
+
