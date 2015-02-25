@@ -143,15 +143,19 @@ subroutine recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, model_id
     type(gmcfPacket) :: packet
     neighbours = -1
     if (.not. isTopRow(model_id, procPerRow)) then
+        call gmcfWaitFor(model_id, RESPDATA, model_id - procPerRow, 1)
         neighbours(1) = model_id - procPerRow
     end if
     if (.not. isBottomRow(model_id, procPerRow, procPerCol)) then
+        call gmcfWaitFor(model_id, RESPDATA, model_id + procPerRow, 1)
         neighbours(2) = model_id + procPerRow
     end if
     if (.not. isLeftmostColumn(model_id, procPerRow)) then
+        call gmcfWaitFor(model_id, RESPDATA, model_id - 1, 1)
         neighbours(3) = model_id - 1
     end if
     if (.not. isRightmostColumn(model_id, procPerRow)) then
+        call gmcfWaitFor(model_id, RESPDATA, model_id + 1, 1)
         neighbours(4) = model_id + 1
     end if
     do while (sum(neighbours) .ne. -4)
