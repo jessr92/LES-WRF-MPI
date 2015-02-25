@@ -8,8 +8,8 @@ subroutine program_message_rate(sys, tile, model_id) ! This replaces 'program ma
     integer :: clock_start, clock_end, clock_rate, elements
     real(kind=4) :: total_time, messages_per_second, throughput
     type(gmcfPacket) :: packet
-    real(kind=4), dimension(1) :: buffer
-    iterations = 100000
+    real(kind=4), dimension(1000) :: buffer
+    iterations = 100
     elements = size(buffer)
     call gmcfInitCoupler(sys, tile, model_id)
     call system_clock(clock_start, clock_rate)
@@ -36,6 +36,9 @@ subroutine program_message_rate(sys, tile, model_id) ! This replaces 'program ma
                 select case(packet%data_id)
                 case(1)
                     call gmcfRead1DFloatArray(buffer, shape(buffer), packet)
+                    if (sum(buffer) .ne. size(buffer)) then
+                        print*, 'Something wrong, sum is ', sum(buffer), ' size is ', size(buffer)
+                    end if
                 case default
                     print*, 'Erroneous RESPDATA'
                 end select
