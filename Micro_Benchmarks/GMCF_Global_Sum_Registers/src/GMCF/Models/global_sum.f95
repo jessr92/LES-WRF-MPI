@@ -15,7 +15,6 @@ subroutine program_global_sum(sys, tile, model_id) ! This replaces 'program main
         value = model_id
         call getGlobalSumOfGMCF(model_id, value)
     end do
-    print*, value
     call system_clock(clock_end, clock_rate)
     call gmcfFinished(model_id)
     if (model_id .eq. 1) then
@@ -49,6 +48,7 @@ subroutine getGlobalOpMaster(model_id, value, tag)
     real(kind=4), intent(inout) :: value
     real(kind=4) :: received
     integer :: i
+    call gmcfLockReg(model_id)
     do i=2,INSTANCES
         call gmcfAddOneToSet(model_id, REGREADY, i)
     end do
@@ -63,9 +63,8 @@ subroutine getGlobalOpMaster(model_id, value, tag)
             print*, tag, ' is an invalid tag.'
         end if
     end do
-    print*, 'Global op result calculated'
+    print*, 'Global op result calculated, value is ', value
     ! Write global op result to register
-    call gmcfLockReg(model_id)
     call gmcfWriteReg(sba_sys, model_id, tag, value)
     call gmcfUnlockReg(model_id)
 end subroutine getGlobalOpMaster
@@ -81,5 +80,6 @@ subroutine getGlobalOpNotMaster(model_id, value, tag)
     call gmcfAddOneToSet(model_id, REGREADY, 1)
     call gmcfWaitForRegs(model_id)
     call gmcfReadReg(sba_sys, 1, tag, value)
+    print*, 'Global op result received, value is ', value
 end subroutine getGlobalOpNotMaster
 
