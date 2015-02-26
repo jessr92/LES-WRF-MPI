@@ -48,11 +48,12 @@ subroutine getGlobalOpMaster(model_id, value, tag)
     real(kind=4), intent(inout) :: value
     real(kind=4) :: received
     integer :: i
-    call gmcfLockRegC(sba_sys, model_id)
     do i=2,INSTANCES
         call gmcfAddOneToSet(model_id, REGREADY, i)
     end do
-    call gmcfWaitForRegsC(model_id)
+    do i=2,INSTANCES
+        call gmcfWaitFor(model_id, REGREADY, i, 1)
+    end do
     do i=2,INSTANCES
         print*, 'gmcfReadReg(sba_sys,', i, ',', tag, ', received)'
         call gmcfReadRegC(sba_sys, i, tag, received)
@@ -66,19 +67,20 @@ subroutine getGlobalOpMaster(model_id, value, tag)
     print*, 'Global op result calculated, value is ', value
     ! Write global op result to register
     call gmcfWriteRegC(sba_sys, model_id, tag, value)
-    call gmcfUnlockRegC(sba_sys, model_id)
+    do i=2,INSTANCES
+        call gmcfSendRegReady(model_id, tag, i)
+    end do
 end subroutine getGlobalOpMaster
 
 subroutine getGlobalOpNotMaster(model_id, value, tag)
     use gmcfAPI
     integer, intent(in) :: model_id, tag
     real(kind=4), intent(inout) :: value
-    call gmcfLockRegC(sba_sys, model_id)
     call gmcfWriteRegC(sba_sys, model_id, tag, value)
-    call gmcfUnlockRegC(sba_sys, model_id)
+    call gmcfSendRegReady(model_id, tag, 1)
     ! Get global op result
     call gmcfAddOneToSet(model_id, REGREADY, 1)
-    call gmcfWaitForRegsC(model_id)
+    call gmcfWaitFor(model_id, REGREADY, 1, 1)
     call gmcfReadRegC(sba_sys, 1, tag, value)
     print*, 'Global op result received, value is ', value
 end subroutine getGlobalOpNotMaster
