@@ -8,7 +8,7 @@ subroutine program_global_sum(sys, tile, model_id) ! This replaces 'program main
     integer :: clock_start, clock_end, clock_rate
     real(kind=4) :: total_time, messages_per_second
     real(kind=4) :: value
-    iterations = 10000
+    iterations = 30000
     call gmcfInitCoupler(sys, tile, model_id)
     call system_clock(clock_start, clock_rate)
     do i=1, iterations

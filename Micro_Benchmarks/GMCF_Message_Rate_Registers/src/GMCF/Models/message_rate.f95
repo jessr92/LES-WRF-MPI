@@ -33,4 +33,3 @@ subroutine program_message_rate(sys, tile, model_id) ! This replaces 'program ma
         print*, "Message size is ", elements, " reals so there is a throughput of ", throughput/1024, "KB/s"
     end if
 end subroutine program_message_rate
-
