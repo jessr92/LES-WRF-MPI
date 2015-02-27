@@ -4,24 +4,26 @@
 #include <unistd.h>
 
 #define THREAD_COUNT 4
-#define ITERATIONS 1
+#define ITERATIONS 10000
 
 int thread_ids[THREAD_COUNT];
 pthread_t threads[THREAD_COUNT];
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t condA = PTHREAD_COND_INITIALIZER;
 pthread_cond_t condB = PTHREAD_COND_INITIALIZER;
-int count = 0;
+pthread_cond_t condC = PTHREAD_COND_INITIALIZER;
+int stillToWrite = 0;
+int stillToRead = 0;
 int opResult = 0;
 
 int reduce(int value) {
     pthread_mutex_lock(&mutex);
     opResult += value;
-    count--;
-    if (count == 0) {
+    stillToWrite--;
+    if (stillToWrite == 0) {
         pthread_cond_broadcast(&condB);
     } else {
-        while (count != 0) {
+        while (stillToWrite != 0) {
             pthread_cond_wait(&condB, &mutex);
         }
     }
@@ -31,7 +33,11 @@ int reduce(int value) {
 
 int opAsMaster(int i) {
     pthread_mutex_lock(&mutex);
-    count = THREAD_COUNT;
+    while (stillToRead != 0) {
+        pthread_cond_wait(&condC, &mutex);
+    }
+    stillToWrite = THREAD_COUNT;
+    stillToRead = THREAD_COUNT;
     opResult = 0;
     pthread_mutex_unlock(&mutex);
     pthread_cond_broadcast(&condA);
@@ -40,7 +46,7 @@ int opAsMaster(int i) {
 
 int opAsNonMaster(int i) {
     pthread_mutex_lock(&mutex);
-    while (count == 0) {
+    while (stillToWrite == 0) {
         pthread_cond_wait(&condA, &mutex);
     }
     pthread_mutex_unlock(&mutex);
@@ -52,8 +58,14 @@ void *globalSum(void* thread_id) {
     int result = 0;
     for (int i=0; i < ITERATIONS; i++) {
         result = (id == 0) ? opAsMaster(id) : opAsNonMaster(id);
-        printf("%d\n", result);
+        pthread_mutex_lock(&mutex);
+        stillToRead--;
+        pthread_mutex_unlock(&mutex);
+        if (stillToRead == 0) {
+            pthread_cond_broadcast(&condC);
+        }
     }
+    printf("Thread %d finished with result %d\n", id, result);
 }
 
 void main() {
