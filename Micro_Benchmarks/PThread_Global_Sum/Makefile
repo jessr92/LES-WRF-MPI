@@ -1,4 +1,4 @@
-CFLAGS=-std=c99 -pthread
+CFLAGS=-std=c99 -pthread -O2
 
 all: global_sum
 
@@ -11,4 +11,7 @@ global_sum.o: global_sum.c
 
 $.o: $.c
 	$(CC) $(CFLAGS) -c %<
+
+clean:
+	rm *.o
 

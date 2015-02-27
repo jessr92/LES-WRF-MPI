@@ -51,17 +51,22 @@ int opAsNonMaster(int i) {
     return reduce(i);
 }
 
+int doOp(int id) {
+    int result = (id == 0) ? opAsMaster(id) : opAsNonMaster(id);
+    pthread_mutex_lock(&mutex);
+    stillToRead--;
+    pthread_mutex_unlock(&mutex);
+    if (stillToRead == 0) {
+        pthread_cond_broadcast(&cond);
+    }
+    return result;
+}
+
 void *globalSum(void* thread_id) {
     int id = *(int*)thread_id;
     int result = 0;
     for (int i=0; i < ITERATIONS; i++) {
-        result = (id == 0) ? opAsMaster(id) : opAsNonMaster(id);
-        pthread_mutex_lock(&mutex);
-        stillToRead--;
-        pthread_mutex_unlock(&mutex);
-        if (stillToRead == 0) {
-            pthread_cond_broadcast(&cond);
-        }
+        result = doOp(id);
     }
     printf("Thread %d finished with result %d\n", id, result);
 }
@@ -85,3 +90,4 @@ void main() {
     double seconds = elapsed_time / 1000000.0;
     printf("Wall clock time: %f, Iterations per second: %f\n", seconds, ITERATIONS/seconds);
 }
+
