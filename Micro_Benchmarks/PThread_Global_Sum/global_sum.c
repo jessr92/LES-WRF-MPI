@@ -9,9 +9,7 @@
 int thread_ids[THREAD_COUNT];
 pthread_t threads[THREAD_COUNT];
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t condA = PTHREAD_COND_INITIALIZER;
-pthread_cond_t condB = PTHREAD_COND_INITIALIZER;
-pthread_cond_t condC = PTHREAD_COND_INITIALIZER;
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 int stillToWrite = 0;
 int stillToRead = 0;
 int opResult = 0;
@@ -21,10 +19,10 @@ int reduce(int value) {
     opResult += value;
     stillToWrite--;
     if (stillToWrite == 0) {
-        pthread_cond_broadcast(&condB);
+        pthread_cond_broadcast(&cond);
     } else {
         while (stillToWrite != 0) {
-            pthread_cond_wait(&condB, &mutex);
+            pthread_cond_wait(&cond, &mutex);
         }
     }
     pthread_mutex_unlock(&mutex);
@@ -34,20 +32,20 @@ int reduce(int value) {
 int opAsMaster(int i) {
     pthread_mutex_lock(&mutex);
     while (stillToRead != 0) {
-        pthread_cond_wait(&condC, &mutex);
+        pthread_cond_wait(&cond, &mutex);
     }
     stillToWrite = THREAD_COUNT;
     stillToRead = THREAD_COUNT;
     opResult = 0;
     pthread_mutex_unlock(&mutex);
-    pthread_cond_broadcast(&condA);
+    pthread_cond_broadcast(&cond);
     return reduce(i);
 }
 
 int opAsNonMaster(int i) {
     pthread_mutex_lock(&mutex);
     while (stillToWrite == 0) {
-        pthread_cond_wait(&condA, &mutex);
+        pthread_cond_wait(&cond, &mutex);
     }
     pthread_mutex_unlock(&mutex);
     return reduce(i);
@@ -62,7 +60,7 @@ void *globalSum(void* thread_id) {
         stillToRead--;
         pthread_mutex_unlock(&mutex);
         if (stillToRead == 0) {
-            pthread_cond_broadcast(&condC);
+            pthread_cond_broadcast(&cond);
         }
     }
     printf("Thread %d finished with result %d\n", id, result);
