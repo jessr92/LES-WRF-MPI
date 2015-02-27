@@ -15,6 +15,13 @@ int stillToWrite = 0;
 int stillToRead = 0;
 int opResult = 0;
 
+int reduce(int);
+int opAsMaster(int);
+int opAsNonMaster(int);
+int doOp(int id);
+void *globalSum(void *);
+int main(void);
+
 int reduce(int value) {
     pthread_mutex_lock(&mutex);
     opResult += value;
@@ -71,11 +78,11 @@ void *globalSum(void* thread_id) {
         result = doOp(id);
     }
     printf("Thread %d finished with result %d\n", id, result);
+    return NULL;
 }
 
-void main() {
+int main(void) {
     cpu_set_t cpuset;
-    pthread_t thread;
     pthread_attr_t attr;
     struct timeval start, end;
     pthread_attr_init(&attr);
@@ -95,5 +102,6 @@ void main() {
     long long elapsed_time = ((end.tv_sec - start.tv_sec) * 1000000LL) + end.tv_usec - start.tv_usec;
     double seconds = elapsed_time / 1000000.0;
     printf("Wall clock time: %f, Iterations per second: %f\n", seconds, ITERATIONS/seconds);
+    return 0;
 }
 
