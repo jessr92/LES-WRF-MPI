@@ -4,27 +4,25 @@
 #include <unistd.h>
 
 #define THREAD_COUNT 4
-#define ITERATIONS 1
+#define ITERATIONS 10
 
 int thread_ids[THREAD_COUNT];
 pthread_t threads[THREAD_COUNT];
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t cond = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t condA = PTHREAD_COND_INITIALIZER;
+pthread_cond_t condB = PTHREAD_COND_INITIALIZER;
 int count = 0;
 int opResult = 0;
 
 int reduce(int value) {
     pthread_mutex_lock(&mutex);
-    printf("Doing the reduce\n");
     opResult += value;
     count--;
     if (count == 0) {
-        pthread_cond_broadcast(&cond);
+        pthread_cond_broadcast(&condB);
     } else {
         while (count != 0) {
-            printf("pthread cond wait:%d\n", count);
-            pthread_cond_wait(&cond, &mutex);
-            printf("I'm awake again:%d\n", count);
+            pthread_cond_wait(&condB, &mutex);
         }
     }
     pthread_mutex_unlock(&mutex);
@@ -36,18 +34,16 @@ int opAsMaster(int i) {
     count = THREAD_COUNT;
     opResult = 0;
     pthread_mutex_unlock(&mutex);
-    pthread_cond_broadcast(&cond);
-    printf("master going to do the reduce\n");
+    pthread_cond_broadcast(&condA);
     return reduce(i);
 }
 
 int opAsNonMaster(int i) {
     pthread_mutex_lock(&mutex);
     while (count == 0) {
-        pthread_cond_wait(&cond, &mutex);
+        pthread_cond_wait(&condA, &mutex);
     }
     pthread_mutex_unlock(&mutex);
-    printf("going to do the reduce\n");
     return reduce(i);
 }
 
@@ -56,8 +52,8 @@ void *globalSum(void* thread_id) {
     int result = 0;
     for (int i=0; i < ITERATIONS; i++) {
         result = (id == 0) ? opAsMaster(id) : opAsNonMaster(id);
+        printf("%d\n", result);
     }
-    printf("%d\n", result);
 }
 
 void main() {
