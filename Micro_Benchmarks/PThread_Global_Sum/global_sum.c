@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 #define THREAD_COUNT 4
-#define ITERATIONS 10
+#define ITERATIONS 1
 
 int thread_ids[THREAD_COUNT];
 pthread_t threads[THREAD_COUNT];
@@ -48,7 +48,7 @@ int opAsNonMaster(int i) {
 }
 
 void *globalSum(void* thread_id) {
-    int id = (int)thread_id;
+    int id = *(int*)thread_id;
     int result = 0;
     for (int i=0; i < ITERATIONS; i++) {
         result = (id == 0) ? opAsMaster(id) : opAsNonMaster(id);
@@ -62,15 +62,16 @@ void main() {
     struct timeval start, end;
     for (int i=1; i < THREAD_COUNT; i++) {
         thread_ids[i] = i;
-        pthread_create(&threads[i], NULL, globalSum, (void *) thread_ids[i]);
+        pthread_create(&threads[i], NULL, globalSum, (void *) &thread_ids[i]);
     }
     gettimeofday(&start, 0);
-    globalSum(0);
+    thread_ids[0] = 0;
+    globalSum((void *) &thread_ids[0]);
     for (int i=1; i < THREAD_COUNT; i++) {
         pthread_join(threads[i], NULL);
     }
     gettimeofday(&end, 0);
     long long elapsed_time = ((end.tv_sec - start.tv_sec) * 1000000LL) + end.tv_usec - start.tv_usec;
     double seconds = elapsed_time / 1000000.0;
-    printf("%f\n", seconds);
+    printf("Wall clock time: %f, Iterations per second: %f\n", seconds, ITERATIONS/seconds);
 }
