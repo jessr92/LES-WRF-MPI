@@ -6,7 +6,7 @@
 #include <stdatomic.h>
 
 #define THREAD_COUNT 4
-#define ITERATIONS 100000
+#define ITERATIONS 1000000
 #define TEST
 
 // Doesn't currently work
@@ -25,26 +25,26 @@ void *globalSum(void *);
 int main(void);
 
 int reduce(int value) {
-    atomic_fetch_add_explicit(&opResult, value, memory_order_relaxed);
-    atomic_fetch_sub_explicit(&stillToWrite, 1, memory_order_relaxed);
-    while (atomic_load_explicit(&stillToWrite, memory_order_relaxed) != 0) {
+    atomic_fetch_add_explicit(&opResult, value, memory_order_acq_rel);
+    atomic_fetch_sub_explicit(&stillToWrite, 1, memory_order_acq_rel);
+    while (atomic_load_explicit(&stillToWrite, memory_order_acquire) != 0) {
         usleep(0);
     }
-    return atomic_load_explicit(&opResult, memory_order_relaxed);
+    return atomic_load_explicit(&opResult, memory_order_acquire);
 }
 
 int opAsMaster(int i) {
-    while (atomic_load_explicit(&stillToRead, memory_order_relaxed) != 0) {
+    while (atomic_load_explicit(&stillToRead, memory_order_acquire) != 0) {
         usleep(0);
     }
-    atomic_store_explicit(&stillToWrite, THREAD_COUNT, memory_order_relaxed);
-    atomic_store_explicit(&stillToRead , THREAD_COUNT, memory_order_relaxed);
-    atomic_store_explicit(&opResult, 0, memory_order_relaxed);
+    atomic_store_explicit(&stillToWrite, THREAD_COUNT, memory_order_release);
+    atomic_store_explicit(&stillToRead , THREAD_COUNT, memory_order_release);
+    atomic_store_explicit(&opResult, 0, memory_order_release);
     return reduce(i);
 }
 
 int opAsNonMaster(int i) {
-    while (atomic_load_explicit(&stillToWrite, memory_order_relaxed) == 0) {
+    while (atomic_load_explicit(&stillToWrite, memory_order_acquire) == 0) {
         usleep(0);
     }
     return reduce(i);
@@ -52,7 +52,7 @@ int opAsNonMaster(int i) {
 
 int doOp(int id) {
     int result = (id == 0) ? opAsMaster(id) : opAsNonMaster(id);
-    atomic_fetch_sub_explicit(&stillToRead, 1, memory_order_relaxed);
+    atomic_fetch_sub_explicit(&stillToRead, 1, memory_order_acq_rel);
     return result;
 }
 
