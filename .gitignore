@@ -67,3 +67,4 @@ message_rate
 global_sum
 
 vgcore.*
+global_sum

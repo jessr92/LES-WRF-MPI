@@ -66,7 +66,9 @@ int doOp(int id) {
 void *globalSum(void* thread_id) {
     int id = *(int*)thread_id;
     int result = 0;
+#ifndef __APPLE__
     printf("ID: %lu, CPU: %d\n", pthread_self(), sched_getcpu());
+#endif
     for (int i=0; i < ITERATIONS; i++) {
         result = doOp(id);
     }
@@ -74,16 +76,20 @@ void *globalSum(void* thread_id) {
 }
 
 void main() {
+#ifndef __APPLE__
     cpu_set_t cpuset;
+#endif
     pthread_t thread;
     pthread_attr_t attr;
     struct timeval start, end;
     pthread_attr_init(&attr);
     for (int i=0; i < THREAD_COUNT; i++) {
+#ifndef __APPLE__
         CPU_ZERO(&cpuset);
         CPU_SET(i, &cpuset);
-        thread_ids[i] = i;
         pthread_attr_setaffinity_np(&attr, sizeof(cpu_set_t), &cpuset);
+#endif
+        thread_ids[i] = i;
         pthread_create(&threads[i], &attr, globalSum, (void *) &thread_ids[i]);
 
     }
@@ -96,4 +102,3 @@ void main() {
     double seconds = elapsed_time / 1000000.0;
     printf("Wall clock time: %f, Iterations per second: %f\n", seconds, ITERATIONS/seconds);
 }
-
