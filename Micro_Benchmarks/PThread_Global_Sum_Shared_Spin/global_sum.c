@@ -27,14 +27,14 @@ int reduce(int value) {
     stillToWrite--;
     pthread_mutex_unlock(&mutex);
     while (stillToWrite != 0) {
-        usleep(1);
+        usleep(0);
     }
     return opResult;
 }
 
 int opAsMaster(int i) {
     while (stillToRead != 0) {
-        usleep(1);
+        usleep(0);
     }
     pthread_mutex_lock(&mutex);
     stillToWrite = THREAD_COUNT;
@@ -46,7 +46,7 @@ int opAsMaster(int i) {
 
 int opAsNonMaster(int i) {
     while (stillToWrite == 0) {
-        usleep(1);
+        usleep(0);
     }
     return reduce(i);
 }
