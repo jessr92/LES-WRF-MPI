@@ -1,4 +1,5 @@
-CFLAGS=-std=c99 -pthread -O2
+CFLAGS=-std=c99 -W -Wall -Wextra -pedantic
+CFLAGS+=-pthread -O2
 
 all: global_sum
 
@@ -14,4 +15,3 @@ $.o: $.c
 
 clean:
 	rm *.o
-
