@@ -10,7 +10,6 @@
 int thread_ids[THREAD_COUNT];
 pthread_t threads[THREAD_COUNT];
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 int stillToWrite = 0;
 int stillToRead = 0;
 int opResult = 0;
@@ -26,36 +25,29 @@ int reduce(int value) {
     pthread_mutex_lock(&mutex);
     opResult += value;
     stillToWrite--;
-    if (stillToWrite == 0) {
-        pthread_cond_broadcast(&cond);
-    } else {
-        while (stillToWrite != 0) {
-            pthread_cond_wait(&cond, &mutex);
-        }
-    }
     pthread_mutex_unlock(&mutex);
+    while (stillToWrite != 0) {
+        usleep(1);
+    }
     return opResult;
 }
 
 int opAsMaster(int i) {
-    pthread_mutex_lock(&mutex);
     while (stillToRead != 0) {
-        pthread_cond_wait(&cond, &mutex);
+        usleep(1);
     }
+    pthread_mutex_lock(&mutex);
     stillToWrite = THREAD_COUNT;
     stillToRead = THREAD_COUNT;
     opResult = 0;
     pthread_mutex_unlock(&mutex);
-    pthread_cond_broadcast(&cond);
     return reduce(i);
 }
 
 int opAsNonMaster(int i) {
-    pthread_mutex_lock(&mutex);
     while (stillToWrite == 0) {
-        pthread_cond_wait(&cond, &mutex);
+        usleep(1);
     }
-    pthread_mutex_unlock(&mutex);
     return reduce(i);
 }
 
@@ -64,9 +56,6 @@ int doOp(int id) {
     pthread_mutex_lock(&mutex);
     stillToRead--;
     pthread_mutex_unlock(&mutex);
-    if (stillToRead == 0) {
-        pthread_cond_broadcast(&cond);
-    }
     return result;
 }
 
