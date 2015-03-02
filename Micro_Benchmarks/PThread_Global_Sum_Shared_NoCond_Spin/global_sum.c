@@ -8,6 +8,7 @@
 #define ITERATIONS 1000000
 
 #ifdef __APPLE__
+#define EBUSY 16
 typedef int pthread_spinlock_t;
 #endif
 
@@ -41,7 +42,7 @@ int pthread_spin_trylock(pthread_spinlock_t *lock) {
     if (__sync_bool_compare_and_swap(lock, 0, 1)) {
         return 0;
     }
-    return -1;
+    return EBUSY;
 }
 
 int pthread_spin_unlock(pthread_spinlock_t *lock) {
