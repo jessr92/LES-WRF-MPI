@@ -5,7 +5,7 @@
 #include <unistd.h>
 
 #define THREAD_COUNT 4
-#define ITERATIONS 1000000
+#define ITERATIONS 10000000
 
 #ifdef __APPLE__
 #define EBUSY 16
@@ -65,14 +65,14 @@ int reduce(int value) {
     stillToWrite--;
     pthread_spin_unlock(&spinlock);
     while (stillToWrite != 0) {
-        usleep(0);
+        __asm__ __volatile__ ("" ::: "memory");
     }
     return opResult;
 }
 
 int opAsMaster(int i) {
     while (stillToRead != 0) {
-        usleep(0);
+        __asm__ __volatile__ ("" ::: "memory");
     }
     pthread_spin_lock(&spinlock);
     stillToWrite = THREAD_COUNT;
@@ -84,7 +84,7 @@ int opAsMaster(int i) {
 
 int opAsNonMaster(int i) {
     while (stillToWrite == 0) {
-        usleep(0);
+        __asm__ __volatile__ ("" ::: "memory");
     }
     return reduce(i);
 }
