@@ -26,54 +26,20 @@ subroutine sendHaloBoundaries(leftSend, rightSend, topSend, bottomSend, procPerR
     implicit none
     real(kind=4), dimension(:,:,:), intent(in) :: leftSend, rightSend, topSend, bottomSend
     integer, intent(in) :: procPerRow
-    integer :: model_id, has_packets, fifo_empty, waitingFor
-    type(gmcfPacket) :: packet
+    integer :: model_id
     call gmcfGetModelId(model_id)
-    waitingFor = 0
-    !print*, 'Model_id ', model_id, ' is waiting for halo boundary requests'
     if (.not. isTopRow(procPerRow)) then
-        !print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id - procPerRow
-        call gmcfWaitFor(model_id, REQDATA, model_id - procPerRow, 1)
-        waitingFor = waitingFor + 1
+        call gmcfSend3DFloatArray(model_id, topSend, shape(topSend), topTag, model_id - procPerRow, PRE, 1)
     end if
     if (.not. isBottomRow(procPerRow)) then
-        !print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id + procPerRow
-        call gmcfWaitFor(model_id, REQDATA, model_id + procPerRow, 1)
-        waitingFor = waitingFor + 1
+        call gmcfSend3DFloatArray(model_id, bottomSend, shape(bottomSend), bottomTag, model_id + procPerRow, PRE, 1)
     end if
     if (.not. isLeftmostColumn(procPerRow)) then
-        !print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id - 1
-        call gmcfWaitFor(model_id, REQDATA, model_id - 1, 1)
-        waitingFor = waitingFor + 1
+        call gmcfSend3DFloatArray(model_id, leftSend, shape(leftSend), leftTag, model_id - 1, PRE, 1)
     end if
     if (.not. isRightmostColumn(procPerRow)) then
-        !print*, 'Model_id ', model_id, ' is waiting for a request from ', model_id + 1
-        call gmcfWaitFor(model_id, REQDATA, model_id + 1, 1)
-        waitingFor = waitingFor + 1
+        call gmcfSend3DFloatArray(model_id, rightSend, shape(rightSend), rightTag, model_id + 1, PRE, 1)
     end if
-    !print*, 'Model_id ', model_id, ' has received halo boundary requests'
-    call gmcfHasPackets(model_id, REQDATA, has_packets)
-    do while (has_packets == 1 .and. waitingFor .gt. 0)
-        call gmcfShiftPending(model_id, REQDATA, packet, fifo_empty)
-        select case (packet%data_id)
-            case (topTag)
-                call gmcfSend3DFloatArray(model_id, topSend, shape(topSend), topTag, packet%source, PRE, 1)
-                waitingFor = waitingFor - 1
-            case (bottomTag)
-                call gmcfSend3DFloatArray(model_id, bottomSend, shape(bottomSend), bottomTag, packet%source, PRE, 1)
-                waitingFor = waitingFor - 1
-            case (leftTag)
-                call gmcfSend3DFloatArray(model_id, leftSend, shape(leftSend), leftTag, packet%source, PRE, 1)
-                waitingFor = waitingFor - 1
-            case (rightTag)
-                call gmcfSend3DFloatArray(model_id, rightSend, shape(rightSend), rightTag, packet%source, PRE, 1)
-                waitingFor = waitingFor - 1
-            case default
-                call gmcfPushPending(model_id, packet)
-        end select
-        call gmcfHasPackets(model_id, REQDATA, has_packets)
-    end do
-    !print*, 'Model_id ', model_id, ' has responded to halo boundary requests'
 end subroutine sendHaloBoundaries
 
 subroutine recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, procPerRow)
@@ -194,9 +160,11 @@ subroutine recvLeftRightSideflow(leftRightRecv, procPerRow)
         select case (packet%data_id)
             case (leftSideTag)
                 call gmcfRead2DFloatArray(leftRightRecv, shape(leftRightRecv), packet)
+                exit
             case default
-                print*, 'Model_id  ', model_id, ' received an unexpected RESPDATA for lr sideflow, got one from ', &
-                packet%source
+                !print*, 'Model_id  ', model_id, ' received an unexpected RESPDATA for lr sideflow, got one from ', &
+                !packet%source
+                call gmcfPushPending(model_id, packet)
         end select
         call gmcfHasPackets(model_id, RESPDATA, has_packets)
     end do
@@ -235,8 +203,8 @@ subroutine sendRightLeftSideflow(rightLeftSend, procPerRow)
                 call gmcfSend2DFloatArray(model_id, rightLeftSend, shape(rightLeftSend), rightSideTag, packet%source, PRE, 1)
                 exit
             case default
-                !print*, 'Model_id  ', model_id, ' received an unexpected REQDATA for rl sideflow, got one from ', &
-                !packet%source
+                print*, 'Model_id  ', model_id, ' received an unexpected REQDATA for rl sideflow, got one from ', &
+                packet%source
                 call gmcfPushPending(model_id, packet)
         end select
         call gmcfHasPackets(model_id, REQDATA, has_packets)
@@ -257,9 +225,11 @@ subroutine recvRightLeftSideflow(rightLeftRecv, procPerRow)
         select case (packet%data_id)
             case (rightSideTag)
                 call gmcfRead2DFloatArray(rightLeftRecv, shape(rightLeftRecv), packet)
+                exit
             case default
-                print*, 'Model_id  ', model_id, ' received an unexpected RESPDATA for rl sideflow, got one from ', &
-                packet%source
+                !print*, 'Model_id  ', model_id, ' received an unexpected RESPDATA for rl sideflow, got one from ', &
+                !packet%source
+                call gmcfPushPending(model_id, packet)
         end select
         call gmcfHasPackets(model_id, RESPDATA, has_packets)
     end do
