@@ -540,7 +540,6 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, &
         allocate(leftRecv(rowCount, depthSize))
         commWith = rank + procPerRow - 1
 #ifdef GMCF
-        call gmcfRequestData(rank, rightSideTag, rowCount*depthSize, commWith, PRE, 1)
         call recvRightLeftSideflow(leftRecv, procPerRow)
 #else
         call MPI_Recv(leftRecv, rowCount*depthSize, MPI_REAL, commWith, rightSideTag, &
@@ -562,7 +561,7 @@ subroutine sideflowRightLeft(array, procPerRow, colToSend, colToRecv, &
             end do
         end do
 #ifdef GMCF
-        call sendRightLeftSideflow(rightSend, procPerRow)
+        call gmcfSend2DFloatArray(rank, rightSend, shape(rightSend), rightSideTag, commWith, PRE, 1)
         call waitForRightLeftSideflowAcks(procPerRow)
 #else
         call MPI_Send(rightSend, rowCount*depthSize, MPI_REAL, commWith, rightSideTag, &
@@ -601,7 +600,7 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, &
             end do
         end do
 #ifdef GMCF
-        call sendLeftRightSideflow(leftSend, procPerRow)
+        call gmcfSend2DFloatArray(rank, leftSend, shape(leftSend), leftSideTag, commWith, PRE, 1)
         call waitForLeftRightSideflowAcks(procPerRow)
 #else
         call MPI_Send(leftSend, rowCount*depthSize, MPI_REAL, commWith, leftSideTag, &
@@ -613,7 +612,6 @@ subroutine sideflowLeftRight(array, procPerRow, colToSend, colToRecv, &
         allocate(rightRecv(rowCount, depthSize))
         commWith = rank - procPerRow + 1
 #ifdef GMCF
-        call gmcfRequestData(rank, leftSideTag, rowCount*depthSize, commWith, PRE, 1)
         call recvLeftRightSideflow(rightRecv, procPerRow)
 #else
         call MPI_Recv(rightRecv, rowCount*depthSize, MPI_REAL, commWith, leftSideTag, &
