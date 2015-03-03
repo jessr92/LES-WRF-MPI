@@ -22,26 +22,6 @@ subroutine finalise_gmcf(model_id)
     call gmcfFinished(model_id)
 end subroutine finalise_gmcf
 
-subroutine sendHaloBoundaries(leftSend, rightSend, topSend, bottomSend, procPerRow)
-    implicit none
-    real(kind=4), dimension(:,:,:), intent(in) :: leftSend, rightSend, topSend, bottomSend
-    integer, intent(in) :: procPerRow
-    integer :: model_id
-    call gmcfGetModelId(model_id)
-    if (.not. isTopRow(procPerRow)) then
-        call gmcfSend3DFloatArray(model_id, topSend, shape(topSend), topTag, model_id - procPerRow, PRE, 1)
-    end if
-    if (.not. isBottomRow(procPerRow)) then
-        call gmcfSend3DFloatArray(model_id, bottomSend, shape(bottomSend), bottomTag, model_id + procPerRow, PRE, 1)
-    end if
-    if (.not. isLeftmostColumn(procPerRow)) then
-        call gmcfSend3DFloatArray(model_id, leftSend, shape(leftSend), leftTag, model_id - 1, PRE, 1)
-    end if
-    if (.not. isRightmostColumn(procPerRow)) then
-        call gmcfSend3DFloatArray(model_id, rightSend, shape(rightSend), rightTag, model_id + 1, PRE, 1)
-    end if
-end subroutine sendHaloBoundaries
-
 subroutine recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, procPerRow)
     implicit none
     real(kind=4), dimension(:,:,:), intent(out) :: leftRecv, rightRecv, topRecv, bottomRecv

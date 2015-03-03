@@ -180,7 +180,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
             end do
         end do
 #ifdef GMCF
-        !call gmcfRequestData(rank, bottomTag, topThickness * colCount * depthSize, commWith, PRE, 1)
+        call gmcfSend3DFloatArray(rank, topSend, shape(topSend), topTag, commWith, PRE, 1)
 #else
         call MPI_ISend(topSend, bottomThickness*colCount*depthSize, MPI_REAL, commWith, topTag, &
                       cartTopComm, requests(1), ierror)
@@ -209,7 +209,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
             end do
         end do
 #ifdef GMCF
-        !call gmcfRequestData(rank, topTag, bottomThickness * colCount * depthSize, commWith, PRE, 1)
+        call gmcfSend3DFloatArray(rank, bottomSend, shape(bottomSend), bottomTag, commWith, PRE, 1)
 #else
         call MPI_IRecv(topRecv, bottomThickness*colCount*depthSize, MPI_REAL, commWith, topTag, &
                       cartTopComm, requests(3), ierror)
@@ -236,7 +236,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
             end do
         end do
 #ifdef GMCF
-        !call gmcfRequestData(rank, rightTag, rowCount * leftThickness * depthSize, commWith, PRE, 1)
+        call gmcfSend3DFloatArray(rank, leftSend, shape(leftSend), leftTag, commWith, PRE, 1)
 #else
         call MPI_ISend(leftSend, rightThickness*rowCount*depthSize, MPI_REAL, commWith, leftTag, &
                       communicator, requests(5), ierror)
@@ -265,7 +265,7 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
             end do
         end do
 #ifdef GMCF
-        !call gmcfRequestData(rank, leftTag, rowCount * rightThickness * depthSize, commWith, PRE, 1)
+        call gmcfSend3DFloatArray(rank, rightSend, shape(rightSend), rightTag, commWith, PRE, 1)
 #else
         call MPI_IRecv(leftRecv, rightThickness*rowCount*depthSize, MPI_REAL, commWith, leftTag, &
                       communicator, requests(7), ierror)
@@ -276,7 +276,6 @@ subroutine exchangeRealHalos(array, procPerRow, neighbours, leftThickness, &
 #endif
     end if
 #ifdef GMCF
-    call sendHaloBoundaries(leftSend, rightSend, topSend, bottomSend, procPerRow)
     call recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, procPerRow)
 #else
     do i=1,8
