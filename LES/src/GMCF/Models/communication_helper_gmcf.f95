@@ -427,7 +427,7 @@ subroutine getGlobalOpMaster(model_id, value, tag)
     do while(has_packets == 1)
         call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
         if (packet%data_id .ne. tag) then
-            print*, 'Received unexpected packet'
+            print*, 'Received unexpected packet global op master RESPDATA'
         else
             call gmcfRead1DFloatArray(receiveBuffer, shape(receiveBuffer), packet)
             if (tag .eq. globalMinTag) then
@@ -458,7 +458,7 @@ subroutine getGlobalOpMaster(model_id, value, tag)
     do while(has_packets == 1)
         call gmcfShiftPending(model_id, REQDATA, packet, fifo_empty)
         if (packet%data_id .ne. tag) then
-            print*, 'Received unexpected packet'
+            print*, 'Received unexpected packet global op master REQDATA'
         else
             call gmcfSend1DFloatArray(model_id, sendBuffer, shape(sendBuffer), tag, packet%source, PRE, 1)
             !print*, 'Model_id ', model_id, ' sent result value to ', packet%source
@@ -496,7 +496,7 @@ subroutine getGlobalOpNotMaster(model_id, value, tag)
     do while(has_packets == 1)
         call gmcfShiftPending(model_id, REQDATA, packet, fifo_empty)
         if (packet%data_id .ne. tag) then
-            print*, 'Received unexpected packet'
+            print*, 'Received unexpected packet global op not master REQDATA'
         else
             call gmcfSend1DFloatArray(model_id, sendBuffer, shape(sendBuffer), tag, packet%source, PRE, 1)
             !print*, 'value sent to ', packet%source
@@ -520,7 +520,7 @@ subroutine getGlobalOpNotMaster(model_id, value, tag)
     do while(has_packets == 1)
         call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
         if (packet%data_id .ne. tag) then
-            print*, 'Received unexpected packet'
+            print*, 'Received unexpected packet gloabl op not master RESPDATA'
         else
             call gmcfRead1DFloatArray(receiveBuffer, shape(receiveBuffer),packet)
         end if
