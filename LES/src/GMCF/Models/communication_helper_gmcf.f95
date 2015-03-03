@@ -305,12 +305,6 @@ subroutine getGlobalOpMaster(model_id, value, tag)
     real(kind=4), dimension(1) :: receiveBuffer, sendBuffer
     integer :: i, has_packets, fifo_empty
     type(gmcfPacket) :: packet
-    !print*, 'Model_id ', model_id, ' is master'
-    ! Request everybody's value
-    do i=2, mpi_size
-        call gmcfRequestData(model_id, tag, 1, i, PRE, 1)
-    end do
-    !print*, 'Model_id ', model_id, ' has requested every value'
     ! Wait for responses
     do i=2, mpi_size
         call gmcfWaitFor(model_id, RESPDATA, i, 1)
@@ -344,22 +338,8 @@ subroutine getGlobalOpMaster(model_id, value, tag)
     ! Wait for everybody to request the global sum
     sendBuffer(1) = value
     do i=2, mpi_size
-        call gmcfWaitFor(model_id, REQDATA, i, 1)
+        call gmcfSend1DFloatArray(model_id, sendBuffer, shape(sendBuffer), tag, i, PRE, 1)
     end do
-    !print*, 'Model_id ', model_id, ' has received all requests for new value'
-    ! Send the global op result
-    call gmcfHasPackets(model_id, REQDATA, has_packets)
-    do while(has_packets == 1)
-        call gmcfShiftPending(model_id, REQDATA, packet, fifo_empty)
-        if (packet%data_id .ne. tag) then
-            print*, 'Received unexpected packet global op master REQDATA'
-        else
-            call gmcfSend1DFloatArray(model_id, sendBuffer, shape(sendBuffer), tag, packet%source, PRE, 1)
-            !print*, 'Model_id ', model_id, ' sent result value to ', packet%source
-        end if
-        call gmcfHasPackets(model_id, REQDATA, has_packets)
-    end do
-    !print*, 'Model_id ', model_id, ' has sent everyone the new value'
     ! Wait for acks
     do i=2,mpi_size
         call gmcfWaitFor(model_id, ACKDATA, i, 1)
@@ -382,21 +362,7 @@ subroutine getGlobalOpNotMaster(model_id, value, tag)
     type(gmcfPacket) :: packet
     !print*, 'Model_id ', model_id, ' is an else thread'
     sendBuffer(1) = value
-    ! Wait for master to ask for my value
-    call gmcfWaitFor(model_id, REQDATA, 1, 1)
-    !print*, 'Model_id ', model_id, ' has got masters REQDATA '
-    ! Send my value
-    call gmcfHasPackets(model_id, REQDATA, has_packets)
-    do while(has_packets == 1)
-        call gmcfShiftPending(model_id, REQDATA, packet, fifo_empty)
-        if (packet%data_id .ne. tag) then
-            print*, 'Received unexpected packet global op not master REQDATA'
-        else
-            call gmcfSend1DFloatArray(model_id, sendBuffer, shape(sendBuffer), tag, packet%source, PRE, 1)
-            !print*, 'value sent to ', packet%source
-        end if
-        call gmcfHasPackets(model_id, REQDATA, has_packets)
-    end do
+    call gmcfSend1DFloatArray(model_id, sendBuffer, shape(sendBuffer), tag, 1, PRE, 1)
     !print*, 'Model_id ', model_id, ' has sent their value'
     call gmcfWaitFor(model_id, ACKDATA, 1, 1)
     ! Deal with the acks
@@ -405,8 +371,6 @@ subroutine getGlobalOpNotMaster(model_id, value, tag)
         call gmcfShiftPending(model_id, ACKDATA, packet, fifo_empty)
         call gmcfHasPackets(model_id, ACKDATA, has_packets)
     end do        
-    ! Request global value
-    call gmcfRequestData(model_id, tag, 1, 1, PRE, 1)
     ! Wait for response
     call gmcfWaitFor(model_id, RESPDATA, 1, 1)
     ! Read in response
