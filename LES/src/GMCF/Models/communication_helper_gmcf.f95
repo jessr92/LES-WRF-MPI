@@ -611,7 +611,7 @@ subroutine gmcfRecv1DArray(receivingArray, receivingSize, rank, tag)
     do while(has_packets == 1)
         call gmcfShiftPending(rank, RESPDATA, packet, fifo_empty)
         if (packet%data_id .ne. tag) then
-            call gmcfPushPending(model_id, packet)
+            call gmcfPushPending(rank, packet)
         else
             call gmcfRead1DFloatArray(receivingArray, shape(receivingArray),packet)
             exit
@@ -659,7 +659,7 @@ subroutine gmcfRecv2DArray(recvBuffer, receivingSize, rank, tag)
     do while(has_packets == 1)
         call gmcfShiftPending(rank, RESPDATA, packet, fifo_empty)
         if (packet%data_id .ne. zbmTag) then
-            call gmcfPushPending(model_id, packet)
+            call gmcfPushPending(rank, packet)
         else
             call gmcfRead2DFloatArray(recvBuffer, shape(recvBuffer),packet)
             exit
