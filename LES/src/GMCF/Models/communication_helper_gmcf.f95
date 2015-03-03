@@ -26,41 +26,50 @@ subroutine recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, procPerR
     implicit none
     real(kind=4), dimension(:,:,:), intent(out) :: leftRecv, rightRecv, topRecv, bottomRecv
     integer, intent(in) :: procPerRow
-    integer :: model_id, has_packets, fifo_empty
+    integer :: model_id, has_packets, fifo_empty, waitingFor
     type(gmcfPacket) :: packet
     call gmcfGetModelId(model_id)
+    waitingFor = 0
     !print*, 'Model_id ', model_id, ' is waiting for halo boundaries'
     if (.not. isTopRow(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id - procPerRow
         call gmcfWaitFor(model_id, RESPDATA, model_id - procPerRow, 1)
+        waitingFor = waitingFor + 1
     end if
     if (.not. isBottomRow(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id + procPerRow
         call gmcfWaitFor(model_id, RESPDATA, model_id + procPerRow, 1)
+        waitingFor = waitingFor + 1
     end if
     if (.not. isLeftmostColumn(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id - 1
         call gmcfWaitFor(model_id, RESPDATA, model_id - 1, 1)
+        waitingFor = waitingFor + 1
     end if
     if (.not. isRightmostColumn(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id + 1
         call gmcfWaitFor(model_id, RESPDATA, model_id + 1, 1)
+        waitingFor = waitingFor + 1
     end if
     !print*, 'Model_id ', model_id, ' has finished waiting for halo boundaries'
     call gmcfHasPackets(model_id, RESPDATA, has_packets)
-    do while (has_packets == 1)
+    do while (has_packets == 1 .and. waitingFor .gt. 0)
         call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
         select case (packet%data_id)
             case (topTag)
                 call gmcfRead3DFloatArray(topRecv, shape(topRecv), packet)
+                waitingFor = waitingFor - 1
             case (bottomTag)
                 call gmcfRead3DFloatArray(bottomRecv, shape(bottomRecv), packet)
+                waitingFor = waitingFor - 1
             case (leftTag)
                 call gmcfRead3DFloatArray(leftRecv, shape(leftRecv), packet)
+                waitingFor = waitingFor - 1
             case (rightTag)
                 call gmcfRead3DFloatArray(rightRecv, shape(rightRecv), packet)
+                waitingFor = waitingFor - 1
             case default
-                print*, 'Model_id  ', model_id, ' received an unexpected RESPDATA for recvhalo, got one from ', packet%source
+                call gmcfPushPending(model_id, packet)
         end select
         call gmcfHasPackets(model_id, RESPDATA, has_packets)
     end do
