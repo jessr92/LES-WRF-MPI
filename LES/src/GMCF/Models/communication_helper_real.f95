@@ -381,7 +381,7 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
             end do
         end do
 #ifdef GMCF
-        call gmcfRequestData(rank, bottomRightTag, topThickness*leftThickness*depthSize, commWith, PRE, 1)
+        call gmcfSend3DFloatArray(rank, topLeftSend, shape(topLeftSend), topLeftTag, commWith, PRE, 1)
 #endif
 #ifdef MPI
         call MPI_ISend(topLeftSend, bottomThickness*rightThickness*depthSize, MPI_REAL, &
@@ -403,7 +403,7 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
             end do
         end do
 #ifdef GMCF
-        call gmcfRequestData(rank, bottomLeftTag, topThickness*rightThickness*depthSize, commWith, PRE, 1)
+        call gmcfSend3DFloatArray(rank, topRightSend, shape(topRightSend), topRightTag, commWith, PRE, 1)
 #endif
 #ifdef MPI
         call MPI_ISend(topRightSend, bottomThickness*leftThickness*depthSize, MPI_REAL, &
@@ -426,7 +426,7 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
             end do
         end do
 #ifdef GMCF
-        call gmcfRequestData(rank, topRightTag, bottomThickness*leftThickness*depthSize, commWith, PRE, 1)
+        call gmcfSend3DFloatArray(rank, bottomLeftSend, shape(bottomLeftSend), bottomLeftTag, commWith, PRE, 1)
 #endif
 #ifdef MPI
         call MPI_ISend(bottomLeftSend, topThickness*rightThickness*depthSize, MPI_REAL, &
@@ -449,7 +449,7 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
             end do
         end do
 #ifdef GMCF
-        call gmcfRequestData(rank, topLeftTag, bottomThickness*rightThickness*depthSize, commWith, PRE, 1)
+        call gmcfSend3DFloatArray(rank, bottomRightSend, shape(bottomRightSend), bottomRightTag, commWith, PRE, 1)
 #endif
 #ifdef MPI
         call MPI_ISend(bottomRightSend, topThickness*leftThickness*depthSize, MPI_REAL, &
@@ -461,7 +461,6 @@ subroutine exchangeRealCorners(array, procPerRow, leftThickness, rightThickness,
 #endif
     end if
 #ifdef GMCF
-    call sendExactCorners(topLeftSend, topRightSend, bottomLeftSend, bottomRightSend, procPerRow)
     call recvExactCorners(topLeftRecv, topRightRecv, bottomLeftRecv, bottomRightRecv, procPerRow)
 #endif
 #ifdef MPI
