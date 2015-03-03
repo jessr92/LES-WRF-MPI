@@ -520,9 +520,10 @@ subroutine getGlobalOpNotMaster(model_id, value, tag)
     do while(has_packets == 1)
         call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
         if (packet%data_id .ne. tag) then
-            print*, 'Received unexpected packet gloabl op not master RESPDATA'
+            call gmcfPushPending(model_id, packet)
         else
             call gmcfRead1DFloatArray(receiveBuffer, shape(receiveBuffer),packet)
+            exit
         end if
         call gmcfHasPackets(model_id, RESPDATA, has_packets)
     end do
