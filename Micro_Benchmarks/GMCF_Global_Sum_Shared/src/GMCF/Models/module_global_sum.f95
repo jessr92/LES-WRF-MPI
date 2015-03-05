@@ -4,7 +4,7 @@ use gmcfAPI
 
 integer :: stillToWrite = 0
 integer :: stillToRead = 0
-integer :: opResult = 0
+real(kind=4) :: opResult = 0
 
 contains
 
@@ -55,7 +55,7 @@ subroutine reduce(value, tag)
     real(kind=4), intent(inout) :: value
     call gmcfLockGlobalOpSpinLock()
     if (tag .eq. 1) then
-        opResult = opResult + tag
+        opResult = opResult + value
     else
         print*, 'Unknown tag ', tag
     end if
