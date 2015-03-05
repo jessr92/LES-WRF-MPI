@@ -1,0 +1,24 @@
+System:
+    Version: 3.0
+    Libraries: [GMCF, CoreServices]
+    NServiceNodes: 5
+    ServiceNodes:
+        mn1: [ 1 , [GMCF.GMCF] ]
+        mn2: [ 2 , [GMCF.GMCF] ]
+        mn3: [ 3 , [GMCF.GMCF] ]
+        mn4: [ 4 , [GMCF.GMCF] ]
+        ctrl: [ 5, [CoreServices.BEGIN] ]
+    
+    Aliases:
+        begin: ctrl.CoreServices.BEGIN.begin
+        global_sum1: mn1.GMCF.GMCF.run_model1
+        global_sum2: mn2.GMCF.GMCF.run_model1
+        global_sum3: mn3.GMCF.GMCF.run_model1
+        global_sum4: mn4.GMCF.GMCF.run_model1
+    
+    ModelLibPaths: ['libglobal_sum.a']
+    
+    Models:
+        global_sum:
+            ModelId: 1
+
