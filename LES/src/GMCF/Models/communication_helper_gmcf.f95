@@ -34,41 +34,50 @@ subroutine recvHaloBoundaries(leftRecv, rightRecv, topRecv, bottomRecv, procPerR
     if (.not. isTopRow(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id - procPerRow
         call gmcfWaitFor(model_id, RESPDATA, model_id - procPerRow, 1)
+        call gmcfAddOneToSet(model_id, RESPDATA, model_id - procPerRow)
         waitingFor = waitingFor + 1
     end if
     if (.not. isBottomRow(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id + procPerRow
         call gmcfWaitFor(model_id, RESPDATA, model_id + procPerRow, 1)
+        call gmcfAddOneToSet(model_id, RESPDATA, model_id + procPerRow)
         waitingFor = waitingFor + 1
     end if
     if (.not. isLeftmostColumn(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id - 1
         call gmcfWaitFor(model_id, RESPDATA, model_id - 1, 1)
+        call gmcfAddOneToSet(model_id, RESPDATA, model_id - 1)
         waitingFor = waitingFor + 1
     end if
     if (.not. isRightmostColumn(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for a response from ', model_id + 1
         call gmcfWaitFor(model_id, RESPDATA, model_id + 1, 1)
+        call gmcfAddOneToSet(model_id, RESPDATA, model_id + 1)
         waitingFor = waitingFor + 1
     end if
     !print*, 'Model_id ', model_id, ' has finished waiting for halo boundaries'
     call gmcfHasPackets(model_id, RESPDATA, has_packets)
     do while (has_packets == 1 .and. waitingFor .gt. 0)
-        call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
+        call gmcfShiftPendingFromInclusionSet(model_id, RESPDATA, packet, fifo_empty)
         select case (packet%data_id)
             case (topTag)
                 call gmcfRead3DFloatArray(topRecv, shape(topRecv), packet)
                 waitingFor = waitingFor - 1
+                call gmcfRemoveFromSet(model_id, RESPDATA, packet%source);
             case (bottomTag)
                 call gmcfRead3DFloatArray(bottomRecv, shape(bottomRecv), packet)
                 waitingFor = waitingFor - 1
+                call gmcfRemoveFromSet(model_id, RESPDATA, packet%source);
             case (leftTag)
                 call gmcfRead3DFloatArray(leftRecv, shape(leftRecv), packet)
                 waitingFor = waitingFor - 1
+                call gmcfRemoveFromSet(model_id, RESPDATA, packet%source);
             case (rightTag)
                 call gmcfRead3DFloatArray(rightRecv, shape(rightRecv), packet)
                 waitingFor = waitingFor - 1
+                call gmcfRemoveFromSet(model_id, RESPDATA, packet%source);
             case default
+                print*, ' recvHaloBoundaries - unexpected packet'
                 call gmcfPushPending(model_id, packet)
         end select
         call gmcfHasPackets(model_id, RESPDATA, has_packets)
@@ -85,27 +94,33 @@ subroutine waitForHaloAcks(procPerRow)
     if (.not. isTopRow(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id - procPerRow
         call gmcfWaitFor(model_id, ACKDATA, model_id - procPerRow, 1)
+        call gmcfAddOneToSet(model_id, ACKDATA, model_id - procPerRow)
     end if
     if (.not. isBottomRow(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id + procPerRow
         call gmcfWaitFor(model_id, ACKDATA, model_id + procPerRow, 1)
+        call gmcfAddOneToSet(model_id, ACKDATA, model_id + procPerRow)
     end if
     if (.not. isLeftmostColumn(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id - 1
         call gmcfWaitFor(model_id, ACKDATA, model_id - 1, 1)
+        call gmcfAddOneToSet(model_id, ACKDATA, model_id - 1)
     end if
     if (.not. isRightmostColumn(procPerRow)) then
         !print*, 'Model_id ', model_id, ' is waiting for an ack from ', model_id + 1
         call gmcfWaitFor(model_id, ACKDATA, model_id + 1, 1)
+        call gmcfAddOneToSet(model_id, ACKDATA, model_id + 1)
     end if
     call gmcfHasPackets(model_id, ACKDATA, has_packets)
     do while (has_packets == 1)
-        call gmcfShiftPending(model_id, ACKDATA, packet, fifo_empty)
+        call gmcfShiftPendingFromInclusionSet(model_id, ACKDATA, packet, fifo_empty)
         if (packet%source .ne. model_id - procPerRow .and. &
               packet%source .ne. model_id + procPerRow .and. &
               packet%source .ne. model_id - 1 .and. &
               packet%source .ne. model_id + 1) then
             print*, 'Model_id  ', model_id, ' received an unexpected ACKDATA for halo acks, got one from ', packet%source
+        else
+            call gmcfRemoveFromSet(model_id, ACKDATA, packet%source)
         end if
         call gmcfHasPackets(model_id, ACKDATA, has_packets)
     end do
@@ -121,7 +136,7 @@ subroutine recvLeftRightSideflow(leftRightRecv, procPerRow)
     call gmcfWaitFor(model_id, RESPDATA, model_id - procPerRow + 1, 1)
     call gmcfHasPackets(model_id, RESPDATA, has_packets)
     do while (has_packets == 1)
-        call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
+        call gmcfShiftPending(model_id, model_id - procPerRow + 1, RESPDATA, packet, fifo_empty)
         select case (packet%data_id)
             case (leftSideTag)
                 call gmcfRead2DFloatArray(leftRightRecv, shape(leftRightRecv), packet)
@@ -144,7 +159,7 @@ subroutine waitForLeftRightSideflowAcks(procPerRow)
     call gmcfWaitFor(model_id, ACKDATA, model_id + procPerRow - 1, 1)
     call gmcfHasPackets(model_id, ACKDATA, has_packets)
     do while (has_packets == 1)
-        call gmcfShiftPending(model_id, ACKDATA, packet, fifo_empty)
+        call gmcfShiftPending(model_id, model_id + procPerRow - 1, ACKDATA, packet, fifo_empty)
         if (packet%source .ne. model_id + procPerRow - 1) then
             print*, 'Model_id  ', model_id, ' received an unexpected ACKDATA for left sideflow acks, got one from ', packet%source
         end if
@@ -162,7 +177,7 @@ subroutine recvRightLeftSideflow(rightLeftRecv, procPerRow)
     call gmcfWaitFor(model_id, RESPDATA, model_id + procPerRow - 1, 1)
     call gmcfHasPackets(model_id, RESPDATA, has_packets)
     do while (has_packets == 1)
-        call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
+        call gmcfShiftPending(model_id, model_id + procPerRow - 1, RESPDATA, packet, fifo_empty)
         select case (packet%data_id)
             case (rightSideTag)
                 call gmcfRead2DFloatArray(rightLeftRecv, shape(rightLeftRecv), packet)
@@ -185,7 +200,7 @@ subroutine waitForRightLeftSideflowAcks(procPerRow)
     call gmcfWaitFor(model_id, ACKDATA, model_id - procPerRow + 1, 1)
     call gmcfHasPackets(model_id, ACKDATA, has_packets)
     do while (has_packets == 1)
-        call gmcfShiftPending(model_id, ACKDATA, packet, fifo_empty)
+        call gmcfShiftPending(model_id, model_id - procPerRow + 1, ACKDATA, packet, fifo_empty)
         if (packet%source .ne. model_id - procPerRow + 1) then
             print*, 'Model_id  ', model_id, ' received an unexpected ACKDATA for right sideflow acks, got one from ', packet%source
         end if
@@ -203,37 +218,46 @@ subroutine recvExactCorners(topLeftRecv, topRightRecv, bottomLeftRecv, bottomRig
     waitingFor = 0
     if (.not. isTopRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, RESPDATA, model_id - procPerRow - 1, 1)
+        call gmcfAddOneToSet(model_id, RESPDATA, model_id - procPerRow - 1)
         waitingFor = waitingFor + 1
     end if
     if (.not. isTopRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, RESPDATA, model_id - procPerRow + 1, 1)
+        call gmcfAddOneToSet(model_id, RESPDATA, model_id - procPerRow + 1)
         waitingFor = waitingFor + 1
     end if
     if (.not. isBottomRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, RESPDATA, model_id + procPerRow - 1, 1)
+        call gmcfAddOneToSet(model_id, RESPDATA, model_id + procPerRow - 1)
         waitingFor = waitingFor + 1
     end if
     if (.not. isBottomRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, RESPDATA, model_id + procPerRow + 1, 1)
+        call gmcfAddOneToSet(model_id, RESPDATA, model_id + procPerRow + 1)
         waitingFor = waitingFor + 1
     end if
     call gmcfHasPackets(model_id, RESPDATA, has_packets)
     do while (has_packets == 1 .and. waitingFor .gt. 0)
-        call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
+        call gmcfShiftPendingFromInclusionSet(model_id, RESPDATA, packet, fifo_empty)
         select case (packet%data_id)
             case (topLeftTag)
                 call gmcfRead3DFloatArray(topLeftRecv, shape(topLeftRecv), packet)
                 waitingFor = waitingFor - 1
+                call gmcfRemoveFromSet(model_id, RESPDATA, packet%source)
             case (topRightTag)
                 call gmcfRead3DFloatArray(topRightRecv, shape(topRightRecv), packet)
                 waitingFor = waitingFor - 1
+                call gmcfRemoveFromSet(model_id, RESPDATA, packet%source)
             case (bottomLeftTag)
                 call gmcfRead3DFloatArray(bottomLeftRecv, shape(bottomLeftRecv), packet)
                 waitingFor = waitingFor - 1
+                call gmcfRemoveFromSet(model_id, RESPDATA, packet%source)
             case (bottomRightTag)
                 call gmcfRead3DFloatArray(bottomRightRecv, shape(bottomRightRecv), packet)
                 waitingFor = waitingFor - 1
+                call gmcfRemoveFromSet(model_id, RESPDATA, packet%source)
             case default
+                print*, 'recvExactCorners - unexpected packet'
                 call gmcfPushPending(model_id, packet)
         end select
         call gmcfHasPackets(model_id, RESPDATA, has_packets)
@@ -248,24 +272,30 @@ subroutine waitForExactCornersAcks(procPerRow)
     call gmcfGetModelId(model_id)
     if (.not. isTopRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, ACKDATA, model_id - procPerRow - 1, 1)
+        call gmcfAddOneToSet(model_id, ACKDATA, model_id - procPerRow - 1)
     end if
     if (.not. isTopRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, ACKDATA, model_id - procPerRow + 1, 1)
+        call gmcfAddOneToSet(model_id, ACKDATA, model_id - procPerRow + 1)
     end if
     if (.not. isBottomRow(procPerRow) .and. .not. isLeftmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, ACKDATA, model_id + procPerRow - 1, 1)
+        call gmcfAddOneToSet(model_id, ACKDATA, model_id + procPerRow - 1)
     end if
     if (.not. isBottomRow(procPerRow) .and. .not. isRightmostColumn(procPerRow)) then
         call gmcfWaitFor(model_id, ACKDATA, model_id + procPerRow + 1, 1)
+        call gmcfAddOneToSet(model_id, ACKDATA, model_id + procPerRow + 1)
     end if
     call gmcfHasPackets(model_id, ACKDATA, has_packets)
     do while (has_packets == 1)
-        call gmcfShiftPending(model_id, ACKDATA, packet, fifo_empty)
+        call gmcfShiftPendingFromInclusionSet(model_id, ACKDATA, packet, fifo_empty)
         if (packet%source .ne. model_id - procPerRow - 1 .and. &
               packet%source .ne. model_id - procPerRow + 1 .and. &
               packet%source .ne. model_id + procPerRow - 1 .and. &
               packet%source .ne. model_id + procPerRow + 1) then
             print*, 'Model_id  ', model_id, ' received an unexpected ACKDATA for exact corner acks.'
+        else
+            call gmcfRemoveFromSet(model_id, ACKDATA, packet%source)
         end if
         call gmcfHasPackets(model_id, ACKDATA, has_packets)
     end do
@@ -317,15 +347,17 @@ subroutine getGlobalOpMaster(model_id, value, tag)
     ! Wait for responses
     do i=2, mpi_size
         call gmcfWaitFor(model_id, RESPDATA, i, 1)
+        call gmcfAddOneToSet(model_id, RESPDATA, i)
     end do
     !print*, 'Model_id ', model_id, ' has received responses for every value'
     ! Read in responses and find the min value
     call gmcfHasPackets(model_id, RESPDATA, has_packets)
     do while(has_packets == 1)
-        call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
+        call gmcfShiftPendingFromInclusionSet(model_id, RESPDATA, packet, fifo_empty)
         if (packet%data_id .ne. tag) then
             print*, 'Received unexpected packet global op master RESPDATA'
         else
+            call gmcfRemoveFromSet(model_id, RESPDATA, packet%source)
             call gmcfRead1DFloatArray(receiveBuffer, shape(receiveBuffer), packet)
             if (tag .eq. globalMinTag) then
                 if (receiveBuffer(1) .lt. value) then
@@ -352,13 +384,15 @@ subroutine getGlobalOpMaster(model_id, value, tag)
     ! Wait for acks
     do i=2,mpi_size
         call gmcfWaitFor(model_id, ACKDATA, i, 1)
+        call gmcfAddOneToSet(model_id, ACKDATA, i)
         !print*, 'Model_id ', model_id, ' received final ack from ', i
     end do
     !print*, 'Model_id ', model_id, ' has receive all acks for new value'
     ! Deal with the acks
     call gmcfHasPackets(model_id, ACKDATA, has_packets)
     do while(has_packets == 1)
-        call gmcfShiftPending(model_id, ACKDATA, packet, fifo_empty)
+        call gmcfShiftPendingFromInclusionSet(model_id, ACKDATA, packet, fifo_empty)
+        call gmcfRemoveFromSet(model_id, ACKDATA, packet%source)
         call gmcfHasPackets(model_id, ACKDATA, has_packets)
     end do
 end subroutine getGlobalOpMaster
@@ -377,7 +411,7 @@ subroutine getGlobalOpNotMaster(model_id, value, tag)
     ! Deal with the acks
     call gmcfHasPackets(model_id, ACKDATA, has_packets)
     do while(has_packets == 1)
-        call gmcfShiftPending(model_id, ACKDATA, packet, fifo_empty)
+        call gmcfShiftPending(model_id, 1, ACKDATA, packet, fifo_empty)
         call gmcfHasPackets(model_id, ACKDATA, has_packets)
     end do        
     ! Wait for response
@@ -385,7 +419,7 @@ subroutine getGlobalOpNotMaster(model_id, value, tag)
     ! Read in response
     call gmcfHasPackets(model_id, RESPDATA, has_packets)
     do while(has_packets == 1)
-        call gmcfShiftPending(model_id, RESPDATA, packet, fifo_empty)
+        call gmcfShiftPending(model_id, 1, RESPDATA, packet, fifo_empty)
         if (packet%data_id .ne. tag) then
             call gmcfPushPending(model_id, packet)
         else
@@ -406,7 +440,7 @@ subroutine recv3DReal4Array(rank, i, recvBuffer, bufferSize)
     call gmcfWaitFor(rank, RESPDATA, i, 1)
     call gmcfHasPackets(rank, RESPDATA, has_packets)
     do while(has_packets == 1)
-        call gmcfShiftPending(rank, RESPDATA, packet, fifo_empty)
+        call gmcfShiftPending(rank, i, RESPDATA, packet, fifo_empty)
         if (packet%source .ne. i) then
             print*, 'Rank ', rank, ' received an unexpected RESPDATA in recv 3d real 4 array'
         else
@@ -423,7 +457,7 @@ subroutine send3DReal4Array(array, rank)
     call gmcfWaitFor(rank, REQDATA, 1, 1)
     call gmcfHasPackets(rank, REQDATA, has_packets)
     do while(has_packets == 1)
-        call gmcfShiftPending(rank, REQDATA, packet, fifo_empty)
+        call gmcfShiftPending(rank, 1, REQDATA, packet, fifo_empty)
         if (packet%source .ne. 1) then
             print*, 'Rank ', rank, ' received an unexpected REQDATA in send 3d real 4 array'
         else
@@ -434,7 +468,7 @@ subroutine send3DReal4Array(array, rank)
    call gmcfWaitFor(rank, ACKDATA, 1, 1)
    call gmcfHasPackets(rank, ACKDATA, has_packets)
    do while(has_packets == 1)
-       call gmcfShiftPending(rank, ACKDATA, packet, fifo_empty)
+       call gmcfShiftPending(rank, 1, ACKDATA, packet, fifo_empty)
        if (packet%source .ne. 1) then
            print*, 'Rank ', rank, ' received an unexpected ACKDATA in send 3d real 4 array'
        end if
@@ -449,7 +483,7 @@ subroutine gmcfSend1DArray(sendBuffer, rank, i, tag)
     call gmcfWaitFor(rank, REQDATA, i, 1)
     call gmcfHasPackets(rank, REQDATA, has_packets)
     do while(has_packets == 1)
-        call gmcfShiftPending(rank, REQDATA, packet, fifo_empty)
+        call gmcfShiftPending(rank, i, REQDATA, packet, fifo_empty)
         if (packet%source .eq. i) then
             call gmcfSend1DFloatArray(rank, sendBuffer, shape(sendBuffer), tag, i, PRE, 1)
             exit
@@ -461,7 +495,7 @@ subroutine gmcfSend1DArray(sendBuffer, rank, i, tag)
     call gmcfWaitFor(rank, ACKDATA, i, 1)
     call gmcfHasPackets(rank, ACKDATA, has_packets)
     do while(has_packets == 1)
-        call gmcfShiftPending(rank, ACKDATA, packet, fifo_empty)
+        call gmcfShiftPending(rank, i, ACKDATA, packet, fifo_empty)
         if (packet%source .ne. i) then
             print*, 'Model_id ', rank, ' received an unexpected ack in send 1d array'
         end if
@@ -477,7 +511,7 @@ subroutine gmcfRecv1DArray(receivingArray, receivingSize, rank, tag)
     call gmcfWaitFor(rank, RESPDATA, 1, 1)
     call gmcfHasPackets(rank, RESPDATA, has_packets)
     do while(has_packets == 1)
-        call gmcfShiftPending(rank, RESPDATA, packet, fifo_empty)
+        call gmcfShiftPending(rank, 1, RESPDATA, packet, fifo_empty)
         if (packet%data_id .ne. tag) then
             call gmcfPushPending(rank, packet)
         else
@@ -495,7 +529,7 @@ subroutine gmcfSend2DArray(sendBuffer, rank, i, tag)
     call gmcfWaitFor(rank, REQDATA, i, 1)
     call gmcfHasPackets(rank, REQDATA, has_packets)
     do while(has_packets == 1)
-        call gmcfShiftPending(rank, REQDATA, packet, fifo_empty)
+        call gmcfShiftPending(rank, i, REQDATA, packet, fifo_empty)
         if (packet%source .eq. i) then
             call gmcfSend2DFloatArray(rank, sendBuffer, shape(sendBuffer), tag, i, PRE, 1)
             exit
@@ -507,7 +541,7 @@ subroutine gmcfSend2DArray(sendBuffer, rank, i, tag)
     call gmcfWaitFor(rank, ACKDATA, i, 1)
     call gmcfHasPackets(rank, ACKDATA, has_packets)
     do while(has_packets == 1)
-        call gmcfShiftPending(rank, ACKDATA, packet, fifo_empty)
+        call gmcfShiftPending(rank, i, ACKDATA, packet, fifo_empty)
         if (packet%source .ne. i) then
             print*, 'Model_id ', rank, ' received an unexpected ack in send 1d array'
         end if
@@ -525,7 +559,7 @@ subroutine gmcfRecv2DArray(recvBuffer, receivingSize, rank, tag)
     print*, 'Model_id ', rank, ' has received zbm response from 1'
     call gmcfHasPackets(rank, RESPDATA, has_packets)
     do while(has_packets == 1)
-        call gmcfShiftPending(rank, RESPDATA, packet, fifo_empty)
+        call gmcfShiftPending(rank, 1, RESPDATA, packet, fifo_empty)
         if (packet%data_id .ne. zbmTag) then
             call gmcfPushPending(rank, packet)
         else
