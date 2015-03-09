@@ -1,0 +1,46 @@
+Climate scientists are interested in modeling aspects of our planet's ecosystem,
+creating a number of simulations to do so. One such simulation is the Large Eddy
+Simulator (LES) developed by Hiromasa Nakayama and Haruyasu Nagai at the Japan
+Atomic Energy Agency and Professor Tetsuya Takemi at the Disaster Prevention
+Research Institute of Kyoto University. The original LES is implemented in
+FORTRAN 77 and is single threaded.
+
+With multicore processors and multiple processors available on a single machine,
+it is beneficial to parallelise the LES to make better use of the computation
+power of a shared memory system. With multiple node systems common place in the
+area of research simulation, a parallelised implementation of the LES that can
+make use of distributed memory system hardware is highly desirable.
+
+Work by Wim Vanderbauwhede has seen the LES automatically ported for Fortran 95
+and an OpenCL implementation created. While this improves performance on shared
+memory systems and allows the use of heterogeneous systems such as those with
+GPUs to be used, the LES may not have the best possible performance on a CPU and
+it is still not ready for distributed memory systems.
+
+This paper presents two implementations of the LES. The first uses the industry
+standard for distributed memory parallelism, MPI, and the second makes use of a
+new framework by Wim Vanderbauwhede, the Glasgow Model Coupling Framework
+(GMCF). The GMCF implementation is shared memory only as the framework is still
+in the early stages of development with future work that includes the ability to
+have distributed memory parallelism.
+
+The major contributions of the work discussed in this paper are:
+
+\begin{itemize}
+    \item MPI implementation of the LES
+    \item Evaluation of MPI LES
+    \item GMCF implementation of the LES
+    \item Evaluation of GMCF LES
+    \item GMCF performance investigation and improvements
+\end{itemize}
+
+Section~\ref{sec:Background} discusses the background to GMCF.
+Section~\ref{sec:MPILES} discusses the MPI implementation of the LES with
+Section~\ref{sec:MPILESEval} conducting a shared-memory and distributed-memory
+performance evaluation. Section~\ref{sec:GMCFLES} then discusses the GMCF
+implementation including framework changes required to facilitate model
+parallelisation with Section~\ref{sec:GMCFLESEval} conducting a shared-memory
+performance evaluation. Section~\ref{sec:GMCFInvestigation} conducts an in-depth
+performance investigation of the GMCF framework while outlining
+performance-related improvements implemented. Section~\ref{sec:Conclusion} then
+concludes, discussing future work for GMCF and the LES.
