@@ -333,7 +333,7 @@ subroutine getGlobalOp(model_id, value, tag)
     implicit none
     integer, intent(in) :: model_id, tag
     real(kind=4), intent(inout) :: value
-    print*, 'Model_id ', model_id, ' beginning getGlobalOp with tag ', tag, ' with value ', value
+    !print*, 'Model_id ', model_id, ' beginning getGlobalOp with tag ', tag, ' with value ', value
     if (isMaster()) then
         call getGlobalOpMaster(value, tag)
     else
@@ -342,7 +342,7 @@ subroutine getGlobalOp(model_id, value, tag)
     call gmcfLockGlobalOpSpinLock()
     stillToRead = stillToRead - 1
     call gmcfUnlockGlobalOpSpinLock()
-    print*, 'Model_id ', model_id, ' finished getGlobalOp', ' with value ', value
+    !print*, 'Model_id ', model_id, ' finished getGlobalOp', ' with value ', value
 end subroutine getGlobalOp
 
 subroutine getGlobalOpMaster(value, tag)
@@ -354,9 +354,7 @@ subroutine getGlobalOpMaster(value, tag)
     stillToWrite = PROC_PER_ROW * PROC_PER_COL
     stillToRead = PROC_PER_ROW * PROC_PER_COL
     opResult = 0
-    print*, ' master has set things up'
     call gmcfUnlockGlobalOpSpinLock()
-    print*, ' master has unlocked the spin lock'
     call reduce(value, tag)
 end subroutine getGlobalOpMaster
 
@@ -371,7 +369,6 @@ end subroutine getGlobalOpNotMaster
 subroutine reduce(value, tag)
     integer, intent(in) :: tag
     real(kind=4), intent(inout) :: value
-    print*, ' in reduce'
     call gmcfLockGlobalOpSpinLock()
     if (tag .eq. globalSumTag) then
         opResult = opResult + value
@@ -386,13 +383,11 @@ subroutine reduce(value, tag)
     else
         print*, 'Unknown tag ', tag
     end if
-    print*, ' done the thing'
     stillToWrite = stillToWrite - 1
     call gmcfUnlockGlobalOpSpinLock()
     do while (stillToWrite .ne. 0)
     end do
     value = opResult
-    print*, ' got the result ', value
 end subroutine reduce
 
 subroutine recv3DReal4Array(rank, i, recvBuffer, bufferSize)
