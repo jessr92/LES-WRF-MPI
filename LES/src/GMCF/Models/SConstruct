@@ -114,7 +114,7 @@ if expanding_area == '1':
 FFLAGS  = [USE_NETCDF_OUTPUT, WITH_MPI, WITH_GMCF, FAST_MPI, EXPANDING_AREA, EXACT_CORNERS, ESTIMATE_CORNERS, GR_DEBUG, WV_DEBUG, PROC_PER_ROW, PROC_PER_COL, WITH_OCL, NO_FILE_IO, ICAL, IFBF,IANIME, IADAM] 
 
 if with_ocl == '0':
-    FFLAGS += ['-cpp','-O0', '-m64', '-Wall','-ffree-form', '-fconvert=big-endian', VERBOSE,TIMINGS]
+    FFLAGS += ['-cpp','-Ofast', '-m64', '-Wall','-ffree-form', '-fconvert=big-endian', VERBOSE,TIMINGS]
     
 csources=[]
 CC= os.environ['CC']
