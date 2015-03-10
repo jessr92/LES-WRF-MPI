@@ -17,6 +17,7 @@ subroutine initialise_gmcf(sys, tile, model_id, procPerRow, procPerCol)
     integer , intent(In) :: model_id, procPerRow, procPerCol
     mpi_size = procPerRow * procPerCol
     call gmcfInitCoupler(sys, tile, model_id)
+    call gmcfInitGlobalOpSpinLock()
 end subroutine initialise_gmcf
 
 subroutine finalise_gmcf(model_id)
@@ -332,13 +333,13 @@ subroutine getGlobalOp(model_id, value, tag)
     implicit none
     integer, intent(in) :: model_id, tag
     real(kind=4), intent(inout) :: value
-    !print*, 'Model_id ', model_id, ' beginning getGlobalOp with tag ', tag
+    print*, 'Model_id ', model_id, ' beginning getGlobalOp with tag ', tag
     if (isMaster()) then
         call getGlobalOpMaster(value, tag)
     else
         call getGlobalOpNotMaster(value, tag)
     end if
-    !print*, 'Model_id ', model_id, ' finished getGlobalOp'
+    print*, 'Model_id ', model_id, ' finished getGlobalOp'
 end subroutine getGlobalOp
 
 subroutine getGlobalOpMaster(value, tag)
