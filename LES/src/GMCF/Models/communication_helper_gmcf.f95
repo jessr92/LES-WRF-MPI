@@ -330,65 +330,10 @@ subroutine getGlobalMinOfGMCF(value)
 end subroutine getGlobalMinOfGMCF
 
 subroutine getGlobalOp(model_id, value, tag)
-    implicit none
     integer, intent(in) :: model_id, tag
     real(kind=4), intent(inout) :: value
-    !print*, 'Model_id ', model_id, ' beginning getGlobalOp with tag ', tag, ' with value ', value
-    if (isMaster()) then
-        call getGlobalOpMaster(value, tag)
-    else
-        call getGlobalOpNotMaster(value, tag)
-    end if
-    call gmcfLockGlobalOpSpinLock()
-    stillToRead = stillToRead - 1
-    call gmcfUnlockGlobalOpSpinLock()
-    !print*, 'Model_id ', model_id, ' finished getGlobalOp', ' with value ', value
+    call gmcfDoOp(model_id, value, tag, mpi_size)
 end subroutine getGlobalOp
-
-subroutine getGlobalOpMaster(value, tag)
-    integer, intent(in) :: tag
-    real(kind=4), intent(inout) :: value
-    do while (stillToRead .ne. 0)
-    end do
-    call gmcfLockGlobalOpSpinLock()
-    stillToWrite = PROC_PER_ROW * PROC_PER_COL
-    stillToRead = PROC_PER_ROW * PROC_PER_COL
-    opResult = 0
-    call gmcfUnlockGlobalOpSpinLock()
-    call reduce(value, tag)
-end subroutine getGlobalOpMaster
-
-subroutine getGlobalOpNotMaster(value, tag)
-    integer, intent(in) :: tag
-    real(kind=4), intent(inout) :: value
-    do while (stillToWrite .eq. 0)
-    end do
-    call reduce(value, tag)
-end subroutine getGlobalOpNotMaster
-
-subroutine reduce(value, tag)
-    integer, intent(in) :: tag
-    real(kind=4), intent(inout) :: value
-    call gmcfLockGlobalOpSpinLock()
-    if (tag .eq. globalSumTag) then
-        opResult = opResult + value
-    else if (tag .eq. globalMaxTag) then
-        if (value .gt. opResult) then
-            opResult = value
-        end if
-    else if (tag .eq. globalMinTag) then
-        if (value .lt. opResult) then
-            opResult = value
-        end if    
-    else
-        print*, 'Unknown tag ', tag
-    end if
-    stillToWrite = stillToWrite - 1
-    call gmcfUnlockGlobalOpSpinLock()
-    do while (stillToWrite .ne. 0)
-    end do
-    value = opResult
-end subroutine reduce
 
 subroutine recv3DReal4Array(rank, i, recvBuffer, bufferSize)
     real(kind=4), dimension(:,:,:), intent(out) :: recvBuffer
