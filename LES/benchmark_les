@@ -26,8 +26,12 @@ do
         PROCESSES=`expr $procPerCol \\* $procPerRow`
         if [ $PROCESSES -le $HARDWARE_THREAD_COUNT ]; then
             OUTPUT_FILE=$TIMING_DIRECTORY"/SharedMemory/les_main_gmcf_row"$procPerRow"_col"$procPerCol".txt"
-            ./build_les $procPerRow $procPerCol "D=TIMINGS"
-            ./run_les > $OUTPUT_FILE
+            if [ -f "$OUTPUT_FILE" ]; then
+                echo "done this"
+            else
+                ./build_les $procPerRow $procPerCol "D=TIMINGS"
+                timeout 10m ./run_les > $OUTPUT_FILE
+            fi
         fi
     done
 done
@@ -38,8 +42,12 @@ do
         PROCESSES=`expr $procPerCol \\* $procPerRow`
         if [ $PROCESSES -le $HARDWARE_THREAD_COUNT ]; then
             OUTPUT_FILE=$TIMING_DIRECTORY"/SharedMemoryExactCorners/les_main_gmcf_row"$procPerRow"_col"$procPerCol".txt"
-            ./build_les $procPerRow $procPerCol "D=TIMINGS exactCorners=1"
-            ./run_les > $OUTPUT_FILE
+            if [ -f "$OUTPUT_FILE" ]; then
+                echo "done this"
+            else
+                ./build_les $procPerRow $procPerCol "D=TIMINGS exactCorners=1"
+                timeout 10m ./run_les > $OUTPUT_FILE
+            fi
         fi
     done
 done
@@ -50,8 +58,12 @@ do
         PROCESSES=`expr $procPerCol \\* $procPerRow`
         if [ $PROCESSES -le $HARDWARE_THREAD_COUNT ]; then
             OUTPUT_FILE=$TIMING_DIRECTORY"/SharedMemoryExpandingArea/les_main_gmcf_row"$procPerRow"_col"$procPerCol".txt"
-            ./build_les $procPerRow $procPerCol "D=TIMINGS expandingArea=1"
-            ./run_les > $OUTPUT_FILE
+            if [ -f "$OUTPUT_FILE" ]; then
+                echo "done this"
+            else
+                ./build_les $procPerRow $procPerCol "D=TIMINGS expandingArea=1"
+                timeout 10m ./run_les > $OUTPUT_FILE
+            fi
         fi
     done
 done
@@ -62,8 +74,12 @@ do
         PROCESSES=`expr $procPerCol \\* $procPerRow`
         if [ $PROCESSES -le $HARDWARE_THREAD_COUNT ]; then
             OUTPUT_FILE=$TIMING_DIRECTORY"/SharedMemoryExactCornersExpandingArea/les_main_gmcf_row"$procPerRow"_col"$procPerCol".txt"
-            ./build_les $procPerRow $procPerCol "D=TIMINGS exactCorners=1 expandingArea=1"
-            ./run_les > $OUTPUT_FILE
+            if [ -f "$OUTPUT_FILE" ]; then
+                echo "done this"
+            else
+                ./build_les $procPerRow $procPerCol "D=TIMINGS exactCorners=1 expandingArea=1"
+                timeout 10m ./run_les > $OUTPUT_FILE
+            fi
         fi
     done
 done
