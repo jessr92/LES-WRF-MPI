@@ -11,45 +11,7 @@
 
 \maketitle
 
-\section{MPI LES}
-
-\subsection{Halo Boundaries}
-
-Compare Figure~\ref{fig:standardLESGrid} and Figure~\ref{fig:mpiLESGrid}. Both
-grids have the same depth however, for the sake of brevity, this is not shown in
-the diagram.
-
-The standard LES grid is two kinds of boundary: periodic boundary and open
-boundary. The periodic boundary are simple memory copies between one side of the
-grid to another. The open boundary is merely a copy to the neighbouring row of
-the grid.
-
-The MPI LES grid is split into a certain number of processors per row and per
-column as shown by the inner, smaller, sections. The grid has the same periodic
-and open boundaries however, in the case of the period boundaries, the exchange
-is actually an MPI message between two processes, one pair per row. In addition
-to these boundaries, the MPI grid also has halo exchanges between the internal
-sections. Up to four exchanges (up, down, left and right) may be required
-because, to calculate a value at position (x, y), a process needs to know its
-neighbouring values which, without the halo exchange, would be out of range for
-the outer edges of a process' grid section.
-
-The boundary code is found in four files: bondFG.f95, bondv1.f95, boundp.f95 and
-boundsm.f95. Halo exchanges and period boundary side exchanges need to be added
-to these files. MPI exchanges come at a non-zero cost so performance concerns
-immediately come to mind. For bondFG.f95, bondv1.f95 and boundsm.f95 this should
-not be an issue given that they are called once per timestep however boundp.f95
-is called four times per timestep. At the cost of correctness, boundp.f95 may
-need to be ignored in terms of MPI exchanges in order to achieve suitable
-performance numbers.
-
-An additional problem occurs when considering corner values. The four halo
-exchanges do not include the corners, these come from the grid that's up-left,
-up-right, down-left, down-right from the process. This means that, per array
-section, the halo exchange would need to be eight messages instead of four. This
-would cause an unacceptable performance hit thus the corner values are estimated
-based on the three neighbouring values known to the process at the cost of
-absolute correctness.
+\section{LES}
 
 \subsection{Effect of Corner Estimation in Halo Boundaries}
 
@@ -87,17 +49,11 @@ Places where corner estimated values are used:
     Doesn't seem to be called however.
 \end{itemize}
 
-\begin{figure}
-    \includegraphics[width=\linewidth]{Diagrams/standardLESGrid.pdf}
-    \caption{Standard LES Grid}
-    \label{fig:standardLESGrid}
-\end{figure}
-
-\begin{figure}
-    \includegraphics[width=\linewidth]{Diagrams/mpiLESGrid.pdf}
-    \caption{MPI LES Grid}
-    \label{fig:mpiLESGrid}
-\end{figure}
+Exact corner code exists. Sending exact corners does not seem to negatively
+affect performance and has been seen to marginally improve performance over the
+estimated corner case. With corner estimation requiring three floating point
+operations per float (two additions and a division), then it isn't unsurprising
+that sending floats instead isn't expensive to do in comparison.
 
 \section{GMCF}
 
@@ -108,13 +64,56 @@ are not currently implemented and a number of workarounds and hacks including
 hard coded values that should be worked out at compile-time instead.
 
 \begin{itemize}
+
     \item The td files for defining each model in the coupling and the model's
-    unique ID are manually created.
+    unique ID are manually created. Currently a Python script exists to generate
+    this for simple examples.
+
     \item The yml files for defining model communication, method names etc are
     manually created instead of being defined from the td file and the model
-    code.
+    code. Currently a Python script exists to generate this for simple examples.
+
     \item The gmcfConnectivityMatrix is currently hard coded instead of being
-    calculated based on the contents of the yml file.
+    calculated based on the contents of the yml file. Currently a Python script
+    exists to generate this for simple examples. The gmcfConnectivityMatrix is
+    unused bar FIN packets at the moment anyway.
+
+\end{itemize}
+
+\subsection{Performance}
+
+\begin{itemize}
+
+    \item There is a double free/memory corruption crash when leaving the model
+    subroutine. This is probably something to do with Fortran silently doing
+    allocates for stack variables and freeing them, then C++ freeing them or
+    something like that.
+
+    \item For large messages (100K reals), MPI has 3x the bandwidth than GMCF
+    using the packets method.
+
+    \item For small messages (1 real), MPI has 1000x the bandwidth than GMCF
+    using the packets method.
+
+    \item For a small number of threads (say 4), GMCF is slightly faster/on-par
+    with MPI for global reductions (sum, min, max).
+
+    \item For a large number of threads (say 64), GMCF is 10x slower than MPI
+    for global reductions but is still 100x faster than the packets method for
+    doing the same thing.
+
+\end{itemize}
+
+\subsection{Future improvements}
+
+\begin{itemize}
+
+    \item Make use of type(*) in Fortran 2003 to provide generic send and
+    receive functions, rather than gmcfSendReal4Array, etc.
+
+    \item Abstracting away the notion of packets into subroutines to minimise
+    the code the end user needs to write.
+
 \end{itemize}
 
 \end{document}
