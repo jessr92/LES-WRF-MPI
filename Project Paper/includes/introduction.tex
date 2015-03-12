@@ -1,47 +1,61 @@
-Climate scientists who are interested in modeling aspects of our planet's
-ecosystem create a number of simulations to do so. One such simulation is the
-Large Eddy Simulation (LES) developed by Hiromasa Nakayama and Haruyasu Nagai at
-the Japan Atomic Energy Agency and Professor Tetsuya Takemi at the Disaster
-Prevention Research Institute of Kyoto University. The LES is used to model
-turbulent flows in computational fluid dynamics (CFD) calculations. The original
-LES is implemented in FORTRAN 77 and is single threaded.
+The ecosystem of our planet is highly complex. Climate scientists wanting to
+model parts of the ecosystem create independent and computationally-intensive
+simulations for each individual aspect; for example, ocean, wind, land, and
+atmosphere. One such simulation is the Large Eddy Simulation (LES) developed by
+Hiromasa Nakayama and Haruyasu Nagai at the Japan Atomic Energy Agency and
+Professor Tetsuya Takemi at the Disaster Prevention Research Institute of Kyoto
+University \cite{Nakayama2011,Nakayama2012}. The LES is used to model turbulent
+air flows for the study of urban boundary-layer flows in computational fluid
+dynamics (CFD) calculations under realistic meteorological conditions. The LES
+is implemented in FORTRAN 77 and is single threaded.
 
-With multicore processors and multiple processors available on a single machine,
-it is beneficial to parallelise the LES to make better use of the computation
-power of a shared memory system. With multiple node systems common place in the
-area of research simulation, a parallelised implementation of the LES that can
-make use of distributed memory system hardware is highly desirable.
+With multi-core processors and multi-socket motherboards widely available for a
+single machine, it is beneficial to parallelise the LES to make better use of
+the computational power of a shared memory system. Also, with computer clusters
+commonplace in the area of research simulation, a parallelised implementation of
+the LES that can make use of a distributed memory system is highly desirable.
 
-Work by Wim Vanderbauwhede has seen the LES automatically ported for Fortran 95
-and an OpenCL implementation created. While this improves performance on shared
-memory systems and allows the use of heterogeneous systems such as those with
-GPUs to be used, the LES may not have the best possible performance on a CPU and
-it is still not ready for distributed memory systems.
+Work by Wim Vanderbauwhede has seen the LES automatically ported to Fortran 95
+and an OpenCL implementation created
+\footnote{\url{http://github.com/wimvanderbauwhede/LES}}. While this has been
+shown to improve performance on shared memory systems and facilitates the use of
+heterogeneous systems such as those with GPUs, the OpenCL-accelerated LES may
+not have the best possible performance on a CPU and it is still not ready for
+distributed memory systems.
 
-This paper presents two implementations of the LES. The first uses the industry
-standard for distributed memory parallelism, MPI, and the second makes use of a
-new framework by Wim Vanderbauwhede, the Glasgow Model Coupling Framework
-(GMCF). The GMCF implementation is shared memory only as the framework is still
-in the early stages of development with future work that includes the ability to
-have distributed memory parallelism.
+This paper presents two implementations of the LES. The first makes use of the
+industry standard for distributed memory parallelism, MPI, and the second is
+implemented using a new framework by Wim Vanderbauwhede, the Glasgow Model
+Coupling Framework (GMCF). The GMCF implementation is capable of shared memory
+parallelism only as the framework is still in the early stages of development.
+Future work for the framework includes the ability to have distributed memory
+parallelism.
 
 The major contributions of the work discussed in this paper are as follows:
 
 \begin{itemize}[noitemsep,nolistsep]
-    \item MPI implementation of the LES
-    \item Evaluation of MPI LES
-    \item GMCF implementation of the LES
-    \item Evaluation of GMCF LES
-    \item GMCF performance investigation and improvements
+
+    \item MPI implementation of the LES for shared-memory and distributed-memory
+    parallelism
+
+    \item Performance evaluation of MPI LES
+
+    \item GMCF implementation of the LES for shared-memory parallelism
+
+    \item Performance evaluation of GMCF LES
+
+    \item GMCF performance investigation and framework improvements
+
 \end{itemize}
 
-Section~\ref{sec:Background} discusses the background to GMCF.
-Section~\ref{sec:MPILES} discusses the MPI implementation of the LES with
-Section~\ref{sec:MPILESEval} conducting a shared-memory and distributed-memory
-performance evaluation. Section~\ref{sec:GMCFLES} then discusses the GMCF
-implementation including framework changes required to facilitate model
-parallelisation with Section~\ref{sec:GMCFLESEval} conducting a shared-memory
-performance evaluation. Section~\ref{sec:GMCFInvestigation} conducts an in-depth
-performance investigation of the GMCF framework while outlining
-performance-related improvements implemented. Section~\ref{sec:Conclusion} then
-concludes, discussing future work for GMCF and the LES.
+The rest of the paper is structured as follows: Section~\ref{sec:Background}
+discusses the background of GMCF. Section~\ref{sec:MPILES} discusses the MPI
+implementation of the LES with Section~\ref{sec:MPILESEval} conducting a
+shared-memory and distributed-memory performance evaluation.
+Section~\ref{sec:GMCFLES} then discusses the GMCF implementation including
+framework changes required to facilitate model parallelisation with
+Section~\ref{sec:GMCFLESEval} conducting a shared-memory performance evaluation.
+Section~\ref{sec:GMCFInvestigation} conducts an in-depth performance
+investigation of the GMCF framework while outlining the performance-related
+improvements implemented. Section~\ref{sec:Conclusion} then concludes,
+discussing future work for GMCF and the LES.
