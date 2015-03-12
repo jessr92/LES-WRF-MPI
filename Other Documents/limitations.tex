@@ -114,6 +114,14 @@ hard coded values that should be worked out at compile-time instead.
     \item Abstracting away the notion of packets into subroutines to minimise
     the code the end user needs to write.
 
+    \item Change the global reduction to a tree-based reduction, similar to
+    OpenMPI's method. This won't improve performance significantly for tens of
+    threads but will probably help scaling to the hundreds of threads.
+
+    \item Add MPI to GMCF for distributed-memory parallelism. (This may mean
+    global reductions in GMCF could just use MPI for sake of simplifying
+    framework code).
+
 \end{itemize}
 
 \end{document}
