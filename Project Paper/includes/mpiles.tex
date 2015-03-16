@@ -1,6 +1,22 @@
-MPI is the industry standard. MPI implementation created to act as a baseline
-for GMCF performance. Also MPI implementation can be used by researchers. Also
-using a mature API helped in the software engineering effort to provide a
-Fortran module that abstracts as much detail of the MPI communication away from
-the application developer such that porting existing single threaded code to MPI
-is simpler.
+\subsection{MPI}
+
+The \textit{de facto} standard for parallel communication in a distributed
+memory system is the Message Passing Interface. As such, it was chosen to
+implement a parallelised LES to act as a baseline for GMCF performance as part
+of the shared-memory performance evaluation. It can also be used in the future
+to compare GMCF's distributed memory performance when support for that is added.
+
+In addition to acting as a performance baseline, the MPI implementation is the
+first distributed-memory parallel implementation of this particular simulator.
+This will allow researchers to simulate at a higher resolution or over larger
+areas than the original single threaded version with more flexibility than the
+OpenCL-accelerated implementation.
+
+\subsection{Implementation techniques}
+
+With the LES algorithms themselves being developed separately, it was highly
+desirable to parallelise the LES by making as few changes to the existing code
+as possible. To facilitate this, the communication code was strongly separated
+into distinct, generic modules. This meant code changes to the LES were minimal,
+with most of the changes being the addition of calls to the Fortran module that
+had the communication logic contained within it.
