@@ -12,15 +12,43 @@ OpenCL-accelerated implementation.
 
 \subsection{Required communication}
 
+The LES works over a 3D area. When parallelising the LES, the processes are
+logically organised into a 2D virtual topology and they take the corresponding
+top-down slice of the 3D area.
 
+The LES has nearly one hundred arrays that represent a different aspect of the
+area under simulation. Some of these arrays will need to communicate with the
+other processes in various fashions.
 
-Halos
+Processes will need to distribute and gather whole arrays. This occurs at the
+beginning and end of the LES's execution. At the beginning a single process
+acting as the master process will read in the entire input data, and distribute
+the result to the other processes. At the end the master process will gather the
+results of the simulation to be written out to disk in the netCDF format.
 
-Sideflows
+Another kind of required communication is the exchange of halos, or array
+boundaries. To calculate a given index in an array, the surrounding values are
+used as part of the calculation. Near the boundaries of each process's array,
+some of the surrounding values will be present in the memory space of a
+neighbouring process. A halo exchange is the copying of array boundary values
+between neighbouring processes. A single process may have to communicate with up
+to eight processes: four for the top, bottom, left, and right boundaries; and a
+further four for the remaining corner values.
 
-Global reductions
+The LES has a second type of array boundary communication to manage the
+sideflows. In the original LES, the left edge of some arrays is copied to the
+right edge and vice versa. This is done to have the simulated area `wrap around'
+itself and keeps the flow of air moving from one side to the other. This is not
+done for the top and bottom edges since they act as the outflow and inflow
+respectively which require no communication between processes.
 
-Distributing and gathering arrays
+The final communication required is global reductions. During the solving of the
+Poisson equation, the sum of scalar values is required. There are also global
+minimum and global maximum values for scalar variables needed at the beginning
+of each time step. This is a form of all-to-all communication since the value in
+each process is needed to calculate the final value which is then given to all
+processes. This can be very expensive so a smart algorithm for calculating the
+global reductions is required.
 
 \subsection{Implementation techniques}
 
