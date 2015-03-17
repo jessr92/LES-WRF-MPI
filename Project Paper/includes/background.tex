@@ -1,60 +1,8 @@
 \subsection{Model Coupling}
-
-Climate scientists create independent simulations that each model a different
-part of the planet's ecosystem. To model more complex aspects of the ecosystem,
-and for more accurate results, multiple simulations are required to work
-together.
-
-There are three ways of doing having models work together \cite{Thevenin}. The
-first is merging the model code bases together which generates a single
-executable with all models having efficient data exchanges since all data is
-contained within the one memory space. This solution isn't ideal since merging
-code bases is difficult and further development of the individual models is now
-more difficult.
-
-The second is to use a communication library directly, such as MPI. Each model
-can keep its own codebase with only explicit communication code being added to
-each model. This solution also isn't ideal since the communication code isn't
-generic since each model coupling will require its own communication code and
-coupling more than two models together results in very complicated exchanges
-being implemented.
-
-The third solution is to use a model coupling library which abstracts the low
-level communication complexities and acts as a ``middle man'' between each
-model. For example, the LES has been coupled to the Weather Research and
-Forecasting Model (WRF) using a number of model coupling libraries. This has led
-to more accurate wind velocities being predicted compared with the predictions
-from WRF alone \cite{Kinbara2010,Nakayama1998}, showing the benefit of having
-multiple models interact with one another. There are many model coupling
-frameworks available, including: the Model Coupling Toolkit (MCT)
-\cite{Jacob2005,Larson2005}; OASIS \cite{Valcke2013,Valcke}; the Earth System
-Modeling Framework (ESMF) \cite{Ramework2004}; and OpenPALM
-\cite{Piacentini2011}.
+\input{includes/modelcoupling.tex}
 
 \subsection{GMCF}
+\input{includes/gmcf.tex}
 
-GMCF is a relatively new framework with development beginning in 2014. GMCF's
-primary function is for model coupling. One of long term goals of GMCF is to
-automate as much of the model coupling process as possible. Current frameworks
-currently require hand modification of existing model code and the writing of
-additional code to describe and control the communication between models. This
-can present a level of difficulty that a research team may not be willing to
-accept so a framework that can automate a significant amount of the model
-coupling work would be welcomed.
-
-GMCF also aims to change the way model coupling is organised at runtime. The
-current model coupling frameworks are focussed on clusters with single-core
-machines and do not take into account the uptake in multicore and heterogeneous
-nodes in modern clusters. The focus on single core nodes leads to a
-communication that is necessarily distributed using MPI or equivalents and load
-balancing between models is organised such that a model gets a fixed number of
-nodes, proportional to its runtime compared with the runtimes of the other
-models. With the advent of multicore clusters, a new load balancing technique
-can be implemented, which is what GMCF does. GMCF aims to limit the coupling of
-models to processes within a single node, with limited distributed memory
-communication. The idea behind this is that communication in the cluster is more
-symmetrical and each node can balance its load more evenly for improved
-performance.
-
-To date, GMCF has been used to couple the LES with WRF, acting as a proof of
-concept to the new ideas behind the framework.
+\subsection{LES}
+\input{includes/les.tex}

@@ -9,11 +9,9 @@ intensive subroutine, is the Poisson equation solver using successive
 over-relaxation (SOR) to do so. This calculates the pressure of the air in the
 simulated area.
 
-\subsection{Code organisation}
-
 The LES is written in FORTRAN 77 and runs in a single thread. The main time step
 loop has a number of sequential calls to subroutines that each have their own
-distinct task:
+distinct task over the three dimensional area under simulation:
 
 \begin{itemize}[noitemsep,nolistsep]
 
@@ -36,13 +34,3 @@ distinct task:
     of the runtime being spent in this subroutine during each time step.
 
 \end{itemize}
-
-\subsection{Required communication}
-
-Halos
-
-Sideflows
-
-Global reductions
-
-Distributing and gathering arrays
