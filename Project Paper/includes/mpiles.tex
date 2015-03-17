@@ -35,12 +35,15 @@ between neighbouring processes. A single process may have to communicate with up
 to eight processes: four for the top, bottom, left, and right boundaries; and a
 further four for the remaining corner values.
 
-The LES has a second type of array boundary communication to manage the
-sideflows. In the original LES, the left edge of some arrays is copied to the
-right edge and vice versa. This is done to have the simulated area `wrap around'
+The LES has a second type of array boundary communication to manage the side
+flows. In the original LES, the left edge of some arrays is copied to the right
+edge and vice versa. This is done to have the simulated area `wrap around'
 itself and keeps the flow of air moving from one side to the other. This is not
 done for the top and bottom edges since they act as the outflow and inflow
 respectively which require no communication between processes.
+
+All of the communication discussed so far is able to use the standard
+MPI\_Send/Recv API (and their non-blocking counterparts).
 
 The final communication required is global reductions. During the solving of the
 Poisson equation, the sum of scalar values is required. There are also global
@@ -48,7 +51,9 @@ minimum and global maximum values for scalar variables needed at the beginning
 of each time step. This is a form of all-to-all communication since the value in
 each process is needed to calculate the final value which is then given to all
 processes. This can be very expensive so a smart algorithm for calculating the
-global reductions is required.
+global reductions is required. The MPI standard has a specific API call,
+MPI\_AllReduce, allowing MPI implementations to devise their own algorithm
+without restrictions.
 
 \subsection{Implementation techniques}
 
@@ -57,4 +62,8 @@ desirable to parallelise the LES by making as few changes to the existing code
 as possible. To facilitate this, the communication code was strongly separated
 into distinct, generic modules. This meant code changes to the LES were minimal,
 with most of the changes being the addition of calls to the Fortran module that
-had the communication logic contained within it.
+had the communication logic contained within it. In addition to keeping the
+communication code separated from the LES code, the communication code itself
+was made generic such that the GMCF communication code could be used in-place of
+the MPI communication code easily, allowing them to share the same pre- and
+post-communication code.
