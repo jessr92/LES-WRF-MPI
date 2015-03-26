@@ -145,14 +145,13 @@ Each node on ARCHIE-WeSt has two Intel Xeon X5650 CPUs. This gives each node 12
 cores running at 2.66GHz base frequency. The cluster was setup such that
 hyperthreading was disabled but turbo boost was enabled. Each node is fitted
 with 48GB RAM and nodes are connected to each other via a 4xQDR Infiniband
-Interconnect.
+Interconnect. ARCHIE's MPI communication library was OpenMPI 1.6.2.
 
 Even though the Intel CPUs have turbo boost enabled, all parallel runs use all
 cores of the cluster so the frequency between runs is consistent.
 
 \begin{figure}
-    \includegraphics[page=1,width=0.5\textwidth]
-    {graphs/ARCHIE-OpenMPI162-GFORTRAN482-default-mapping-fixed-area-crop.pdf}
+    \includegraphics[width=0.5\textwidth]{graphs/ARCHIE-fixed-area.png}
     \caption{ARCHIE Fixed Area}
     \label{fig:archiefixedarea}
 \end{figure}
@@ -167,8 +166,7 @@ as the problem of less useful work per process and increasing communication
 costs will ultimately become too great to overcome.
 
 \begin{figure}
-    \includegraphics[page=1,width=0.5\textwidth]
-    {graphs/ARCHIE-OpenMPI162-GFORTRAN482-default-mapping-expanding-area-crop.pdf}
+    \includegraphics[width=0.5\textwidth]{graphs/ARCHIE-expanding-area.png}
     \caption{ARCHIE Expanding Area}
     \label{fig:archieexpandingarea}
 \end{figure}
