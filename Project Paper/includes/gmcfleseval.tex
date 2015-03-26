@@ -9,10 +9,9 @@ primarily aimed at model coupling, not parallelism. As GMCF matures it can be
 expected that the performance gap will narrow.
 
 \begin{figure}
-    \includegraphics[page=1,width=0.5\textwidth]
-    {graphs/gmcfThreadPinningFasterSorNoREQDATAnewAPISpinBusyWaitFixedArea-crop.pdf}
-    \caption{GMCF Fixed Area}
-    \label{fig:gmcffixedarea}
+    \includegraphics[width=0.5\textwidth]{graphs/GMCF-MPI-fixed-area}
+    \caption{MPI versus GMCF Fixed Area}
+    \label{fig:gmcfmpifixedarea}
 \end{figure}
 
 \begin{figure}
@@ -21,11 +20,11 @@ expected that the performance gap will narrow.
     \label{fig:gmcfexpandingarea}
 \end{figure}
 
-Figure~\ref{fig:gmcffixedarea} shows the performance scaling for a fixed area.
-This scales up to 62 threads. 63 and 64 threads have poor performance because
-there are two non-model threads in GMCF. These are also busy waiting hence two
-cores are spent not doing model work. This is about 2.5x slower than MPI but is
-still competitive.
+Figure~\ref{fig:gmcfmpifixedarea} shows the performance scaling for a fixed
+area. This scales up to 62 threads. 63 and 64 threads have poor performance
+because there are two non-model threads in GMCF. These are also busy waiting
+hence two cores are spent not doing model work. This is about 2.5x slower than
+MPI but is still competitive.
 
 Figure~\ref{fig:gmcfexpandingarea} shows the performance scaling for an
 expanding area. The scaling situation is the same as for the fixed area version.
@@ -38,17 +37,3 @@ Figure~\ref{fig:gmcfmpifixedarea} shows that, for fixed area, MPI goes to around
 
 Figure~\ref{fig:gmcfmpiexpandingarea} shows that, for expanding area, MPI goes
 up to around 220 seconds, GMCF does the same but performance degrades quicker.
-
-\begin{figure}
-    \includegraphics[page=1,width=0.5\textwidth]
-    {graphs/gmcf-versus-mpi-fixed-area-crop.pdf}
-    \caption{GMCF versus MPI Fixed Area}
-    \label{fig:gmcfmpifixedarea}
-\end{figure}
-
-\begin{figure}
-    \includegraphics[page=1,width=0.5\textwidth]
-    {graphs/gmcf-versus-mpi-expanding-area-crop.pdf}
-    \caption{GMCF versus MPI Expanding Area}
-    \label{fig:gmcfmpiexpandingarea}
-\end{figure}
