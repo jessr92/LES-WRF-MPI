@@ -39,15 +39,15 @@ of achieving a higher turbo clock frequency if applicable.
 
 \begin{figure}
     \includegraphics[page=1,width=0.5\textwidth]
-    {graphs/MPICH313-default-mapping-fixed-area-crop.pdf}
-    \caption{MPICH 3.1.3 Default Mapping Fixed Area}
-    \label{fig:mpichdefaultmappingfixedarea}
+    {graphs/MPICH313-fixed-area.png}
+    \caption{MPICH 3.1.3 Fixed Area Runtimes}
+    \label{fig:mpichdfixedarea}
 \end{figure}
 
-Figure~\ref{fig:mpichdefaultmappingfixedarea} shows linear improvements in
-runtime for a fixed sized area. Single threaded performance brings runtime to
-275.5 seconds with 64 threads completing its run in 39.2 seconds, a 7x
-improvement in computational throughput.
+Figure~\ref{fig:mpichdfixedarea} shows linear improvements in runtime for a
+fixed sized area. Single threaded performance brings runtime to 275.5 seconds
+with 64 threads completing its run in 39.2 seconds, a 7x improvement in
+computational throughput.
 
 The graph isn't as smooth as would normally be expected. This is as a direct
 consequence to the mapping of processes over a two dimensional area. If the same
@@ -101,17 +101,10 @@ a single socket rather than each having the resources of their own socket.
 Another downside is that the turbo frequency will be reduced quicker on
 applicable systems since a socket will reach higher process counts sooner.
 
-\begin{figure}
-    \includegraphics[page=1,width=0.5\textwidth]
-    {graphs/MPICH313-by-core-mapping-fixed-area-crop.pdf}
-    \caption{MPICH 3.1.3 By Core Mapping Fixed Area}
-    \label{fig:mpichbycoremappingfixedarea}
-\end{figure}
-
-Figure~\ref{fig:mpichbycoremappingfixedarea} shows that, for the fixed area
-runs, the performance difference is negligible. The lower process counts have
-poorer performance however, once the 32 process boundary has been crossed,
-performance is the same as the default mapping case.
+Figure~\ref{fig:mpichdfixedarea} shows that, for the fixed area runs, the
+performance difference is negligible. The lower process counts have poorer
+performance however, once the 32 process boundary has been crossed, performance
+is the same as the default mapping case.
 
 \begin{figure}
     \includegraphics[page=1,width=0.5\textwidth]
