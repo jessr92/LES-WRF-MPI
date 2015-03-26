@@ -38,8 +38,7 @@ load on the CPUs cache for small numbers of processes and maximises the chance
 of achieving a higher turbo clock frequency if applicable.
 
 \begin{figure}
-    \includegraphics[page=1,width=0.5\textwidth]
-    {graphs/MPICH313-fixed-area.png}
+    \includegraphics[width=0.5\textwidth]{graphs/MPICH313-fixed-area.png}
     \caption{MPICH 3.1.3 Fixed Area Runtimes}
     \label{fig:mpichdfixedarea}
 \end{figure}
@@ -59,8 +58,7 @@ This difference acts as a bottleneck since the shorter halo exchanges finish
 sooner then have to wait for the longer halo exchanges to complete.
 
 \begin{figure}
-    \includegraphics[page=1,width=0.5\textwidth]
-    {graphs/MPICH313-expanding-area.png}
+    \includegraphics[width=0.5\textwidth]{graphs/MPICH313-expanding-area.png}
     \caption{MPICH 3.1.3 Expanding Area Runtimes}
     \label{fig:mpichexpandingarea}
 \end{figure}
@@ -123,14 +121,20 @@ performance improvement at higher numbers of processes.
 \subsubsection{MPICH versus OpenMPI}
 
 \begin{figure}
-    \includegraphics[page=1,width=0.5\textwidth]
-    {graphs/MPICH313-versus-OpenMPI184-crop.pdf}
+    \includegraphics[width=0.5\textwidth]
+    {graphs/MPICH313-OpenMPI184-fixed-area.png}
+    \caption{MPICH 3.1.3 Versus OpenMPI 1.8.4 Fixed Area}
+    \label{fig:mpichversusopenmpifixedarea}
+    \includegraphics[width=0.5\textwidth]
+    {graphs/MPICH313-OpenMPI184-expanding-area.png}
     \caption{MPICH 3.1.3 Versus OpenMPI 1.8.4 Expanding Area}
     \label{fig:mpichversusopenmpiexpandingarea}
 \end{figure}
 
-Figure~\ref{fig:mpichversusopenmpiexpandingarea} shows how there is no tangible
-performance difference between MPICH 3.1.3 and OpenMPI 1.8.4.
+Figures~\ref{fig:mpichversusopenmpifixedarea} and
+\ref{fig:mpichversusopenmpiexpandingarea} show how there is no tangible
+performance difference between MPICH 3.1.3 and OpenMPI 1.8.4. MPICH 3.1.3 is
+moderately faster but OpenMPI is never more than 10\% slower.
 
 \subsection{Distributed-memory paralellism}
 
