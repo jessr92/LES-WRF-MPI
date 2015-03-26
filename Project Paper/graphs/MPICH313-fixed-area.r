@@ -5,7 +5,7 @@ x_range = range(data$processes)
 
 plot_colours <- c("blue", "red")
 
-png(filename="MPICH313-fixed-area.png", height=350, width=500, bg="white")
+png(filename="MPICH313-fixed-area.png", height=400, width=500, bg="white")
 
 plot(data$processes, data$default, log="xy",type="l", col=plot_colours[1], ylim=y_range, xlim=x_range, axes=TRUE, ann=FALSE)
 
