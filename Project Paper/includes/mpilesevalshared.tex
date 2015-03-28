@@ -97,7 +97,19 @@ performance improvement at higher numbers of processes.
 
 \subsubsection{MPICH versus OpenMPI}
 
-\begin{figure}
+There are two popular implementations of the MPI standard: MPICH and OpenMPI.
+Other implementations include several derivatives of MPICH making MPICH one of
+the most popular implementations available. OpenMPI is used in many of the
+TOP500 supercomputers and is designed to act as an efficient implementation for
+common case MPI use cases whereas MPICH acts as a high quality reference
+implementation of the latest available MPI standard.
+
+In addition to evaluating performance on MPICH version 3.1.3, the performance
+characteristics of OpenMPI version 1.8.4 were also investigated. Many of the
+configurations discussed for MPICH were repeated for OpenMPI to enable direct
+comparisons between runtimes.
+
+\begin{figure}[h]
     \includegraphics[width=0.5\textwidth]
     {graphs/MPICH313-OpenMPI184-fixed-area.png}
     \caption{MPICH 3.1.3 Versus OpenMPI 1.8.4 Fixed Area}
@@ -109,6 +121,11 @@ performance improvement at higher numbers of processes.
 \end{figure}
 
 Figures~\ref{fig:mpichversusopenmpifixedarea} and
-\ref{fig:mpichversusopenmpiexpandingarea} show how there is no tangible
-performance difference between MPICH 3.1.3 and OpenMPI 1.8.4. MPICH 3.1.3 is
-moderately faster but OpenMPI is never more than 10\% slower.
+\ref{fig:mpichversusopenmpiexpandingarea} represent a runtime comparison for
+fixed area and expanding area runs in a by core mapping configuration. They show
+how there is no tangible performance difference between MPICH 3.1.3 and OpenMPI
+1.8.4. MPICH 3.1.3 is moderately faster but OpenMPI is less than 10\% slower for
+high process counts. It can be concluded that use of either MPI implementation
+will yield similar speedups as each other. With many other MPI implementations
+being based on MPICH, the same performance characteristics could be expected
+from those as well.
