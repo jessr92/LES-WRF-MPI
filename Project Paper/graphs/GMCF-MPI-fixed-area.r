@@ -1,6 +1,6 @@
 data <- read.table("GMCF-MPI-fixed-area.input", header=T, sep="\t")
 
-y_range = range(20, data$mpi, data$gmcf)
+y_range = range(20, data$mpi, data$gmcf, na.rm=TRUE)
 x_range = range(data$processes)
 
 plot_colours <- c("blue", "red")
