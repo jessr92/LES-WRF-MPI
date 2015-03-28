@@ -1,2 +1,29 @@
-Shared memory only at the moment. Best result is competitive with MPI. Software
-engineering effort for MPI LES made it easy to port from MPI to GMCF.
+GMCF's primary goal is to efficiently facilitate model coupling while reducing
+the number of manual changes a model developer has to do. This goal is set to
+improve on the current model coupling frameworks such as ESMF and OASIS.
+
+A large number of existing models, the LES included, are written in a single
+threaded fashion. The developers of these models aren't always well versed in
+the computing science areas of multi-threading and shared- and
+distributed-memory paralellism. This brings rise to a second goal of automatic
+model parallelisation. This would significantly lower the barrier to using
+multi-core multi-socket machines and clusters and dramatically improve the
+performance of existing model code.
+
+As a first stage in working towards automatic parallelisation, work was
+conducted on GMCF to support intra-model communication. GMCF work had so far
+concentrated on the communication between distinct models. This has led GMCF to
+be the first model coupling framework to also support shared-memory
+parallelisation. The parallelisation is currently manual however the
+communication code using the same API as the model coupling communication code
+so no further learning curve is required. This also means that when work towards
+greater automation of model coupling is conducted, the intra-model
+parallelisation work will also benefit from the changes.
+
+In terms of parallelisation the LES itself using GMCF, the software engineering
+effort for MPI LES made it easy to port from MPI to GMCF. The majority of the
+communication code can be reused with the only changes being made were the
+replacement of MPI API calls with GMCF API calls. This also shows how GMCF can
+almost be used as a drop-in replacement for MPI meaning models that have already
+been parallelised with MPI can either remain paralellised in this way when using
+GMCF for model coupling, or can use GMCF for both parallelisation and coupling.
