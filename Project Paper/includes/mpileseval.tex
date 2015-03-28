@@ -1,0 +1,53 @@
+The performance evaluation is split into two: a shared memory performance
+scaling evaluation on a 64 core machine, and a distributed memory performance
+evaluation on a cluster on up to 12 nodes.
+
+\subsection{Evaluation Methodology}
+
+The performance evaluation aimed to test the scalability of the parallelised
+application in two ways. The first is with a fixed area under test. This will
+show how a given problem (150x150x90 in size) would scale to larger machines and
+in a cluster. The second test is with an expanding area. This is where, for all
+runs, each process has its own area of a set size (150x150x90) such that, as the
+number of processes grows, the overall computational area increases at the same
+rate. This will show well larger problem sets can be handled and how the
+overhead of communication grows as the number of processes involved in the
+communication grows.
+
+For a given number of processes, there can be many runs. This is because the
+layout of processes matters. For instance, the 64 process runs are executed in a
+4x16, 8x8, and 16x4 layout. The quickest layout is reported as the runtime for
+that number of processes.
+
+\subsection{Shared-memory parallelisation}
+\input{includes/mpilesevalshared.tex}
+
+\subsection{Distributed-memory paralellism}
+\input{includes/mpilesevaldistributed.tex}
+
+\subsection{Estimated versus exact corners}
+
+The majority of the communication in the LES involves halo exchanges. These
+involve sending and receiving up to four edges between neighbouring processes.
+To be mathematically correct, there would also need to be up to four other
+communications, a small number of values need to be sent and received for corner
+values from four other processes. This brings the total number of messages per
+process up to eight. This was thought to be a potential source of overhead,
+especially given the overhead of sending a single message was likely to outweigh
+the transfers itself. To test this, all runs were reran with corners instead
+being calculated rather than exchanged.
+
+For the shared memory runs, there was a negligible change in performance. This
+is likely to be because the cost of calculating floating point units is very
+similar to simple memory copies between memory spaces, especially in an AMD
+system where floating point units are shared between pairs of cores in what AMD
+calls a module.
+
+For the distributed memory runs, exact corners were up to 5\% faster than the
+estimated corner runs. The improvement is somewhat more surprising than the
+shared memory case however given the fast Infiniband Interconnect between nodes,
+the cost of sending a message is likely to be only marginally higher than
+communication within a single node. The performance improvement is likely due to
+the Xeon X5650's older architecture meaning it supports fewer instruction set
+extensions such as AVX and FMA that are known to improve integer and floating
+point operation performance.
