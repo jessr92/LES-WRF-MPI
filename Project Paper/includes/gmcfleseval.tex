@@ -17,7 +17,7 @@ expected that the performance gap will narrow.
 \begin{figure}
     \includegraphics[width=0.5\textwidth]{graphs/GMCF-MPI-expanding-area.png}
     \caption{GMCF Expanding Area}
-    \label{fig:gmcfexpandingarea}
+    \label{fig:gmcfmpiexpandingarea}
 \end{figure}
 
 Figure~\ref{fig:gmcfmpifixedarea} shows the performance scaling for a fixed
@@ -26,7 +26,7 @@ because there are two non-model threads in GMCF. These are also busy waiting
 hence two cores are spent not doing model work. This is about 2.5x slower than
 MPI but is still competitive.
 
-Figure~\ref{fig:gmcfexpandingarea} shows the performance scaling for an
+Figure~\ref{fig:gmcfmpiexpandingarea} shows the performance scaling for an
 expanding area. The scaling situation is the same as for the fixed area version.
 There is little difference in runtime between MPI and GMCF in this scenario.
 
