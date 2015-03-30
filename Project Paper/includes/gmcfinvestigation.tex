@@ -76,6 +76,29 @@ beneficial as the number of processes grows into the hundreds and thousands.
 
 \subsubsection{Spin locks and busy waiting}
 
+Traditional locks used for mutual exclusion will cause a thread to sleep if the
+lock is held by another thread. Condition variables are also used to allow a
+thread that currently holds the lock, but finds the data it has access to isn't
+ready, for example a queue that is empty in a subroutine that processes the head
+of a queue. These also cause a thread to sleep until a condition is met. In this
+example, until the queue isn't empty. This stops a thread wasting CPU cycles and
+is seen as a way to mediate fair access to a shared resource.
+
+Spin locks replace traditional locks. If another thread holds the lock, rather
+than going to sleep, a thread will ``spin'' over the lock, continually trying to
+obtain the lock until the lock is available. Spin locks use atomic operations
+such as compare and swap to implement this. This is thought to improve
+performance in some cases. Anderson et al. \cite{Anderson1990} found that spin
+locks offer poor performance, especially at high thread counts whereas
+Mellor-Crummey et al. \cite{Mellor-Crummey1991} found that the lack of fairness
+in spin locks can result in improved performance, likely due to the reduced
+latency between a lock becoming available and another thread locking it.
+
+Busy waiting replaces condition variables. Rather than sleeping until a specific
+condition is met, a thread will enter an empty loop and continually check the
+while condition. When the while condition is false, the thread knows it is safe
+to execute the required action.
+
 With the success of spin locks and busy waiting in the global reduction code
 GMCFs per-thread receiving FIFO queues were looked at as another potential
 source of performance improvement. Model threads will regularly sleep, waiting
