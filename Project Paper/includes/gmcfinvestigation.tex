@@ -74,7 +74,40 @@ beneficial as the number of processes grows into the hundreds and thousands.
 
 \subsubsection{Spin locks and busy waiting}
 
+With the success of spin locks and busy waiting in the global reduction code
+GMCFs per-thread receiving FIFO queues were looked at as another potential
+source of performance improvement. Model threads will regularly sleep, waiting
+for packets to arrive. This reduces CPU usage but increases the latency between
+a packet arriving and a thread being awake and able to process it. MPI processes
+do not sleep by default for this reason. The FIFO queues in GMCF were currently
+managed by mutual exclusion locks and condition variables. These were replaced
+with spin locks and busy waiting. This reduced runtimes by around 20\%, a
+significant improvement.
+
+This change is the reason behind the lack of 63 and 64 thread runs in the GMCF
+evaluation. This is due to two non-model threads that are created by the GMCF
+framework. These two threads currently use the same code for their FIFO queues.
+As a result these two threads needlessly spin and waste the computational
+resources of two cores. This is a temporary implementation detail as future work
+will include creating a separate FIFO queue implementation for these threads to
+allow them to sleep again.
+
 \subsubsection{Thread Pinning}
+
+POSIX threads, by default, are free to be mapped to any available CPU core by
+the kernel. This can help kernels to even load over all of the CPUs but is not
+ideal from a cache perspective. Each time a thread migrates to a different CPU
+socket, the cache built up on that socket's cache is wasted. This can have a
+significantly negative impact on performance.
+
+To help combat this, GMCF threads were allocated a single core each. This is
+identical to the behaviour of MPI's by-core mapping which helped to improve
+performance for the MPI version of the LES. The thread pinning change in GMCF is
+responsible for the slight degradation in performance at small numbers of
+threads as shown in Figure~\ref{fig:gmcfbeforeandafter} but improved performance
+at higher numbers of threads by around 17\%. Again, since the assumption is that
+model simulations are the only running programs on a machine and thus use all
+CPU cores available, this is a worthwhile change.
 
 \subsubsection{Miscellaneous Changes}
 
