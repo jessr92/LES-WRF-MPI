@@ -24,7 +24,9 @@ GMCF was suffering from scalability issues, with the runtime increasing above
 ten threads and causing a bathtub curve. A number of framework changes including
 a dedicated method of calculating global reductions, spin locks, and thread
 pinning were investigated and were ultimately implemented to improve
-performance.
+performance. Overall these changes were responsible for making GMCF performance
+scalable as the number of threads grows and reducing GMCF performance to nearly
+one sixth for a fixed area problem.
 
 \subsubsection{Global Reduction}
 
@@ -37,7 +39,7 @@ required. One of those reductions, a global sum, is contained within an inner
 loop and is thus calculated up to fifty times per main loop iteration.
 Temporarily disabling this global sum caused the runtime graph to flatten out
 without significant runtime degradation at higher threading levels. Runtime was
-now around 150 seconds rather than nearly 300 seconds at 64 threads which was a
+now around 150 seconds rather than nearly 320 seconds at 64 threads which was a
 significant improvement but still nearly six times slower than MPI.
 
 With the cause of the bathtub curve found, a number of different ways of
@@ -110,6 +112,17 @@ model simulations are the only running programs on a machine and thus use all
 CPU cores available, this is a worthwhile change.
 
 \subsubsection{Miscellaneous Changes}
+
+In addition to lower level changes, framework-specific changes were also made.
+For example, the original GMCF had one queue for each thread for each type of
+packet. Since a thread may be looking for a packet from a specific thread, the
+queues had to be iterated over to find a packet from the requested source
+thread. To prevent this, each thread had a map of queues for each packet type
+and each source thread. This meant that, to find a specific packet, only one
+queue had to be looked at and the required packet is guaranteed to either be at
+the head of the queue. This map of FIFOs helped speed up the code that waited
+for and found packets resulting in an overall performance improvement of nearly
+20\%.
 
 \subsection{Fortran and C++ interoperability issue}
 \label{sec:fortrancppinteroperability}

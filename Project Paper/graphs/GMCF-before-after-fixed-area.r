@@ -1,6 +1,6 @@
 data <- read.table("GMCF-before-after-fixed-area.input", header=T, sep="\t")
 
-y_range = range(50, data$before, data$after)
+y_range = range(50, data$before, data$after, na.rm=TRUE)
 x_range = range(data$processes)
 
 plot_colours <- c("blue", "red")
