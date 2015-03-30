@@ -1,0 +1,37 @@
+\subsection{Performance changes}
+
+With GMCF performance being competitive with MPI, but not completely on par or
+improving on MPI, further performance investigations are required. Three
+potential performance issues are thought to remain.
+
+The first involves the C++ and Fortran boundary. This boundary is crossed many
+times throughout an application's runtime. The boundary itself involves no
+runtime overhead as the coupled application is a single boundary however the
+language changes limit the scope of what compiler optimisations can achieve. By
+giving the Fortran API more capabilities such as handling packet sending and
+receiving, making it more than just a thin wrapper, the compiler may be able to
+optimise more heavily and thus improve performance.
+
+The second performance improvement that should be investigated is a more direct
+method of data transfer between threads in a shared-memory system. At the
+moment, the sending thread creates an intermediate array to hold the data being
+transferred, the framework creates a copy of the memory being transferred
+between threads, and the receiving thread copies the data in its intermediate
+array to the required array. By making changes to the API, it would be possible
+to remove this additional intermediate memory copy and instead copy memory
+directly between threads. This could also remove the need to send an
+acknowledgement to the sending thread after the data has been copied to the
+recipient, further reducing packet overhead.
+
+The third performance improvement is an investigation into a tree-based
+reduction algorithm such as the one implemented by OpenMPI. This will not
+provide a performance benefit for a single node since the number of threads
+involved are too small but as distributed memory capabilities are added to GMCF,
+and the framework is tested on hundreds of CPU cores, the benefits of a
+tree-based reduction may become apparent.
+
+\subsection{New capabilities}
+
+A major new capability that is set for future work in the coming months is
+distributed-memory parallelism. This is the primary limitation between GMCF and
+MPI as it stands.

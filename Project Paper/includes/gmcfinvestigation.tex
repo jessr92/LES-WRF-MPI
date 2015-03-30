@@ -131,7 +131,7 @@ do not know about each other explicitly. For model parallelisation this packet
 type is unnecessary. Each thread for a model is able to work out which thread it
 needs data from, and what data it needs to send data to. By removing the
 unnecessary ``REQDATA'' packets from the GMCF LES, the number of packets sent
-between threads was reduced by one third and runtime was reduced by around 30\%. 
+between threads was reduced by one third and runtime was reduced by around 30\%.
 
 \subsection{Fortran and C++ interoperability issue}
 \label{sec:fortrancppinteroperability}
@@ -163,6 +163,8 @@ seems to affect the other threads' stack variable.
 
 The solution to this problem is simple. Rather than the arrays being coded as
 being on the stack, the arrays are made allocatable and each thread, at runtime,
-will allocate its own array on the heap. This stops the compiler causing
+will allocate its own array on the heap. This can be automated since static
+variables have their size known at compile time so a simple script can easily
+work out and insert the required allocate calls. This stops the compiler causing
 erroneous behaviour while only involving a minor code change with insignificant
 runtime overhead for the allocation and deallocation.
