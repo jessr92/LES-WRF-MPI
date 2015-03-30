@@ -21,9 +21,56 @@ application using POSIX threads to call Fortran subroutines.
 Figure~\ref{fig:gmcfbeforeandafter} shows the original GMCF performance results
 alongside the best results for a fixed area run. As is clear from the graph,
 GMCF was suffering from scalability issues, with the runtime increasing above
-ten threads and causing a bathtub curve.
+ten threads and causing a bathtub curve. A number of framework changes including
+a dedicated method of calculating global reductions, spin locks, and thread
+pinning were investigated and were ultimately implemented to improve
+performance.
 
 \subsubsection{Global Reduction}
+
+The first task in the performance investigation was to look for aspects of
+communication that were causing the bathtub curve. The performance degradation
+at ever increasing levels of threads pointed towards global communication. Only
+one kind of global communication occurs in each LES time step, global
+reductions. The maximum, minimum, and sum of a small number of scalars is
+required. One of those reductions, a global sum, is contained within an inner
+loop and is thus calculated up to fifty times per main loop iteration.
+Temporarily disabling this global sum caused the runtime graph to flatten out
+without significant runtime degradation at higher threading levels. Runtime was
+now around 150 seconds rather than nearly 300 seconds at 64 threads which was a
+significant improvement but still nearly six times slower than MPI.
+
+With the cause of the bathtub curve found, a number of different ways of
+calculating a global reduction were investigated. The original method involved
+message passing in the same way halo exchanges and other arrays were passed. The
+overhead of sending packets for a single scalar were clearly significant. Also,
+a single thread was the recipient of all of the scalars, one from each thread.
+That same thread then calculated the global reduction, then sent the result to
+every other threads. This caused a single thread to have an ever increasing
+amount of work to do compared to other threads, a problem that became worse as
+the total thread count grew. In a micro benchmark, GMCF was 100x slower than MPI
+when calculating a global sum over 4 threads and 1000x slower over 64 threads.
+
+The solution was a specific subroutine embedded within the GMCF framework that
+did not use messages but instead a global variable. Rather than have a single
+thread do the heavy lifting of receiving, calculating, and sending results, each
+thread accessed the global variable and did a partial calculation. Once all
+threads had done the partial calculation, all threads can then simultaneously
+read the global variable to get the final result. Many methods of this were
+investigated with the final implementation involving a POSIX thread spinlock and
+busy waiting. This combination of spinlock and busy waiting offered a 10x
+improvement over a more traditional mutex and condition variable combination.
+The performance of the micro benchmarks were within 10\% of MPI.
+
+When the global reductions in LES were re-enabled to use the new method of
+calculation, the global reduction overhead became negligible.
+
+OpenMPI's method of global reduction uses a ``recursive doubling algorithm''.
+This involves a tree-like reduction that in a work depth that is logarithmic
+with the number of communicating processes. GMCFs new method has a work depth
+that is linear with the number of threads. For tens of processes, MPIs tree-like
+algorithm does not improve performance of the reductions however it may be
+beneficial as the number of processes grows into the hundreds and thousands.
 
 \subsubsection{Spin locks and busy waiting}
 
