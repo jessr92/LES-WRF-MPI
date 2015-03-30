@@ -124,6 +124,15 @@ the head of the queue. This map of FIFOs helped speed up the code that waited
 for and found packets resulting in an overall performance improvement of nearly
 20\%.
 
+Another change was to remove the need to send ``REQDATA'' packets. This packet
+type is required for model coupling where a model can request data from another
+model. This is necessary for model coupling since the two communicating models
+do not know about each other explicitly. For model parallelisation this packet
+type is unnecessary. Each thread for a model is able to work out which thread it
+needs data from, and what data it needs to send data to. By removing the
+unnecessary ``REQDATA'' packets from the GMCF LES, the number of packets sent
+between threads was reduced by one third and runtime was reduced by around 30\%. 
+
 \subsection{Fortran and C++ interoperability issue}
 \label{sec:fortrancppinteroperability}
 
