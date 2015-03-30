@@ -57,3 +57,11 @@ distributed-memory parallelism. This is the primary limitation between GMCF and
 MPI as it stands. Enabling distributed-memory parallelism will allow GMCF model
 coupling to use clusters and acts as a major step towards GMCF's novel model
 coupling goal.
+
+With the LES parallelisation conducted by a developer outwith the LES project,
+the required paralellisation details such as shared arrays and halo sizes, had
+to be inferred. As a result, it is feasible that the parallelisation can be made
+automatic, even without annotations in some cases. An investigation into the
+near-automatic parallelisation of existing single-threaded Fortran models should
+be conducted as this will complement GMCFs goal of near-automated model
+coupling.

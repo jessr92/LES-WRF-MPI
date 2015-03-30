@@ -1,5 +1,11 @@
-MPI LES is a fast, scalable LES implementation that can be used straightaway.
-GMCF shown to be competitive performance-wise. Future work will add distributed
-memory parallelism abilities to GMCF. This will help GMCF obtain the goal of
-being a replacement for OpenMP/MPI and existing model coupling frameworks in
-one.
+The LES parallelised by MPI has been shown to be fast and scalable. With MPI
+being mature over GMCF, the MPI LES implementation is stable enough that it can
+be used straightaway on shared- and distributed-memory systems.
+
+The GMCF framework has been shown to support model parallelisation as well as
+model coupling. The performance results are competitive with MPI and, as GMCF
+matures, the performance gap is expected to narrow further.
+
+As future work has discussed, GMCF's capabilities are set to grow with
+distributed-memory and more automation of parallelisation and model coupling in
+the pipeline.
