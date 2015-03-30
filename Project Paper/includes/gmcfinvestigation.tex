@@ -127,4 +127,33 @@ for and found packets resulting in an overall performance improvement of nearly
 \subsection{Fortran and C++ interoperability issue}
 \label{sec:fortrancppinteroperability}
 
-That weird Fortran/C++ stack array above a certain size sharing thing.
+The GMCF framework is written in C++ with a Fortran API. Since the LES is
+written in Fortran, GMCF creates a number of POSIX threads, each of which calls
+LES's main subroutine. All of the arrays the LES uses are allocated on the stack
+thus making it seemingly trivial to show that each thread has an independent
+copy of each variable.
+
+Due to an implementation detail on Fortran stack variables, this is not the
+case. Since Fortran has no built-in concept of a thread, the compiler is free to
+change many aspects of the code that a compiler for a thread-aware language
+could not do. One of these changes involves changing how large stack variables
+are stored. Having large stack variables may not be performance optimal so the
+Fortran compiler looks for large stack variables (32kiB or larger by default)
+and allocates memory in ``static memory'' for them. The stack variable is then
+silently replaced by a pointer to this area of memory.
+
+For a single threaded application this change has no consequences as the thread
+can still read and write to the array as normal. The problem occurs in a
+situation such as in GMCF where multiple threads are calling the same Fortran
+subroutine simultaneously. Rather than each thread having its own array on the
+stack, they now all share a pointer to the same area in static memory. As a
+direct result, any writes are visible to all threads resulting in erroneous
+behaviour. From a developer's perspective, the behaviour is very confusing since
+the code has an array on the stack, yet one thread changing its stack variable
+seems to affect the other threads' stack variable.
+
+The solution to this problem is simple. Rather than the arrays being coded as
+being on the stack, the arrays are made allocatable and each thread, at runtime,
+will allocate its own array on the heap. This stops the compiler causing
+erroneous behaviour while only involving a minor code change with insignificant
+runtime overhead for the allocation and deallocation.
