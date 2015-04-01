@@ -7,9 +7,9 @@ plot_colours <- c("blue", "red")
 
 png(filename="GMCF-MPI-expanding-area.png", height=400, width=500, bg="white")
 
-plot(data$processes, data$mpi, log="xy",type="l", col=plot_colours[1], ylim=y_range, xlim=x_range, axes=TRUE, ann=FALSE)
+plot(data$processes, data$mpi, log="xy",type="o", col=plot_colours[1], ylim=y_range, xlim=x_range, axes=TRUE, ann=FALSE)
 
-lines(data$processes, data$gmcf, type="l", col=plot_colours[2], ylim=y_range, xlim=x_range, ann=FALSE)
+lines(data$processes, data$gmcf, type="o", col=plot_colours[2], ylim=y_range, xlim=x_range, ann=FALSE)
 
 abline(v=c(1, 2, 5, 10, 20, 50), col="grey10", lty="dotted")
 abline(h=c(50, 100, 150, 200), col="grey10", lty="dotted")
