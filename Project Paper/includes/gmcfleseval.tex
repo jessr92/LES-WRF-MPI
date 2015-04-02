@@ -32,10 +32,11 @@ as for the MPI shared-memory parallelisation evaluation, togian.
 \end{figure}
 
 Figure~\ref{fig:gmcfmpifixedarea} shows the performance scaling for a fixed
-area. MPI's best runtime is 24.3 seconds with GMCF's best runtime is 51 seconds.
-This means GMCF is 2.1x slower than MPI which is a significant difference and
-thus indicates GMCF requires further work to improve performance for
-communication involving small transfers.
+area. MPI's best runtime over all process counts is 24.3 seconds with GMCF's
+best runtime over all thread counts is 51 seconds. This means GMCF is 2.1x
+slower than MPI which is a significant difference and thus indicates GMCF
+requires further work to improve performance for communication involving small
+transfers.
 
 Figure~\ref{fig:gmcfmpiexpandingarea} shows the performance scaling for an
 expanding area. The results in this case are much more promising with little

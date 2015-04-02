@@ -18,12 +18,57 @@ application using POSIX threads to call Fortran subroutines.
     \label{fig:gmcfbeforeandafter}
 \end{figure}
 
+\begin{table*}[t]
+    \centering
+    \begin{tabular}{|l|l|l|}
+        \hline
+        Change & 64 thread runtime (seconds) & Performance Improvement\\
+        \hline
+        Original & 320.8 & -\\
+        \hline
+        Global reduction changes & 150.8 & 53\%\\
+        \hline
+        Spin lock and busy waiting on FIFOs & 120.6 & 20\%\\
+        \hline
+        Thread Pinning & 100.1 & 17\%\\
+        \hline
+        Map of FIFOs & 83 & 20\%\\
+        \hline
+        Not sending REQDATA packets & 58.1 & 30\%\\
+        \hline
+    \end{tabular}
+    \caption{Summary of performance enhancements made to GMCF}
+    \label{tab:gmcfperformanceimprovements}
+\end{table*}
+
+\begin{table*}[t]
+    \centering
+    \begin{tabular}{|l|l|l|}
+        \hline
+        Global reduction method &
+        4 thread message rate per second &
+        64 thread message rate per second\\
+        \hline
+        Original GMCF & 9,842 & 60\\
+        \hline
+        PThread Mutex and condition variables & 29,960 & 120\\
+        \hline
+        PThread Spin locks and busy waiting & 1,371,846 & 5,234\\
+        \hline
+        MPI All\_Reduce & 1,344,086 & 53,504\\
+        \hline
+    \end{tabular}
+    \caption{Global Reduction microbenchmark results}
+    \label{tab:gmcfglobalreductionresults}
+\end{table*}
+
 Figure~\ref{fig:gmcfbeforeandafter} shows the original GMCF performance results
 alongside the best results for a fixed area run. As is clear from the graph,
 GMCF was suffering from scalability issues, with the runtime increasing above
-ten threads and causing a bathtub curve. A number of framework changes including
-a dedicated method of calculating global reductions, spin locks, and thread
-pinning were investigated and were ultimately implemented to improve
+ten threads and causing a bathtub curve. As
+Table~\ref{tab:gmcfperformanceimprovements} shows, a number of framework changes
+including a dedicated method of calculating global reductions, spin locks, and
+thread pinning were investigated and were ultimately implemented to improve
 performance. Overall these changes were responsible for making GMCF performance
 scalable as the number of threads grows and reducing GMCF performance to nearly
 one sixth for a fixed area problem.
@@ -43,36 +88,44 @@ now around 150 seconds rather than nearly 320 seconds at 64 threads which was a
 significant improvement but still nearly six times slower than MPI.
 
 With the cause of the bathtub curve found, a number of different ways of
-calculating a global reduction were investigated. The original method involved
-message passing in the same way halo exchanges and other arrays were passed. The
+calculating a global reduction were investigated. A summary of microbenchmark
+results for the different methods tried is shown in
+Table~\ref{tab:gmcfglobalreductionresults}. The original method involved message
+passing in the same way halo exchanges and other arrays were passed. The
 overhead of sending packets for a single scalar were clearly significant. Also,
 a single thread was the recipient of all of the scalars, one from each thread.
 That same thread then calculated the global reduction, then sent the result to
 every other threads. This caused a single thread to have an ever increasing
 amount of work to do compared to other threads, a problem that became worse as
-the total thread count grew. In a micro benchmark, GMCF was 100x slower than MPI
-when calculating a global sum over 4 threads and 1000x slower over 64 threads.
+the total thread count grew. In a micro benchmark, GMCF was over 100x slower
+than MPI when calculating a global sum over 4 threads and nearly 1000x slower
+over 64 threads.
 
 The solution was a specific subroutine embedded within the GMCF framework that
 did not use messages but instead a global variable. Rather than have a single
 thread do the heavy lifting of receiving, calculating, and sending results, each
 thread accessed the global variable and did a partial calculation. Once all
 threads had done the partial calculation, all threads can then simultaneously
-read the global variable to get the final result. Many methods of this were
-investigated with the final implementation involving a POSIX thread spinlock and
-busy waiting. This combination of spinlock and busy waiting offered a 10x
-improvement over a more traditional mutex and condition variable combination.
-The performance of the micro benchmarks were within 10\% of MPI.
+read the global variable to get the final result. Two methods of this were
+investigated with the first using mutexes and condition variables to mediate
+access to the global variable. The mutexes and condition variables method
+improved performance by 2-3x over the GMCF message passing implementation but is
+still significantly slower than MPI. The final implementation involves a POSIX
+thread spinlock and busy waiting. This combination of spinlock and busy waiting
+offered around a 45x improvement over the more traditional mutex and condition
+variable combination. This brought performance for four threads inline with MPI
+but performance for 64 threads is still an order of magnitude slower than MPI.
 
 When the global reductions in LES were re-enabled to use the new method of
-calculation, the global reduction overhead became negligible.
+calculation, the global reduction overhead became negligible. This shows that,
+although MPI's method of global reduction has better performance at higher
+thread counts, the LES doesn't execute the global reduction often enough for
+this to impact the overall runtime.
 
 OpenMPI's method of global reduction uses a ``recursive doubling algorithm''.
 This involves a tree-like reduction that in a work depth that is logarithmic
 with the number of communicating processes. GMCFs new method has a work depth
-that is linear with the number of threads. For tens of processes, MPIs tree-like
-algorithm does not improve performance of the reductions however it may be
-beneficial as the number of processes grows into the hundreds and thousands.
+that is linear with the number of threads
 
 \subsubsection{Spin locks and busy waiting}
 
