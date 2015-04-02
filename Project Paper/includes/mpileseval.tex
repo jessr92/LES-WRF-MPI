@@ -7,18 +7,21 @@ evaluation on a cluster on up to 12 nodes.
 
 The performance evaluation aimed to test the scalability of the parallelised
 application in two ways. The first is with a fixed area under test. This will
-show how a given problem (150x150x90 in size) would scale to larger machines and
-in a cluster. The second test is with an expanding area. This is where, for all
-runs, each process has its own area of a set size (150x150x90) such that, as the
-number of processes grows, the overall computational area increases at the same
-rate. This will show well larger problem sets can be handled and how the
-overhead of communication grows as the number of processes involved in the
-communication grows.
+show how a given problem (150x150x90 in size) would scale in multi-core and
+multi-socket machines and in a cluster. The second test is with an expanding
+area. This is where, for all runs, each process has its own area of a set size
+(150x150x90) such that, as the number of processes grows, the overall
+computational area increases at the same rate. This will show how well larger
+problem sets can be handled and how the overhead of communication grows as the
+number of processes involved in the communication grows.
 
-For a given number of processes, there can be many runs. This is because the
-layout of processes matters. For instance, the 64 process runs are executed in a
-4x16, 8x8, and 16x4 layout. The quickest layout is reported as the runtime for
-that number of processes.
+For a given number of processes, there can be many runs. This is because there
+are different ways to lay out the processes in a two dimensional grid. For
+instance, the 64 process runs are executed in a 4x16, 8x8, and 16x4 layout. The
+quickest layout is reported as the runtime for that number of processes. To
+limit the number of configurations, the maximum number of processes in any
+single dimension was limited to 16. This limit is for the evaluation only, the
+LES supports arbitrarily large process grids.
 
 Many of the graphs, for instance Figure~\ref{fig:mpichfixedarea} have the
 occasional spike in runtime. These occur at a prime number of processes. A run

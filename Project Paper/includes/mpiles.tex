@@ -12,9 +12,10 @@ OpenCL-accelerated implementation.
 
 \subsection{Required communication}
 
-The LES works over a 3D area. When parallelising the LES, the processes are
-logically organised into a 2D virtual topology and they take the corresponding
-top-down slice of the 3D area.
+The LES works over a three dimensional area. When parallelising the LES, the
+processes are logically organised into a two dimensional virtual topology over
+the geographical area under simulation. Each process computes their own slice of
+the three dimensional area.
 
 The LES has nearly one hundred arrays that represent a different aspect of the
 area under simulation. Some of these arrays will need to communicate with the
