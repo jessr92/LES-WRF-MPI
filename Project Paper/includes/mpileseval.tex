@@ -20,6 +20,17 @@ layout of processes matters. For instance, the 64 process runs are executed in a
 4x16, 8x8, and 16x4 layout. The quickest layout is reported as the runtime for
 that number of processes.
 
+Many of the graphs, for instance Figure~\ref{fig:mpichfixedarea} have the
+occasional spike in runtime. These occur at a prime number of processes. A run
+with a prime number of processes will have to have a 1xN or Nx1 layout over the
+LES area. This limits the number of neighbours per process to two but, rather
+than improving performance due to the reduced number of messages, performance
+degrades. This is due to the non-blocking nature of the sends and receives used
+in the MPI LES. For other process counts, with up to four neighbours, there is
+less work to do for each message exchange meaning the first exchange will start
+sooner and have more overlap with subsequent exchanges than the prime number
+cases.
+
 \subsection{Shared-memory parallelisation}
 \input{includes/mpilesevalshared.tex}
 
