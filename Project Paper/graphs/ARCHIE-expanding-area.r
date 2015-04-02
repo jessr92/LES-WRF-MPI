@@ -9,7 +9,7 @@ png(filename="ARCHIE-expanding-area.png", height=400, width=500, bg="white")
 
 plot(data$processes, data$runtime, log="xy",type="o", col=plot_colours[1], ylim=y_range, xlim=x_range, axes=TRUE, ann=FALSE)
 
-arrows(c(144), 205, c(144), 235,length=0.1,code=3,angle=90)
+arrows(c(144), 207, c(144), 230,length=0.1,code=3,angle=90)
 
 abline(v=c(1, 2, 5, 10, 20, 50, 100), col="grey10", lty="dotted")
 abline(h=c(180, 200, 220, 240), col="grey10", lty="dotted")
