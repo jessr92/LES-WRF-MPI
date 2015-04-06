@@ -11,15 +11,17 @@ GMCF also aims to change the way model coupling is organised at runtime. The
 current model coupling frameworks are focussed on clusters with single-core
 machines and do not take into account the uptake in multicore and heterogeneous
 nodes in modern clusters. The focus on single core nodes leads to a
-communication that is necessarily distributed using MPI or equivalents and load
-balancing between models is organised such that a model gets a fixed number of
-nodes, proportional to its runtime compared with the runtimes of the other
-models. With the advent of multicore clusters, a new load balancing technique
-can be implemented, which is what GMCF does. GMCF aims to limit the coupling of
-models to processes within a single node, with limited distributed memory
-communication. The idea behind this is that communication in the cluster is more
-symmetrical and each node can balance its load more evenly for improved
-performance.
+communication that is necessarily distributed using MPI or an equivalent
+framework and, as such, load balancing between models is organised in such a way
+that each model gets a fixed number of nodes, proportional to its runtime
+compared with the runtimes of the other models. With the advent of multicore
+clusters, a new load balancing technique can be implemented, which is what GMCF
+does. GMCF aims to limit the communication of models to processes within a
+single node, with limited distributed memory communication. The idea behind this
+is that communication in the cluster is localised to within each shared memory
+node with only occasional communication between nodes. This also means that each
+node can balance its load more evenly for improved performance since each node
+now executes part of each individual model.
 
 To date, GMCF has been used to couple the LES with WRF, acting as a proof of
 concept to the new ideas behind the framework.
