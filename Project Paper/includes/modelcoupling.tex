@@ -1,30 +1,36 @@
 Climate scientists create independent simulations that each model a different
 part of the planet's ecosystem. To model more complex aspects of the ecosystem,
-and for more accurate results, multiple simulations are required to work
-together.
+and for more accurate results, multiple simulations are required to interact and
+share data.
 
-There are three ways of doing having models work together \cite{Thevenin}. The
-first is merging the model code bases together which generates a single
-executable with all models having efficient data exchanges since all data is
-contained within the one memory space. This solution isn't ideal since merging
-code bases is difficult and further development of the individual models is now
-more difficult.
+There are three ways of having models work together \cite{Thevenin}. The first
+is merging the model code bases together. This generates a single executable
+with the biggest benefit being that all models have efficient data exchanges
+since all data is contained within the one memory space. However, merging code
+bases is not an ideal solution because the merge itself is difficult to complete
+and further development of the individual models is now more difficult. The
+problems associated with merging code bases grow exponentially as the number of
+models in the coupling grows.
 
-The second is to use a communication library directly, such as MPI. Each model
-can keep its own codebase with only explicit communication code being added to
-each model. This solution also isn't ideal since the communication code isn't
-generic since each model coupling will require its own communication code and
-coupling more than two models together results in very complicated exchanges
+The second is to use a communication library directly, such as MPI. The main
+benefit of this over merging code bases is that each model can keep its own
+independent code base with only explicit communication code being added to each
+model. This solution is still not ideal since the communication code is not
+generic. Each different model coupling will require its own communication code
+and coupling more than two models together results in very complicated exchanges
 being implemented.
 
 The third solution is to use a model coupling library which abstracts the low
 level communication complexities and acts as a ``middle man'' between each
-model. For example, the LES has been coupled to the Weather Research and
-Forecasting Model (WRF) using a number of model coupling libraries. This has led
-to more accurate wind velocities being predicted compared with the predictions
-from WRF alone \cite{Kinbara2010,Nakayama1998}, showing the benefit of having
-multiple models interact with one another. There are many model coupling
-frameworks available, including: the Model Coupling Toolkit (MCT)
-\cite{Jacob2005,Larson2005}; OASIS \cite{Valcke2013,Valcke}; the Earth System
-Modeling Framework (ESMF) \cite{Ramework2004}; and OpenPALM
-\cite{Piacentini2011}.
+model. Techniques to facilitate this vary however they all generally require
+some code changes for framework initialisation and to register arrays as being
+part of the inter-model communication. A plain text file then handles the model
+coupling specifics. This method of model coupling is the most popular with, for
+example, the LES being coupled to the Weather Research and Forecasting Model
+(WRF) using a number of model coupling libraries. This has led to more accurate
+wind velocities being predicted compared with the predictions from WRF alone
+\cite{Kinbara2010,Nakayama1998}, showing the benefit of having multiple models
+interact with one another. There are many model coupling frameworks available,
+including: the Model Coupling Toolkit (MCT) \cite{Jacob2005,Larson2005}; OASIS
+\cite{Valcke2013,Valcke}; the Earth System Modeling Framework (ESMF)
+\cite{Ramework2004}; and OpenPALM \cite{Piacentini2011}.
