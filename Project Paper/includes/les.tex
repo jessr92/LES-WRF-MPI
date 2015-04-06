@@ -5,9 +5,9 @@ several hundred kilometres} realistic meteorological simulations and Geographic
 Information System (GIS) data to model the elevation, buildings, and other
 objects in the environment. The LES has a number of different subroutines to
 calculate different effects however the most important, and more computationally
-intensive subroutine, is the Poisson equation solver using successive
-over-relaxation (SOR) to do so. This calculates the pressure of the air in the
-simulated area.
+intensive subroutine, is the Poisson equation solver. The solver uses successive
+over-relaxation (SOR) to solve the linear system of equations. This calculates
+the pressure of the air in the simulated area.
 
 The LES is written in FORTRAN 77 and runs in a single thread. The main time step
 loop has a number of sequential calls to subroutines that each have their own
