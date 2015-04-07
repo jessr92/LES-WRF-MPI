@@ -70,3 +70,9 @@ vgcore.*
 global_sum
 
 Project Paper/1002536r.pdf
+
+Project Presentation/presentation.pdf
+
+*.nav
+
+*.snm
