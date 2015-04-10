@@ -9,6 +9,18 @@ intensive subroutine, is the Poisson equation solver. The solver uses successive
 over-relaxation (SOR) to solve the linear system of equations. This calculates
 the pressure of the air in the simulated area.
 
+\begin{figure}
+    \includegraphics[width=0.5\textwidth]{graphs/pressure_in_LES_output_p.png}
+    \caption{Time evolution of pressure}
+    \label{fig:lespressure}
+\end{figure}
+
+\begin{figure}
+    \includegraphics[width=0.5\textwidth]{graphs/velocity_x_in_LES_output_u.png}
+    \caption{Velocity in the direction of the wind flow}
+    \label{fig:lesvelocity}
+\end{figure}
+
 The LES is written in FORTRAN 77 and runs in a single thread. The main time step
 loop has a number of sequential calls to subroutines that each have their own
 distinct task over the three dimensional area under simulation:
@@ -35,16 +47,16 @@ distinct task over the three dimensional area under simulation:
 
 \end{itemize}
 
-\begin{figure}
-    \includegraphics[width=0.5\textwidth]{graphs/pressure_in_LES_output_p.png}
-    \caption{LES Pressure Output from Panoply}
-    \label{fig:lespressure}
-\end{figure}
-
 Output is stored in the netCDF file format. This can then be fed into WRF or
-another climate system or viewed visually. Figure~\ref{fig:lespressure} shows an
-example output from the LES. The output shown is a two dimensional slice of
-pressure. The output is a series of three dimensional grids over regular
-intervals in the simulation. These grids are manually analysed for turbulent
-flows, evidenced by the rate of change and shape of change in the colour code
-pressure and velocity graphs.
+another climate system or viewed visually. For example,
+Figure~\ref{fig:lespressure} shows an example output from the LES. The figure
+shows the time evolution of pressure for the middle point of the area under
+simulation. Figure~\ref{fig:lesvelocity} shows the wind velocity in the
+direction of the wind flow for a 2D slice of the 3D area for the final time step
+of the simulation.
+
+Overall, output is a series of four dimensional grids over regular intervals in
+the simulation. There is a four dimensional grid for each of pressure and the
+three components of the velocity vectors. These grids are manually analysed for
+turbulent flows, evidenced by the rate of change and shape of change in the
+colour code pressure and velocity graphs.
