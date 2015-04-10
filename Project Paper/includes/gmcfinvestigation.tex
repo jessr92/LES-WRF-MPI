@@ -244,3 +244,36 @@ variables have their size known at compile time so a simple script can easily
 work out and insert the required allocate calls. This stops the compiler causing
 erroneous behaviour while only involving a minor code change with insignificant
 runtime overhead for the allocation and deallocation.
+
+\subsection{False Cache Sharing}
+
+False cache sharing is where a single cache line contains some data only
+accessed by one thread (called A) and some data only accessed by another thread
+(called B). If thread A updates its data, thread B has to invalidate its cache
+line even if the data it has access to hasn't changed. This can occur in
+communication exchanges. The first part of a cache line may contain the last few
+elements of an array that will be updated by thread A's bottom neighbour. The
+latter part of a cache line may contain the first few elements of an array that
+will be updated by thread B's top neighbour. Rather than one cache line
+invalidation between threads, they will now experience two. This has obvious
+performance issues but isn't easily resolved, if at all. Preventing false cache
+sharing involves ensuring arrays are aligned in a cache line and no single cache
+line contains data for multiple threads. This is impossible in the general case
+as the fix involves padding an array to the size of a cache line. MPI cannot
+suffer from this problem as MPI works on processes that, by definition, have
+independent memory spaces.
+
+To investigate this problem, a 4kB array was added to the LES model code. This
+meant each thread had a 4kB padding between each threads. Performance was
+investigated for both the fixed area and expanding area runs but the padding had
+no effect on performance.
+
+To further investigate the potential cache sharing option, a sleep based on a
+thread's model ID was added. In addition to the padding array, the sleep forced
+thread number i complete all of its allocate calls before thread number i+1.
+This would give the best chance of removing the possibility that false cache
+sharing would occur. Performance was investigated again but the padding and
+sleep had no effect on performance.
+
+This shows that there is no benefit from trying to pad the arrays since this
+will not improve performance.
