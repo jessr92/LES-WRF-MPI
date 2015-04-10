@@ -109,24 +109,7 @@ characteristics of OpenMPI version 1.8.4 were also investigated. Many of the
 configurations discussed for MPICH were repeated for OpenMPI to enable direct
 comparisons between runtimes.
 
-\begin{figure}[h]
-    \includegraphics[width=0.5\textwidth]
-    {graphs/MPICH313-OpenMPI184-fixed-area.png}
-    \caption{MPICH 3.1.3 Versus OpenMPI 1.8.4 Fixed Area}
-    \label{fig:mpichversusopenmpifixedarea}
-\end{figure}
-
-\begin{figure}[h]
-    \includegraphics[width=0.5\textwidth]
-    {graphs/MPICH313-OpenMPI184-expanding-area.png}
-    \caption{MPICH 3.1.3 Versus OpenMPI 1.8.4 Expanding Area}
-    \label{fig:mpichversusopenmpiexpandingarea}
-\end{figure}
-
-Figures~\ref{fig:mpichversusopenmpifixedarea} and
-\ref{fig:mpichversusopenmpiexpandingarea} represent a runtime comparison for
-fixed area and expanding area runs in a by core mapping configuration. They show
-how there is no tangible performance difference between MPICH 3.1.3 and OpenMPI
+There is no tangible performance difference between MPICH 3.1.3 and OpenMPI
 1.8.4. MPICH 3.1.3 is moderately faster but OpenMPI is less than 10\% slower for
 high process counts. It can be concluded that use of either MPI implementation
 will yield similar speedups as each other. With many other MPI implementations
