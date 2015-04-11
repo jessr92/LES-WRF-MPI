@@ -15,12 +15,6 @@ the pressure of the air in the simulated area.
     \label{fig:lespressure}
 \end{figure}
 
-\begin{figure}
-    \includegraphics[width=0.5\textwidth]{graphs/velocity_x_in_LES_output_u.png}
-    \caption{Wind flow velocity from Panoply}
-    \label{fig:lesvelocity}
-\end{figure}
-
 The LES is written in FORTRAN 77 and runs in a single thread. The main time step
 loop has a number of sequential calls to subroutines that each have their own
 distinct task over the three dimensional area under simulation:
@@ -54,6 +48,12 @@ shows the time evolution of pressure for the middle point of the area under
 simulation. Figure~\ref{fig:lesvelocity} shows the wind velocity in the
 direction of the wind flow for a 2D slice of the 3D area for the final time step
 of the simulation.
+
+\begin{figure}
+    \includegraphics[width=0.5\textwidth]{graphs/velocity_x_in_LES_output_u.png}
+    \caption{Wind flow velocity from Panoply}
+    \label{fig:lesvelocity}
+\end{figure}
 
 Overall, output is a series of four dimensional grids over regular intervals in
 the simulation. There is a four dimensional grid for each of pressure and the

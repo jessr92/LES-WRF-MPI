@@ -1,3 +1,9 @@
+\begin{figure}
+    \includegraphics[width=0.5\textwidth]{graphs/gmcfArchitecture.png}
+    \caption{GMCF Architecture}
+    \label{fig:gmcfArchitecture}
+\end{figure}
+
 GMCF is a relatively new framework with development beginning in 2014. GMCF's
 primary function is for model coupling. One of long term goals of GMCF is to
 automate as much of the model coupling process as possible. Current frameworks
@@ -25,3 +31,15 @@ now executes part of each individual model.
 
 To date, GMCF has been used to couple the LES with WRF, acting as a proof of
 concept to the new ideas behind the framework.
+
+GMCF works by having a concept of packets which are transferred between the
+source and destination threads, arriving at the destination thread's FIFO queue.
+Each thread has a main FIFO queue for receiving packets and packets are
+demultiplexed from this queue into another queue dependent on the packet's type
+and source thread ID. Figure~\ref{gmcfArchitecture} shows this architecture from
+the perspective of a single GMCF Tile, which is owned by a single thread.
+
+GMCF has many packet types, including a packet type to request data, a packet
+type to respond with a pointer to the requested data, and an acknowledgement
+packet type to let the source thread know that the data has been copied by the
+destination so the array being sent is safe to use.
