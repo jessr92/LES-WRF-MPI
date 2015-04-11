@@ -34,12 +34,6 @@ balanced layout thus two halos will be significantly shorter than the others.
 This difference acts as a bottleneck since the shorter halo exchanges finish
 sooner then have to wait for the longer halo exchanges to complete.
 
-\begin{figure}
-    \includegraphics[width=0.5\textwidth]{graphs/MPICH313-expanding-area.png}
-    \caption{MPICH 3.1.3 Expanding Area Runtimes}
-    \label{fig:mpichexpandingarea}
-\end{figure}
-
 Figure~\ref{fig:mpichexpandingarea} shows good scaling of runtime where the
 overall area under simulation grows at the same rate as the process count. A
 single process executing on a 150x150x90 area takes 69.2 seconds to execute
@@ -52,6 +46,12 @@ before. This is also as intuition would expect since the setup cost of sending a
 message is fixed irrespective of the message size so larger messages amortize
 the cost of the setup. Also, as the fixed area runs gain processes, the ratio
 between useful computation and message sending decreases.
+
+\begin{figure}
+    \includegraphics[width=0.5\textwidth]{graphs/MPICH313-expanding-area.png}
+    \caption{MPICH 3.1.3 Expanding Area Runtimes}
+    \label{fig:mpichexpandingarea}
+\end{figure}
 
 Towards the end of the graph there is a significant increase. This occurs on the
 move from 32 to 33 processes. This is because at 32 processes, all sockets are
