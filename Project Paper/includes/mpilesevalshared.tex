@@ -20,19 +20,19 @@ of achieving a higher turbo clock frequency if applicable.
     \label{fig:mpichfixedarea}
 \end{figure}
 
-Figure~\ref{fig:mpichfixedarea} shows linear improvements in runtime for a
-fixed sized area. Single threaded performance brings runtime to 275.5 seconds
-with 64 threads completing its run in 39.2 seconds, a 7x improvement in
-computational throughput.
+Figure~\ref{fig:mpichfixedarea} shows linear improvements in runtime for a fixed
+sized area. Single threaded performance has a runtime of 275.5 seconds with 64
+threads completing its run in 39.2 seconds, a 7x improvement in computational
+throughput.
 
 The graph isn't as smooth as would normally be expected. This is as a direct
 consequence to the mapping of processes over a two dimensional area. If the same
 number of processes exist in both axes, then the performance is at its best
-since the length of all halos are equal. In an extreme case, the runs that have
-a prime number of processes (11 and 13 for instance) by definition cannot have a
-balanced layout thus two halos will be significantly shorter than the others.
-This difference acts as a bottleneck since the shorter halo exchanges finish
-sooner then have to wait for the longer halo exchanges to complete.
+since the length of all halos are equal. If the process counts differ then they
+cannot have a balanced layout since two halos will be significantly shorter than
+the others. This difference acts as a bottleneck since the shorter halo
+exchanges finish sooner then have to wait for the longer halo exchanges to
+complete.
 
 Figure~\ref{fig:mpichexpandingarea} shows good scaling of runtime where the
 overall area under simulation grows at the same rate as the process count. A
@@ -41,11 +41,12 @@ whereas 64 processes executing on a 1200x1200x90 area takes 235.9 seconds to
 execute. This equates to a 3.4x increase in runtime for a 64x increase in area,
 improving throughput by 18.8x. Comparing this with the fixed area improvement of
 7x, it is clear to see that to get the most benefit from the MPI parallelised
-LES is to calculate velocities over greater areas or at greater resolutions than
-before. This is also as intuition would expect since the setup cost of sending a
-message is fixed irrespective of the message size so larger messages amortize
-the cost of the setup. Also, as the fixed area runs gain processes, the ratio
-between useful computation and message sending decreases.
+LES, it should be used to to calculate velocities over greater areas or at
+greater resolutions than before. This is also as intuition would expect since
+the setup cost of sending a message is fixed irrespective of the message size so
+larger messages amortize the cost of the setup. Also, as the fixed area runs
+gain processes, the ratio between time spent doing useful computation and
+message sending decreases.
 
 \begin{figure}
     \includegraphics[width=0.5\textwidth]{graphs/MPICH313-expanding-area.png}

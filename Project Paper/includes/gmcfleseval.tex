@@ -11,7 +11,7 @@ that GMCF uses threads for parallelisation whereas MPI uses processes. The
 second is that GMCF performance scaling does not include 63 and 64 instances of
 the LES. This is due to a temporary implementation detail discussed in
 Section~\ref{sec:GMCFInvestigation}. Given the performance characteristics of
-both MPI and GMCF these two omissions are insignificant in showing the
+both MPI and GMCF these two differences are insignificant in showing the
 performance scaling of GMCF in comparison to MPI.
 
 \subsection{Shared-memory parallelisation}
@@ -49,8 +49,8 @@ simulate at higher resolutions or over larger areas, this result is more
 indicative of realistic performance characteristics.
 
 Overall, MPI may be faster than GMCF but the GMCF performance results are highly
-competitive. The MPICH library is the initial implementation of the MPI 1.x
-standard so is around two decades old. Throughout its existence, it has also
+competitive. The MPICH library started as the initial implementation of the MPI
+1.x standard so is around two decades old. Throughout its existence, it has also
 acted as a high quality reference implementation of the latest MPI standard.
 This makes MPICH a well thought out and mature library. GMCF's implementation
 began in August 2014, less than a year ago and the primary work was aimed at

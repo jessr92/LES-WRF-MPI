@@ -122,10 +122,12 @@ although MPI's method of global reduction has better performance at higher
 thread counts, the LES doesn't execute the global reduction often enough for
 this to impact the overall runtime.
 
-OpenMPI's method of global reduction uses a ``recursive doubling algorithm''.
-This involves a tree-like reduction that in a work depth that is logarithmic
-with the number of communicating processes. GMCFs new method has a work depth
-that is linear with the number of threads
+MPICH and OpenMPI's method of global reduction uses a ``recursive doubling
+algorithm''\cite{Thakur2003}. This involves a tree-like reduction that has a
+work depth that is logarithmic with the number of communicating processes. GMCFs
+new method has a work depth that is linear with the number of threads. This
+linear work depth is likely the reason for the lower throughput at higher thread
+counts compared with MPI.
 
 \subsubsection{Spin locks and busy waiting}
 
@@ -133,9 +135,9 @@ Traditional locks used for mutual exclusion will cause a thread to sleep if the
 lock is held by another thread. Condition variables are also used to allow a
 thread that currently holds the lock, but finds the data it has access to isn't
 ready, for example a queue that is empty in a subroutine that processes the head
-of a queue. These also cause a thread to sleep until a condition is met. In this
-example, until the queue isn't empty. This stops a thread wasting CPU cycles and
-is seen as a way to mediate fair access to a shared resource.
+of a queue. These also cause a thread to sleep until a condition is met. This
+stops a thread wasting CPU cycles and is seen as a way to mediate fair access to
+a shared resource.
 
 Spin locks replace traditional locks. If another thread holds the lock, rather
 than going to sleep, a thread will ``spin'' over the lock, continually trying to
@@ -157,7 +159,7 @@ GMCFs per-thread receiving FIFO queues were looked at as another potential
 source of performance improvement. Model threads will regularly sleep, waiting
 for packets to arrive. This reduces CPU usage but increases the latency between
 a packet arriving and a thread being awake and able to process it. MPI processes
-do not sleep by default for this reason. The FIFO queues in GMCF were currently
+do not sleep by default for this reason. The FIFO queues in GMCF were previously
 managed by mutual exclusion locks and condition variables. These were replaced
 with spin locks and busy waiting. This reduced runtimes by around 20\%, a
 significant improvement.
@@ -195,9 +197,9 @@ packet. Since a thread may be looking for a packet from a specific thread, the
 queues had to be iterated over to find a packet from the requested source
 thread. To prevent this, each thread had a map of queues for each packet type
 and each source thread. This meant that, to find a specific packet, only one
-queue had to be looked at and the required packet is guaranteed to either be at
-the head of the queue. This map of FIFOs helped speed up the code that waited
-for and found packets resulting in an overall performance improvement of nearly
+queue had to be looked at and the required packet is guaranteed to be at the
+head of the queue. This map of FIFOs helped speed up the code that waited for
+and found packets, resulting in an overall performance improvement of nearly
 20\%.
 
 Another change was to remove the need to send ``REQDATA'' packets. This packet
@@ -270,10 +272,10 @@ no effect on performance.
 
 To further investigate the potential cache sharing option, a sleep based on a
 thread's model ID was added. In addition to the padding array, the sleep forced
-thread number i complete all of its allocate calls before thread number i+1.
-This would give the best chance of removing the possibility that false cache
-sharing would occur. Performance was investigated again but the padding and
-sleep had no effect on performance.
+thread number i to complete all of its allocate calls before thread number i+1
+started theirs. This would give the best chance of removing the possibility that
+false cache sharing would occur. Performance was investigated again but the
+padding and sleep had no effect on performance.
 
 This shows that there is no benefit from trying to pad the arrays since this
 will not improve performance.

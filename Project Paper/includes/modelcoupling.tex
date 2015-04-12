@@ -16,19 +16,19 @@ The second is to use a communication library directly, such as MPI. The main
 benefit of this over merging code bases is that each model can keep its own
 independent code base with only explicit communication code being added to each
 model. This solution is still not ideal since the communication code is not
-generic. Each different model coupling will require its own communication code
-and coupling more than two models together results in very complicated exchanges
-being implemented.
+generic. Every model coupling configuration will require its own communication
+code and coupling more than two models together results in very complicated
+exchanges needing to be implemented.
 
-The third solution is to use a model coupling library which abstracts the low
-level communication complexities and acts as a ``middle man'' between each
-model. Techniques to facilitate this vary however they all generally require
-some code changes for framework initialisation and to register arrays as being
-part of the inter-model communication. A plain text file then handles the model
-coupling specifics. This method of model coupling is the most popular with, for
-example, the LES being coupled to the Weather Research and Forecasting Model
-(WRF) using a number of model coupling libraries. This has led to more accurate
-wind velocities being predicted compared with the predictions from WRF alone
+The third solution is to use a model coupling library to abstract the low level
+communication complexities and act as a ``middle man'' between each model.
+Techniques to facilitate this vary however they all generally require some code
+changes for framework initialisation and to register arrays as being part of the
+inter-model communication. A plain text file then handles the model coupling
+specifics. This method of model coupling is the most popular with, for example,
+the LES being coupled to the Weather Research and Forecasting Model (WRF) using
+a number of model coupling libraries. This has led to more accurate wind
+velocities being predicted compared with the predictions from WRF alone
 \cite{Kinbara2010,Nakayama1998}, showing the benefit of having multiple models
 interact with one another. There are many model coupling frameworks available,
 including: the Model Coupling Toolkit (MCT) \cite{Jacob2005,Larson2005}; OASIS

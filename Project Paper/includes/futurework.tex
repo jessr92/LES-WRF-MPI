@@ -12,7 +12,7 @@ potential performance issues are thought to remain.
 
 The first involves the C++ and Fortran boundary. This boundary is crossed many
 times throughout an application's runtime. The boundary itself involves no
-runtime overhead as the coupled application is a single boundary however the
+runtime overhead as the coupled application is a single binary however the
 language changes limit the scope of what compiler optimisations can achieve. By
 giving the Fortran API more capabilities such as handling packet sending and
 receiving, making it more than just a thin wrapper, the compiler may be able to
@@ -40,7 +40,7 @@ of CPU cores, the benefits of a tree-based reduction may become apparent.
 \subsection{New capabilities}
 
 A major new capability that is set for future work in the coming months is
-distributed-memory parallelism. This is the primary limitation between GMCF and
+distributed-memory parallelism. This is the primary difference between GMCF and
 MPI as it stands. Enabling distributed-memory parallelism will allow GMCF model
 coupling to use clusters and acts as a major step towards GMCF's novel model
 coupling goal.

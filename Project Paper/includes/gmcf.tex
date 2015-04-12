@@ -40,12 +40,14 @@ and of the correct type. Figure~\ref{fig:gmcfArchitecture} shows this
 architecture from the perspective of a single GMCF Tile, which is owned by a
 single thread.
 
-GMCF has many packet types, including a packet type to request data, a packet
-type to respond with a pointer to the requested data, and an acknowledgement
-packet type to let the source thread know that the data has been copied by the
-destination so the array that was sent is now safe to use again. The high level
-API offered by GMCF hides the packet abstraction, instead offering higher level
-calls for sending and receiving data.
+GMCF has many packet types, including a packet type to request data, a response
+packet type that contains a pointer to the requested data, and an
+acknowledgement packet type to let the source thread know that the data has been
+copied by the destination thread so the array that was sent is now safe to use
+again. Since pointers to data are sent between threads, packet message length is
+minimal making the processing of packets lightweight. The high level API offered
+by GMCF hides the packet abstraction, instead offering higher level calls for
+sending and receiving data.
 
 To date, GMCF has been used to couple the LES with WRF, acting as a proof of
 concept to the new ideas behind the framework.

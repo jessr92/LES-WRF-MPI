@@ -14,18 +14,18 @@ OpenCL-accelerated implementation.
 
 The LES works over a three dimensional area. When parallelising the LES, the
 processes are logically organised into a two dimensional virtual topology over
-the geographical area under simulation. Each process computes their own slice of
-the three dimensional area.
+the geographical area under simulation. Each process computes over their own
+slice of the three dimensional area.
 
 The LES has nearly one hundred arrays that represent a different aspect of the
 area under simulation. Some of these arrays will need to communicate with the
 other processes in various fashions.
 
 Processes will need to distribute and gather whole arrays. This occurs at the
-beginning and end of the LES's execution. At the beginning a single process
-acting as the master process will read in the entire input data, and distribute
-the result to the other processes. At the end the master process will gather the
-results of the simulation to be written out to disk in the netCDF format.
+beginning and end of the LES's execution. At the beginning, a single process
+acting as the master process will read in the entire input data and distribute
+the result to the other processes. At the end, the master process will gather
+the results of the simulation to be written out to disk in the netCDF format.
 
 Another kind of required communication is the exchange of halos, or array
 boundaries. To calculate a given index in an array, the surrounding values are
@@ -39,8 +39,8 @@ further four for the remaining corner values.
 The LES has a second type of array boundary communication to manage the side
 flows. In the original LES, the left edge of some arrays is copied to the right
 edge and vice versa. This is done to have the simulated area `wrap around'
-itself and keeps the flow of air moving from one side to the other. This is not
-done for the top and bottom edges since they act as the outflow and inflow
+itself in the direction perpendicular to the direction of the inflow. This is
+not done for the top and bottom edges since they act as the outflow and inflow
 respectively which require no communication between processes.
 
 All of the communication discussed so far is able to use the standard
@@ -65,6 +65,5 @@ into distinct, generic modules. This meant code changes to the LES were minimal,
 with most of the changes being the addition of calls to the Fortran module that
 had the communication logic contained within it. In addition to keeping the
 communication code separated from the LES code, the communication code itself
-was made generic such that the GMCF communication code could be used in-place of
-the MPI communication code easily, allowing them to share the same pre- and
-post-communication code.
+was made generic such that GMCF could be used in-place of MPI easily, allowing
+them to share the same pre- and post-communication code.

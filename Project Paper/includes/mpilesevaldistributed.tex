@@ -1,7 +1,7 @@
 In addition to shared-memory parallelism, the performance characteristics of the
 MPI LES in a distributed-memory environment are of interest. The ability to run
 on large computing clusters allows researchers using the LES to simulate at even
-higher resolution or over larger areas than on a single machine.
+higher resolutions or over larger areas than on a single machine.
 
 Results were obtained using the EPSRC funded ARCHIE-WeSt High Performance
 Computer (\url{www.archie-west.ac.uk}). EPSRC grant no. EP/K000586/1.
@@ -13,7 +13,7 @@ with 48GB RAM and nodes are connected to each other via a 4xQDR Infiniband
 Interconnect. ARCHIE's MPI communication library was OpenMPI 1.6.2.
 
 Even though the Intel CPUs have turbo boost enabled, all parallel runs use all
-cores of the cluster so the frequency between runs is consistent.
+cores of each node so the frequency between runs is consistent.
 
 \begin{figure}[h]
     \includegraphics[width=0.5\textwidth]{graphs/ARCHIE-fixed-area.png}
