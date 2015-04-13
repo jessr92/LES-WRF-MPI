@@ -74,10 +74,13 @@ the Glasgow Model Coupling Framework}
 \frame{
     \frametitle{Evaluation}
     \begin{itemize}
-        \item MPI and GMCF for shared-memory evaluation
-        \item togian - 64 cores
-        \item MPI for distributed-memory evaluation
-        \item ARCHIE - up to 12 nodes (144 cores)
+        \item MPI and GMCF had shared-memory evaluation on togian
+        \item togian has 64 cores across 4 sockets
+        \item MPI had distributed-memory evaluation on ARCHIE
+        \item ARCHIE is a cluster with thousands of cores
+        \item Evaluation used up to 12 nodes (144 cores)
+        \item Fixed area test where total area was 150x150x90
+        \item Expanding area test where each instance had 150x150x90 area
     \end{itemize}
 }
 \placelogofalse
@@ -87,7 +90,10 @@ the Glasgow Model Coupling Framework}
     \includegraphics[width=0.5\textwidth]{images/MPICH313-fixed-area.png}
     \includegraphics[width=0.5\textwidth]{images/MPICH313-expanding-area.png}
     \begin{itemize}
-        \item MPI on togian
+        \item Default mapping - round robin across sockets
+        \item By core mapping - sequential core assignment
+        \item Fixed area has linear scaling. Around 7x improvement over 64 cores
+        \item Expanding area scales well. Runtime settles to 220 seconds
     \end{itemize}
 }
 \subsection{GMCF Shared-memory evaluation}
@@ -96,38 +102,44 @@ the Glasgow Model Coupling Framework}
     \includegraphics[width=0.5\textwidth]{images/GMCF-MPI-fixed-area.png}
     \includegraphics[width=0.5\textwidth]{images/GMCF-MPI-expanding-area.png}
     \begin{itemize}
-        \item GMCF on togian
+        \item Fixed area scales well initially, levels out around 2x slower than MPI
+        \item Expanding area performance very similar to MPI, scales well.
+        \item Smaller transfers need more work to improve performance
     \end{itemize}
 }
-\placelogotrue
 \subsection{MPI Distributed-memory evaluation}
 \frame{
     \frametitle{MPI Distributed--memory evaluation}
     \includegraphics[width=0.5\textwidth]{images/ARCHIE-fixed-area.png}
     \includegraphics[width=0.5\textwidth]{images/ARCHIE-expanding-area.png}
     \begin{itemize}
-        \item MPI on ARCHIE
+        \item Fixed area shows linear scaling. 48 cores offers 25x improvement
+        \item 144 cores offers 43.5x improvement but individual areas very small
+        \item Expanding area shows runtime levels out around 220 seconds
+        \item Variation in runtime caused by varying load in ARCHIE overall
     \end{itemize}
 }
-\placelogofalse
 \section{GMCF Performance Improvements}
 \frame{
     \frametitle{GMCF Performance Improvements}
     \includegraphics[width=0.5\textwidth]{images/GMCF-before-after-fixed-area.png}
     \begin{itemize}
-        \item Was really bad, now better
-        \item Global reduction
-        \item Spin locks
-        \item Thread pinning
-        \item Other stuff
+        \item GMCF originally had `bathtub' shaped graph as thread count grew
+        \item Global reductions primary cause of performance problems
+        \item Spin locks on FIFOs improved performance by 20\%
+        \item Thread pinning reduced runtime by 17\%
+        \item Preemptive data sending and more granular FIFOs reduced runtime by nearly 50\%
     \end{itemize}
 }
-\section{Conclusion}
+\section{Conclusion and Future Work}
 \frame{
-    \frametitle{Conclusion}
+    \frametitle{Conclusion and Future Work}
     \begin{itemize}
-        \item GMCF competitive with MPI
-        \item Future work to make it better
+        \item GMCF's performance is competitive with MPI
+        \item GMCF well placed to act as parallelisation and model coupling framework
+        \item Future work will add distributed memory parallelism
+        \item Automation of model coupling can be extended to include automatic parallelisation
+        \item Further performance improvements
     \end{itemize}
 }
 \end{document}
