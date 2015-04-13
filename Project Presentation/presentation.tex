@@ -7,12 +7,51 @@
 the Glasgow Model Coupling Framework}
 \author{Gordon Reid - 1002536r}
 \date{April 22, 2015}
+\newif\ifplacelogo
+\placelogofalse
+\logo{\ifplacelogo\includegraphics[width=3.5cm]{images/ARCHIE-WeSt_logo1.jpg}\vspace{200pt}\fi}
 \begin{document}
 \frame{\titlepage}
+\frame{\tableofcontents}
+\section{LES}
 \frame{
-    \includegraphics{images/ARCHIE-WeSt_logo1.jpg}
+    \includemovie[autoplay,poster,repeat,controls,text={Click to play}]{6cm}{4cm}{videos/pressure_at_75_over_t.avi}
+    \begin{itemize}
+        \item Large Eddy Simulation
+    \end{itemize}
 }
+\section{GMCF}
 \frame{
-    \includemovie[autoplay,poster,repeat,text={Click to play}]{6cm}{4cm}{videos/pressure_at_75_over_t.avi}
+    \begin{itemize}
+        \item Model coupling framework
+    \end{itemize}
+}
+\section{Evaluation}
+\frame{
+    \begin{itemize}
+        \item MPI and GMCF for shared-memory evaluation
+        \item MPI for distributed-memory evaluation
+    \end{itemize}
+}
+\subsection{Shared-memory evaluation}
+\frame{
+    \begin{itemize}
+        \item MPI and GMCF
+    \end{itemize}
+}
+\placelogotrue
+\subsection{MPI Distributed-memory evaluation}
+\frame{
+    \begin{itemize}
+        \item MPI on ARCHIE
+    \end{itemize}
+}
+\placelogofalse
+\section{Conclusion}
+\frame{
+    \begin{itemize}
+        \item GMCF competitive with MPI
+        \item Future work to make it better
+    \end{itemize}
 }
 \end{document}
