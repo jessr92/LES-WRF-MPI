@@ -14,20 +14,44 @@ the Glasgow Model Coupling Framework}
 \frame{\titlepage}
 \frame{\tableofcontents}
 \section{LES}
+\subsection{What is the LES?}
 \frame{
-    \includemovie[autoplay,poster,repeat,controls,text={Click to play}]{6cm}{4cm}{videos/pressure_at_75_over_t.avi}
+    \frametitle{What is the LES?}
+    \includemovie[autoplay,poster,repeat,controls,
+    text={Click to play}]{6cm}{4cm}{videos/pressure_at_75_over_t.avi}
     \begin{itemize}
-        \item Large Eddy Simulation
+        \item Large Eddy Simulation models turbulent flows in urban environments
+        \item Originally in FORTRAN 77, automatically ported to Fortran 95
+        \item Single-threaded, candidate for parallelisation
+        \item Operates over 3D area, outputs 4D arrays to netCDF files
+        \item Video shows evolution of pressure over time for a 2D slice of area
+    \end{itemize}
+}
+\subsection{Parallelisation Techniques}
+\frame{
+    \frametitle{Parallelisation Techniques}
+    \begin{itemize}
+        \item Using MPI for shared- and distributed-memory parallelism
+        \item Using GMCF for shared-memory parallelism
+        \item MPI acts as baseline to compare GMCF with
+    \end{itemize}
+    \begin{itemize}
+        \item LES instances organised into 2D grid, each taking slice of total area
+        \item Need communication to distribute and gather whole arrays
+        \item At each time step, side flows and halos need to be exchanged
+        \item Also global reductions to get the min, max, and sum of scalars
     \end{itemize}
 }
 \section{GMCF}
 \frame{
+    \frametitle{GMCF}
     \begin{itemize}
         \item Model coupling framework
     \end{itemize}
 }
 \section{Evaluation}
 \frame{
+    \frametitle{Evaluation}
     \begin{itemize}
         \item MPI and GMCF for shared-memory evaluation
         \item MPI for distributed-memory evaluation
@@ -35,6 +59,7 @@ the Glasgow Model Coupling Framework}
 }
 \subsection{Shared-memory evaluation}
 \frame{
+    \frametitle{Shared-memory evaluation}
     \begin{itemize}
         \item MPI and GMCF
     \end{itemize}
@@ -42,6 +67,7 @@ the Glasgow Model Coupling Framework}
 \placelogotrue
 \subsection{MPI Distributed-memory evaluation}
 \frame{
+    \frametitle{MPI Distributed--memory evaluation}
     \begin{itemize}
         \item MPI on ARCHIE
     \end{itemize}
@@ -49,6 +75,7 @@ the Glasgow Model Coupling Framework}
 \placelogofalse
 \section{Conclusion}
 \frame{
+    \frametitle{Conclusion}
     \begin{itemize}
         \item GMCF competitive with MPI
         \item Future work to make it better
