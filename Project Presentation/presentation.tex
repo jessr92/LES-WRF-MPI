@@ -33,12 +33,13 @@ the Glasgow Model Coupling Framework}
     \begin{itemize}
         \item Using MPI for shared- and distributed-memory parallelism
         \item Using GMCF for shared-memory parallelism
-        \item MPI acts as baseline to compare GMCF with
+        \item MPI performance acts as baseline to compare GMCF with
     \end{itemize}
     \begin{itemize}
         \item LES instances organised into 2D grid, each taking slice of total area
-        \item Need communication to distribute and gather whole arrays
+        \item Processes communicate to distribute and gather whole arrays
         \item At each time step, side flows and halos need to be exchanged
+        \item Halos require up to eight messages: four edges and four corners
         \item Also global reductions to get the min, max, and sum of scalars
     \end{itemize}
 }
@@ -74,11 +75,13 @@ the Glasgow Model Coupling Framework}
 \frame{
     \frametitle{Evaluation}
     \begin{itemize}
-        \item MPI and GMCF had shared-memory evaluation on togian
+        \item MPI and GMCF shared-memory evaluation on togian
         \item togian has 64 cores across 4 sockets
-        \item MPI had distributed-memory evaluation on ARCHIE
+        \item Performance scaling as instance count grew from 1 to 64
+        \item MPI distributed-memory evaluation on ARCHIE
         \item ARCHIE is a cluster with thousands of cores
         \item Evaluation used up to 12 nodes (144 cores)
+        \item Performance scaling as each additional node added
         \item Fixed area test where total area was 150x150x90
         \item Expanding area test where each instance had 150x150x90 area
     \end{itemize}
@@ -92,8 +95,9 @@ the Glasgow Model Coupling Framework}
     \begin{itemize}
         \item Default mapping - round robin across sockets
         \item By core mapping - sequential core assignment
-        \item Fixed area has linear scaling. Around 7x improvement over 64 cores
-        \item Expanding area scales well. Runtime settles to 220 seconds
+        \item MPICH and OpenMPI tested, both performed similarly
+        \item Fixed area has linear scaling: 7x improvement over 64 cores
+        \item Expanding area runtime settles to 220 seconds
     \end{itemize}
 }
 \subsection{GMCF Shared-memory evaluation}
@@ -104,6 +108,7 @@ the Glasgow Model Coupling Framework}
     \begin{itemize}
         \item Fixed area scales well initially, levels out around 2x slower than MPI
         \item Expanding area performance very similar to MPI, scales well.
+        \item Performance competitive with MPI even with MPIs maturity
         \item Smaller transfers need more work to improve performance
     \end{itemize}
 }
