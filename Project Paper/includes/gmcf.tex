@@ -6,12 +6,13 @@
 
 GMCF is a relatively new framework with development beginning in 2014. GMCF's
 primary function is for model coupling. One of long term goals of GMCF is to
-automate as much of the model coupling process as possible. Current frameworks
-currently require hand modification of existing model code and the writing of
-additional code to describe and control the communication between models. This
-can present a level of difficulty that a research team may not be willing to
-accept so a framework that can automate a significant amount of the model
-coupling work would be welcomed.
+automate as much of the model coupling process as possible
+\cite{Vanderbauwhede2015}. Current frameworks currently require hand
+modification of existing model code and the writing of additional code to
+describe and control the communication between models. This can present a level
+of difficulty that a research team may not be willing to accept so a framework
+that can automate a significant amount of the model coupling work would be
+welcomed.
 
 GMCF also aims to change the way model coupling is organised at runtime. The
 current model coupling frameworks are focussed on clusters with single-core
@@ -49,5 +50,6 @@ minimal making the processing of packets lightweight. The high level API offered
 by GMCF hides the packet abstraction, instead offering higher level calls for
 sending and receiving data.
 
-To date, GMCF has been used to couple the LES with WRF, acting as a proof of
-concept to the new ideas behind the framework.
+To date, GMCF has been used to couple the LES with WRF
+\cite{Vanderbauwhede2015}, acting as a proof of concept to the new ideas behind
+the framework.

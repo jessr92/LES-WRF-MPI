@@ -1,3 +1,14 @@
+@article{Vanderbauwhede2015,
+abstract = {{In this report we present a novel approach to model coupling for shared-memory multicore systems hosting OpenCL-compliant accelerators, which we call The Glasgow Model Coupling Framework (GMCF). We discuss the implementation of a prototype of GMCF and its application to coupling the Weather Research and Forecasting Model and an OpenCL-accelerated version of the Large Eddy Simulator for Urban Flows (LES) developed at DPRI.   The first stage of this work concerned the OpenCL port of the LES. The methodology used for the OpenCL port is a combination of automated analysis and code generation and rule-based manual parallelization. For the evaluation, the non-OpenCL LES code was compiled using gfortran, fort and pgfortran\}, in each case with auto-parallelization and auto-vectorization. The OpenCL-accelerated version of the LES achieves a 7 times speed-up on a NVIDIA GeForce GTX 480 GPGPU, compared to the fastest possible compilation of the original code running on a 12-core Intel Xeon E5-2640.   In the second stage of this work, we built the Glasgow Model Coupling Framework and successfully used it to couple an OpenMP-parallelized WRF instance with an OpenCL LES instance which runs the LES code on the GPGPI. The system requires only very minimal changes to the original code. The report discusses the rationale, aims, approach and implementation details of this work.},
+archivePrefix = {arXiv},
+arxivId = {1504.02264},
+author = {Vanderbauwhede, Wim},
+eprint = {1504.02264},
+month = apr,
+title = {{Model Coupling between the Weather Research and Forecasting Model and the DPRI Large Eddy Simulator for Urban Flows on GPU-accelerated Multicore Systems}},
+url = {http://arxiv.org/abs/1504.02264},
+year = {2015}
+}
 @article{Thakur2003,
 abstract = {We report on our work on improving the performance of col- lective operations in MPICH on clusters connected by switched networks. For each collective operation, we use multiple algorithms depending on the message size, with the goal of minimizing latency for short messages and minimizing bandwidth usage for long messages. Although we have implemented new algorithms for all MPI collective operations, because of limited space we describe only the algorithms for allgather, broad- cast, reduce-scatter, and reduce. We present performance results using the SKaMPI benchmark on a Myrinet-connected Linux cluster and an IBM SP. In all cases, the new algorithms significantly outperform the old algorithms used in MPICH on the Myrinet cluster, and, in many cases, they outperform the algorithms used in IBM’s MPI on the SP.},
 author = {Thakur, Rajeev and Gropp, William},
@@ -349,18 +360,6 @@ title = {{Test Suite for Evaluating Performance of Multithreaded MPI Communicati
 volume = {35},
 year = {2009}
 }
-@article{Thakur2009a,
-abstract = {As parallel systems are commonly being built out of increasingly large multicore chips, application programmers are exploring the use of hybrid programming models combining MPI across nodes and multithreading within a node. Many MPI implementations, however, are just starting to support multithreaded MPI communication, often focussing on correctness first and performance later. As a result, both users and implementers need some measure for evaluating the multithreaded performance of an MPI implementation. In this paper, we propose a number of performance tests that are motivated by typical application scenarios. These tests cover the overhead of providing the MPI\_THREAD\_MULTIPLE level of thread safety for user programs, the amount of concurrency in different threads making MPI calls, the ability to overlap communication with computation, and other features. We present performance results with this test suite on several platforms (Linux cluster, Sun and IBM SMPs) and MPI implementations (MPICH2, Open MPI, IBM, and Sun). ?? 2009 Elsevier B.V.},
-author = {Thakur, Rajeev and Gropp, William},
-file = {:Users/gordonreid/Library/Application Support/Mendeley Desktop/Downloaded//Thakur, Gropp - 2009 - Test Suite for Evaluating Performance of Multithreaded MPI Communication.pdf:pdf},
-journal = {Parallel Computing},
-keywords = {Benchmarks,Message passing interface (MPI),Multithreading,Performance measurement,benchmarks,measurement,message passing interface,mpi,multithreading,performance},
-number = {January 2009},
-pages = {608--617},
-title = {{Test Suite for Evaluating Performance of}},
-volume = {35},
-year = {2009}
-}
 @article{Zhao2013,
 abstract = {Many new large-scale applications have emerged recently and become important in areas such as bioinformatics and social networks. These applications are often data-intensive and involve irregular communication patterns and complex operations on remote processes. Active messages have proven effective for parallelizing such nontraditional applications. However, most current active messages frameworks are low-level and system specific, do not efficiently support asynchronous progress, and are not interoperable with two-sided and collective communications. In this paper, we present the design and implementation of an active messages framework inside MPI to provide portability and programmability, and we explore challenges when asynchronously handling active messages and other messages from the network as well as from shared memory. We test our implementation with a set of comprehensive benchmarks. Evaluation results show that our framework has the advantages of overlapping and interoperability, while introducing only a modest overhead.},
 author = {Zhao, Xin and Buntinas, Darius and Zounmevo, Judicael and Dinan, James and Goodell, David and Balaji, Pavan and Thakur, Rajeev and Afsahi, Ahmad and Gropp, William},
@@ -416,13 +415,6 @@ title = {{LES Analysis of the Aerodynamic Surface Properties for Turbulent Flows
 url = {http://journals.ametsoc.org/doi/abs/10.1175/2011JAMC2567.1},
 volume = {50},
 year = {2011}
-}
-@article{Vanderbauwhede2014,
-author = {Vanderbauwhede, Wim},
-file = {:Users/gordonreid/Library/Application Support/Mendeley Desktop/Downloaded/Vanderbauwhede - 2014 - Model Coupling between the Weather Research and Forecasting Model and the DPRI Large Eddy Simulator for Urban Fl.pdf:pdf},
-pages = {1--23},
-title = {{Model Coupling between the Weather Research and Forecasting Model and the DPRI Large Eddy Simulator for Urban Flows on GPU-accelerated Multicore Systems}},
-year = {2014}
 }
 @article{Hoefler2007,
 abstract = {Collective operations and non-blocking point-to-point operations have always been part of MPI. Although non-blocking collective operations are an obvious extension to MPI, there have been no comprehensive studies of this functionality. In this paper we present LibNBC, a portable high-performance library for implementing non-blocking collective MPI communication operations. LibNBC provides non-blocking versions of all MPI collective operations, is layered on top of MPI-1, and is portable to nearly all parallel architectures. To measure the performance characteristics of our implementation, we also present a microbenchmark for measuring both latency and overlap of computation and communication. Experimental results demonstrate that the blocking performance of the collective operations in our library is comparable to that of collective operations in other high-performance MPI implementations. Our library introduces a very low overhead between the application and the underlying MPI and thus, in conjunction with the potential to overlap communication with computation, offers the potential for optimizing real-world applications.},
