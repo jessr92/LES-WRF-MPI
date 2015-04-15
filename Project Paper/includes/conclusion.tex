@@ -1,11 +1,18 @@
-The LES parallelised by MPI has been shown to be fast and scalable. With MPI
-being mature over GMCF, the MPI LES implementation is stable enough that it can
-be used straightaway on shared- and distributed-memory systems.
+The LES parallelised by MPI has been shown to be fast and scalable up to 12
+nodes with 144 cores. With MPI itself being more mature than the GMCF framework,
+the MPI LES implementation is stable enough that it can be used straightaway on
+shared- and distributed-memory systems by climate scientists.
 
 The GMCF framework has been shown to support model parallelisation as well as
-model coupling. The performance results are competitive with MPI and, as GMCF
-matures, the performance gap is expected to narrow further.
+model coupling. The global reduction technique with spin locks and busy waiting
+resulted in significantly improved performance and a scalable framework. All of
+the performance changes to the framework benefit both the model parallelisation
+and model coupling performance. Overall, with all of the substantial performance
+improvements made, the performance results are highly competitive with MPI and,
+as GMCF matures, the performance gap is expected to narrow further.
 
-As future work has discussed, GMCF's capabilities are set to grow with
-distributed-memory and more automation of parallelisation and model coupling in
-the pipeline.
+As discussed in future work, GMCF's capabilities are set to grow with
+distributed-memory capabilities and more automation model coupling with
+automation of model parallelisation in the pipeline. With this and the
+performance improvements made, GMCF is set to be a strong model coupling and
+parallelisation framework.
