@@ -21,10 +21,10 @@ the Glasgow Model Coupling Framework}
                  {6cm}{4cm}{videos/pressure_at_75_over_t.avi}
     \begin{itemize}
         \item Large Eddy Simulation models turbulent flows in urban environments
-        \item Originally in FORTRAN 77, automatically ported to Fortran 95
-        \item Single-threaded, candidate for parallelisation
         \item Operates over 3D area, outputs 4D arrays to netCDF files
         \item Video shows evolution of pressure over time for a 2D slice of area
+        \item Originally in FORTRAN 77, automatically ported to Fortran 95
+        \item Single-threaded, candidate for parallelisation
     \end{itemize}
 }
 \subsection{Parallelisation Techniques}
@@ -145,6 +145,7 @@ the Glasgow Model Coupling Framework}
         \item Future work will add distributed memory parallelism
         \item Automation of model coupling can be extended to include automatic parallelisation
         \item Further performance improvements
+        \item MPI LES stable
     \end{itemize}
 }
 \end{document}
