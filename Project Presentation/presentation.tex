@@ -17,13 +17,22 @@ the Glasgow Model Coupling Framework}
 \subsection{What is the LES?}
 \frame{
     \frametitle{What is the LES?}
+    \begin{itemize}
+        \item Developed by the Disaster Prevention Research Institute at Kyoto University
+        \item Large Eddy Simulation models turbulent flows in urban environments
+        \item Geographical Information System data for terrain and building data
+        \item High resolution over mesoscale area (100s of km)
+        \item Poisson equation solver for linear system of equations using successive over relaxation
+        \item Operates over 3D area, outputs 4D arrays to netCDF files
+    \end{itemize}
+}
+\frame{
+    \frametitle{What is the LES?}
     \includemovie[poster,repeat,controls,text={Click to play}]
                  {6cm}{4cm}{videos/pressure_at_75_over_t.avi}
     \begin{itemize}
-        \item Large Eddy Simulation models turbulent flows in urban environments
-        \item Poisson equation solver using successive over relaxation
-        \item Operates over 3D area, outputs 4D arrays to netCDF files
         \item Video shows evolution of pressure over time for a 2D slice of area
+        \item Data can be visualised like this or used as input to another model
         \item Originally in FORTRAN 77, automatically ported to Fortran 95
         \item Single-threaded, candidate for parallelisation
     \end{itemize}
@@ -35,7 +44,12 @@ the Glasgow Model Coupling Framework}
         \item Using MPI for shared- and distributed-memory parallelism
         \item Using GMCF for shared-memory parallelism
         \item MPI performance acts as baseline to compare GMCF with
+        \item GMCF distributed-memory ability is future work
     \end{itemize}
+}
+\frame{
+    \frametitle{Parallelisation Techniques}
+    \includegraphics[width=0.5\textwidth]{images/mpiLESGrid.pdf}
     \begin{itemize}
         \item LES instances organised into 2D grid, each taking slice of total area
         \item Processes communicate to distribute and gather whole arrays
