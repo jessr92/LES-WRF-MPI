@@ -14,7 +14,7 @@ single machine, it is beneficial to parallelise the LES to make better use of
 the computational power of a shared memory system. Also, with computer clusters
 commonplace in the area of research simulation, a parallelised implementation of
 the LES that can make use of a distributed memory system is highly desirable.
-The parallelisation can reduce the execution time of a single execution run or
+The parallelisation can reduce the execution time of a single simulation run or
 allow higher resolution simulations to be run in the same timeframe as the
 original single threaded implementation.
 
@@ -36,7 +36,7 @@ parallelism along with automated model coupling and parallelism.
 
 The major contributions of the work discussed in this paper are as follows:
 
-\begin{itemize}[noitemsep,nolistsep]
+\begin{itemize}
 
     \item MPI implementation of the LES for shared-memory and distributed-memory
     parallelism
@@ -52,14 +52,14 @@ The major contributions of the work discussed in this paper are as follows:
 \end{itemize}
 
 The rest of the paper is structured as follows: Section~\ref{sec:Background}
-discusses the background of GMCF. Section~\ref{sec:MPILES} discusses the MPI
-implementation of the LES with Section~\ref{sec:MPILESEval} conducting a
-shared-memory and distributed-memory performance evaluation.
-Section~\ref{sec:GMCFLES} then discusses the GMCF implementation including the
-framework changes required to facilitate model parallelisation with
-Section~\ref{sec:GMCFLESEval} conducting a shared-memory performance evaluation.
-Section~\ref{sec:GMCFInvestigation} conducts an in-depth performance
-investigation of the GMCF framework while outlining the performance-related
-improvements implemented. Section~\ref{sec:FutureWork} discusses the future work
-to improve the capabilities and performance of the GMCF framework with
-Section~\ref{sec:Conclusion} concluding the paper.
+discusses the background of model coupling, GMCF, and the LES.
+Section~\ref{sec:MPILES} discusses the MPI implementation of the LES with
+Section~\ref{sec:MPILESEval} conducting a shared-memory and distributed-memory
+performance evaluation. Section~\ref{sec:GMCFLES} then discusses the GMCF
+implementation including the framework changes required to facilitate model
+parallelisation with Section~\ref{sec:GMCFLESEval} conducting a shared-memory
+performance evaluation. Section~\ref{sec:GMCFInvestigation} conducts an in-depth
+performance investigation of the GMCF framework while outlining the
+performance-related improvements implemented. Section~\ref{sec:FutureWork}
+discusses the future work to improve the capabilities and performance of the
+GMCF framework with Section~\ref{sec:Conclusion} concluding the paper.

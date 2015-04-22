@@ -49,7 +49,7 @@ application using POSIX threads to call Fortran subroutines.
         4 thread message rate per second &
         64 thread message rate per second\\
         \hline
-        Original GMCF & 9,842 & 60\\
+        Original GMCF using packets & 9,842 & 60\\
         \hline
         PThread Mutex and condition variables & 29,960 & 120\\
         \hline
@@ -134,10 +134,10 @@ counts compared with MPI.
 Traditional locks used for mutual exclusion will cause a thread to sleep if the
 lock is held by another thread. Condition variables are also used to allow a
 thread that currently holds the lock, but finds the data it has access to isn't
-ready, for example a queue that is empty in a subroutine that processes the head
-of a queue. These also cause a thread to sleep until a condition is met. This
-stops a thread wasting CPU cycles and is seen as a way to mediate fair access to
-a shared resource.
+ready, to release the lock until the data is ready. For example, a queue that is
+empty in a subroutine that processes the head of a queue. These also cause a
+thread to sleep until a condition is met. This stops a thread wasting CPU cycles
+and is seen as a way to mediate fair access to a shared resource.
 
 Spin locks replace traditional locks. If another thread holds the lock, rather
 than going to sleep, a thread will ``spin'' over the lock, continually trying to

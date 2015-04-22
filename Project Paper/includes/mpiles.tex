@@ -58,12 +58,12 @@ without restrictions.
 
 \subsection{Implementation techniques}
 
-With the LES algorithms themselves being developed separately, it was highly
-desirable to parallelise the LES by making as few changes to the existing code
-as possible. To facilitate this, the communication code was strongly separated
-into distinct, generic modules. This meant code changes to the LES were minimal,
-with most of the changes being the addition of calls to the Fortran module that
-had the communication logic contained within it. In addition to keeping the
+With the LES being developed separately, it was highly desirable to parallelise
+the LES by making as few changes to the existing code as possible. To facilitate
+this, the communication code was strongly separated into distinct, generic
+modules. This meant code changes to the LES were minimal, with most of the
+changes being the addition of calls to the Fortran module that had the
+communication logic contained within it. In addition to keeping the
 communication code separated from the LES code, the communication code itself
 was made generic such that GMCF could be used in-place of MPI easily, allowing
 them to share the same pre- and post-communication code.

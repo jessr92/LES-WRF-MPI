@@ -1,10 +1,11 @@
 The shared-memory parallelisation run was conducted on a machine called togian.
 This system is a quad socket AMD Opteron 6366HE system giving it 64 cores paired
-into 32 modules running at 1.8GHz. To provide consistent benchmarking results,
-the turbo clock frequencies were disabled. The system has been fitted with 512GB
-of DDR3 RAM. In terms of software, gfortran version 4.7.2 with MPICH 3.1.3 were
-used for the majority of the evaluation. OpenMPI 1.8.4 performance was also
-investigated.
+into 32 modules running at 1.8GHz. Each module has its own floating point units
+that are shared between the pair of cores. To provide consistent benchmarking
+results, the turbo clock frequencies were disabled. The system has been fitted
+with 512GB of DDR3 RAM. In terms of software, gfortran version 4.7.2 with MPICH
+3.1.3 were used for the majority of the evaluation. OpenMPI 1.8.4 performance
+was also investigated.
 
 \subsubsection{Default Mapping}
 
@@ -37,7 +38,7 @@ complete.
 Figure~\ref{fig:mpichexpandingarea} shows good scaling of runtime where the
 overall area under simulation grows at the same rate as the process count. A
 single process executing on a 150x150x90 area takes 69.2 seconds to execute
-whereas 64 processes executing on a 1200x1200x90 area takes 235.9 seconds to
+whereas 64 processes executing over a 1200x1200x90 area takes 235.9 seconds to
 execute. This equates to a 3.4x increase in runtime for a 64x increase in area,
 improving throughput by 18.8x. Comparing this with the fixed area improvement of
 7x, it is clear to see that to get the most benefit from the MPI parallelised
@@ -54,13 +55,14 @@ message sending decreases.
     \label{fig:mpichexpandingarea}
 \end{figure}
 
-Towards the end of the graph there is a significant increase. This occurs on the
-move from 32 to 33 processes. This is because at 32 processes, all sockets are
-exactly `half full'. Each module has its own hardware thread active so each
-process has its own floating point units. On the move to 33 processes, a process
-will now have to share floating point units with another process. This will slow
-down these processes and, by extension, the application overall. This is a
-feature of the AMD CPU architecture and not something caused by MPI or the LES.
+Towards the end of the graph there is a significant increase in runtime. This
+occurs on the move from 32 to 33 processes. This is because at 32 processes, all
+sockets are exactly `half full'. Each module has its own hardware thread active
+so each process has its own floating point units. On the move to 33 processes, a
+process will now have to share floating point units with another process. This
+will slow down these processes and, by extension, the application overall. This
+is a feature of the AMD CPU architecture and not something caused by MPI or the
+LES.
 
 \subsubsection{By Core Mapping}
 
@@ -78,9 +80,9 @@ Another downside is that the turbo frequency will be reduced quicker on
 applicable systems since a socket will reach higher process counts sooner.
 
 Figure~\ref{fig:mpichfixedarea} shows that, for the fixed area runs, the
-performance difference is negligible. The lower process counts have poorer
+performance difference is minor. The lower process counts have poorer
 performance however, once the 32 process boundary has been crossed, performance
-is the same as the default mapping case.
+is slightly improved over the default mapping case.
 
 Figure~\ref{fig:mpichexpandingarea} again shows good scaling of
 runtime where the overall simulation area increases at the same rate as the
