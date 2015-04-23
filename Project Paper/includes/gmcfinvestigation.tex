@@ -18,7 +18,7 @@ application using POSIX threads to call Fortran subroutines.
     \label{fig:gmcfbeforeandafter}
 \end{figure}
 
-\begin{table*}[t]
+\begin{table*}
     \centering
     \begin{tabular}{|l|l|l|}
         \hline
@@ -41,7 +41,7 @@ application using POSIX threads to call Fortran subroutines.
     \label{tab:gmcfperformanceimprovements}
 \end{table*}
 
-\begin{table*}[t]
+\begin{table*}
     \centering
     \begin{tabular}{|l|l|l|}
         \hline
@@ -70,8 +70,8 @@ Table~\ref{tab:gmcfperformanceimprovements} shows, a number of framework changes
 including a dedicated method of calculating global reductions, spin locks, and
 thread pinning were investigated and were ultimately implemented to improve
 performance. Overall these changes were responsible for making GMCF performance
-scalable as the number of threads grows and reducing GMCF performance to nearly
-one sixth for a fixed area problem.
+scalable as the number of threads grows and reducing GMCF runtime to nearly one
+sixth of the original runtime for a fixed area problem.
 
 \subsubsection{Global Reduction}
 
@@ -92,8 +92,8 @@ calculating a global reduction were investigated. A summary of microbenchmark
 results for the different methods tried is shown in
 Table~\ref{tab:gmcfglobalreductionresults}. The original method involved message
 passing in the same way halo exchanges and other arrays were passed. The
-overhead of sending packets for a single scalar were clearly significant. Also,
-a single thread was the recipient of all of the scalars, one from each thread.
+overhead of sending packets for a single scalar was clearly significant. Also, a
+single thread was the recipient of all of the scalars, one from each thread.
 That same thread then calculated the global reduction, then sent the result to
 every other threads. This caused a single thread to have an ever increasing
 amount of work to do compared to other threads, a problem that became worse as
@@ -191,16 +191,16 @@ CPU cores available, this is a worthwhile change.
 
 \subsubsection{Miscellaneous Changes}
 
-In addition to lower level changes, framework-specific changes were also made.
-For example, the original GMCF had one queue for each thread for each type of
-packet. Since a thread may be looking for a packet from a specific thread, the
-queues had to be iterated over to find a packet from the requested source
+In addition to the lower level changes, framework-specific changes were also
+made. For example, the original GMCF had one queue for each thread for each type
+of packet. Since a thread may be looking for a packet from a specific thread,
+the queues had to be iterated over to find a packet from the requested source
 thread. To prevent this, each thread had a map of queues for each packet type
-and each source thread. This meant that, to find a specific packet, only one
-queue had to be looked at and the required packet is guaranteed to be at the
-head of the queue. This map of FIFOs helped speed up the code that waited for
-and found packets, resulting in an overall performance improvement of nearly
-20\%.
+and each source thread. This increased FIFO granularity meant that, to find a
+specific packet, only one queue had to be looked at and the required packet is
+guaranteed to be at the head of the queue. This map of FIFOs helped speed up the
+code that waited for and found packets, resulting in an overall performance
+improvement of nearly 20\%.
 
 Another change was to remove the need to send ``REQDATA'' packets. This packet
 type is required for model coupling where a model can request data from another
@@ -279,3 +279,4 @@ padding and sleep had no effect on performance.
 
 This shows that there is no benefit from trying to pad the arrays since this
 will not improve performance.
+\\
